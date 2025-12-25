@@ -1,0 +1,283 @@
+New Terminal Output:
+
+root@acf1ecf3cb49:/app/src# cd /app/src
+root@acf1ecf3cb49:/app/src# grep -n '^[>]' -n program.cbl | head
+root@acf1ecf3cb49:/app/src# cat > program.cbl <<'COB'
+0).
+
+       01  WS-NUM.
+           05  WS-LOAN-AMT              PIC 9(13)V99 COMP-3.
+           05  WS-PROP-VAL              PIC 9(13)V99 COMP-3.
+           05  WS-DOWN-PAY              PIC 9(13)V99 COMP-3.
+           05  WS-MIN-DOWN              PIC 9(13)V99 COMP-3.
+           05  WS-RATE                  PIC 9(3)V9(5)  COMP-3.
+           05  WS-MONTHLY-RATE          PIC 9V9(9)     COMP-3.
+           05  WS-BALANCE               PIC 9(13)V99 COMP-3.
+           05  WS-PAYMENT               PIC 9(13)V99 COMP-3.
+           05  WS-INTEREST              PIC 9(13)V99 COMP-3.
+           05  WS-PRINCIPAL             PIC 9(13)V99 COMP-3.
+
+       01  WS-TERM.
+           05  WS-TERM-YEARS            PIC 9(3) COMP.
+           05  WS-TERM-MONTHS           PIC 9(5) COMP.
+           05  WS-MONTH                 PIC 9(5) COMP.
+
+       01  WS-FORMULA.
+           05  WS-ONE                   PIC 9V9(18) COMP-3 VALUE 1.
+           05  WS-POW                   PIC 9V9(18) COMP-3.
+           05  WS-DENOM                 PIC 9V9(18) COMP-3.
+
+       01  WS-OUT.
+           05  WS-STATUS                PIC X(5).
+           05  WS-REASON                PIC X(50).
+
+       01  WS-SCHED-LINE.
+           05  SL-MONTH                 PIC 9(3).
+           05  FILLER                   PIC X VALUE SPACE.
+           05  SL-PAY                   PIC 9(8).99.
+           05  FILLER                   PIC X VALUE SPACE.
+           05  SL-INT                   PIC 9(8).99.
+           05  FILLER                   PIC X VALUE SPACE.
+           05  SL-PRN                   PIC 9(8).99.
+           05  FILLER                   PIC X VALUE SPACE.
+           05  SL-BAL                   PIC 9(10).99.
+
+       PROCEDURE DIVISION.
+       MAIN.
+           OPEN INPUT IN-FILE
+                OUTPUT OUT-FILE
+
+           PERFORM UNTIL WS-EOF = "Y"
+               READ IN-FILE
+                   AT END
+                       MOVE "Y" TO WS-EOF
+                   NOT AT END
+                       PERFORM PROCESS-REC
+               END-READ
+           END-PERFORM
+
+           CLOSE IN-FILE OUT-FILE
+           STOP RUN.
+
+       PROCESS-REC.
+           PERFORM PARSE-INPUT
+           PERFORM CONVERT-FIELDS
+           PERFORM CHECK-APPLICATION.
+
+       PARSE-INPUT.
+           MOVE SPACES TO WS-PARSED
+           UNSTRING IN-REC DELIMITED BY ";"
+               INTO WS-ID
+                    WS-NAME
+                    WS-LOAN-STR
+                    WS-PROP-STR
+                    WS-DOWN-STR
+                    WS-TERM-STR
+                    WS-RATE-STR
+           END-UNSTRING.
+
+       CONVERT-FIELDS.
+           MOVE FUNCTION NUMVAL(WS-LOAN-STR) TO WS-LOAN-AMT
+           MOVE FUNCTION NUMVAL(WS-PROP-STR) TO WS-PROP-VAL
+           MOVE FUNCTION NUMVAL(WS-DOWN-STR) TO WS-DOWN-PAY
+           MOVE FUNCTION NUMVAL(WS-TERM-STR) TO WS-TERM-YEARS
+
+           IF WS-RATE-STR = SPACES
+               MOVE 0 TO WS-RATE
+           ELSE
+               IF FUNCTION INDEX(WS-RATE-STR, ".") > 0
+                   MOVE FUNCTION NUMVAL(WS-RATE-STR) TO WS-RATE
+               ELSE
+                   COMPUTE WS-RATE ROUNDED =
+ >        IDENTIFICATION DIVISION.
+>        PROGRAM-ID. PROGRAM.
+   >
+ >        ENVIRONMENT DIVISION.
+  >        INPUT-OUTPUT SECTION.
+-APPLICA>        FILE-CONTROL.
+>            SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>            SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>
+>        DATA DIVISION.
+>        FILE SECTION.
+>        FD  IN-FILE.
+>        01  IN-REC                       PIC X(256).
+RITE->
+>        FD  OUT-FILE.
+>        01  OUT-REC                      PIC X(200).
+I>
+T>        WORKING-STORAGE SECTION.
+ T>        77  WS-EOF                       PIC X VALUE "N".
+ >
+ >        01  WS-PARSED.
+B>            05  WS-ID                    PIC X(10).
+>            05  WS-NAME                  PIC X(30).
+PRO>            05  WS-LOAN-STR              PIC X(40).
+>            05  WS-PROP-STR              PIC X(40).
+>            05  WS-DOWN-STR              PIC X(40).
+>            05  WS-TERM-STR              PIC X(10).
+ >            05  WS-RATE-STR              PIC X(20).
+>
+>        01  WS-NUM.
+S->            05  WS-LOAN-AMT              PIC 9(13)V99 COMP-3.
+D>            05  WS-PROP-VAL              PIC 9(13)V99 COMP-3.
+>            05  WS-DOWN-PAY              PIC 9(13)V99 COMP-3.
+IF >            05  WS-MIN-DOWN              PIC 9(13)V99 COMP-3.
+>            05  WS-RATE                  PIC 9(3)V9(5)  COMP-3.
+>            05  WS-MONTHLY-RATE          PIC 9V9(9)     COMP-3.
+>            05  WS-BALANCE               PIC 9(13)V99 COMP-3.
+>            05  WS-PAYMENT               PIC 9(13)V99 COMP-3.
+>            05  WS-INTEREST              PIC 9(13)V99 COMP-3.
+>            05  WS-PRINCIPAL      
+[... output limited to 10000 bytes; 69 interior bytes omitted ...]
+ 9(8).99.
+>            05  FILLER                   PIC X VALUE SPACE.
+>            05  SL-INT                   PIC 9(8).99.
+>            05  FILLER                   PIC X VALUE SPACE.
+>            05  SL-PRN                   PIC 9(8).99.
+>            05  FILLER                   PIC X VALUE SPACE.
+>            05  SL-BAL                   PIC 9(10).99.
+>
+>        PROCEDURE DIVISION.
+>        MAIN.
+>            OPEN INPUT IN-FILE
+>                 OUTPUT OUT-FILE
+>
+>            PERFORM UNTIL WS-EOF = "Y"
+>                READ IN-FILE
+>                    AT END
+>                        MOVE "Y" TO WS-EOF
+>                    NOT AT END
+>                        PERFORM PROCESS-REC
+>                END-READ
+>            END-PERFORM
+>
+>            CLOSE IN-FILE OUT-FILE
+>            STOP RUN.
+>
+>        PROCESS-REC.
+>            PERFORM PARSE-INPUT
+>            PERFORM CONVERT-FIELDS
+>            PERFORM CHECK-APPLICATION.
+>
+>        PARSE-INPUT.
+>            MOVE SPACES TO WS-PARSED
+>            UNSTRING IN-REC DELIMITED BY ";"
+>                INTO WS-ID
+>                     WS-NAME
+>                     WS-LOAN-STR
+>                     WS-PROP-STR
+>                     WS-DOWN-STR
+>                     WS-TERM-STR
+>                     WS-RATE-STR
+>            END-UNSTRING.
+>
+>        CONVERT-FIELDS.
+>            MOVE FUNCTION NUMVAL(WS-LOAN-STR) TO WS-LOAN-AMT
+>            MOVE FUNCTION NUMVAL(WS-PROP-STR) TO WS-PROP-VAL
+>            MOVE FUNCTION NUMVAL(WS-DOWN-STR) TO WS-DOWN-PAY
+>            MOVE FUNCTION NUMVAL(WS-TERM-STR) TO WS-TERM-YEARS
+>
+>            IF WS-RATE-STR = SPACES
+>                MOVE 0 TO WS-RATE
+>            ELSE
+>                IF FUNCTION INDEX(WS-RATE-STR, ".") > 0
+>                    MOVE FUNCTION NUMVAL(WS-RATE-STR) TO WS-RATE
+>                ELSE
+>                    COMPUTE WS-RATE ROUNDED =
+>                        FUNCTION NUMVAL(WS-RATE-STR) / 100
+>                END-IF
+>            END-IF.
+>
+>        CHECK-APPLICATION.
+>            COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP-VAL * 0.15
+>
+>            IF WS-DOWN-PAY < WS-MIN-DOWN
+>                MOVE "DENY " TO WS-STATUS
+>                MOVE "INSUFFICIENT FUNDS FOR DOWN PAYMENT" TO WS-REASON
+>                PERFORM WRITE-DENY
+>            ELSE
+>                MOVE "APPRO" TO WS-STATUS
+>                PERFORM WRITE-APPRO
+>                PERFORM BUILD-SCHEDULE
+>            END-IF.
+>
+>        WRITE-DENY.
+>            MOVE SPACES TO OUT-REC
+>            STRING WS-ID WS-STATUS WS-REASON
+>                DELIMITED BY SIZE
+>                INTO OUT-REC
+>            END-STRING
+>            WRITE OUT-REC.
+>
+>        WRITE-APPRO.
+>            MOVE SPACES TO OUT-REC
+>            STRING WS-ID WS-STATUS
+>                DELIMITED BY SIZE
+>                INTO OUT-REC
+>            END-STRING
+>            WRITE OUT-REC.
+>
+>        BUILD-SCHEDULE.
+>            COMPUTE WS-TERM-MONTHS = WS-TERM-YEARS * 12
+>            IF WS-TERM-MONTHS <= 0
+>                EXIT PARAGRAPH
+>            END-IF
+>
+>            COMPUTE WS-MONTHLY-RATE ROUNDED = WS-RATE / 1200
+>            MOVE WS-LOAN-AMT TO WS-BALANCE
+>
+>            IF WS-MONTHLY-RATE = 0
+>                COMPUTE WS-PAYMENT ROUNDED =
+>                    WS-LOAN-AMT / WS-TERM-MONTHS
+>            ELSE
+>                COMPUTE WS-POW =
+>                    (WS-ONE + WS-MONTHLY-RATE) ** (0 - WS-TERM-MONTHS)
+>                COMPUTE WS-DENOM ROUNDED = WS-ONE - WS-POW
+>                COMPUTE WS-PAYMENT ROUNDED =
+>                    WS-LOAN-AMT * WS-MONTHLY-RATE / WS-DENOM
+>            END-IF
+>
+>            PERFORM VARYING WS-MONTH FROM 1 BY 1
+>                UNTIL WS-MONTH > WS-TERM-MONTHS
+>
+>                COMPUTE WS-INTEREST ROUNDED =
+>                    WS-BALANCE * WS-MONTHLY-RATE
+>                COMPUTE WS-PRINCIPAL ROUNDED =
+>                    WS-PAYMENT - WS-INTEREST
+>
+>                IF WS-MONTH = WS-TERM-MONTHS
+>                    MOVE WS-BALANCE TO WS-PRINCIPAL
+>                    COMPUTE WS-PAYMENT ROUNDED =
+>                        WS-INTEREST + WS-PRINCIPAL
+>                END-IF
+>
+>                COMPUTE WS-BALANCE ROUNDED =
+>                    WS-BALANCE - WS-PRINCIPAL
+>                IF WS-BALANCE < 0
+>                    MOVE 0 TO WS-BALANCE
+>                END-IF
+>
+>                PERFORM WRITE-SCHEDULE-LINE
+>
+>            END-PERFORM.
+>
+>        WRITE-SCHEDULE-LINE.
+>            MOVE WS-MONTH TO SL-MONTH
+>            MOVE WS-PAYMENT TO SL-PAY
+>            MOVE WS-INTEREST TO SL-INT
+>            MOVE WS-PRINCIPAL TO SL-PRN
+>            MOVE WS-BALANCE TO SL-BAL
+>            MOVE WS-SCHED-LINE TO OUT-REC
+>            WRITE OUT-REC.
+> COB
+root@acf1ecf3cb49:/app/src# cobc -x program.cbl -o program
+program.cbl: in paragraph 'CONVERT-FIELDS':
+program.cbl:112: error: FUNCTION 'INDEX' unknown
+root@acf1ecf3cb49:/app/src# ./program
+bash: ./program: No such file or directory
+root@acf1ecf3cb49:/app/src# sed -n '1,120p' /app/data/OUTPUT.DAT
+
+root@acf1ecf3cb49:/app/src#

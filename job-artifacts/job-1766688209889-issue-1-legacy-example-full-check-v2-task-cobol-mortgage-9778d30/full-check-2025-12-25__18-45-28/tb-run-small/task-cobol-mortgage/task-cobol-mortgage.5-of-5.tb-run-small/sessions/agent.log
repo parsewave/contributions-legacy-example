@@ -1,0 +1,418 @@
+[?2004hroot@907522a370a1:/app# asciinema rec --stdin /logs/agent.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@907522a370a1:/app# clear
+[?2004l[H[J[3J[?2004hroot@907522a370a1:/app# mkdir -p /app/src
+[?2004l[?2004hroot@907522a370a1:/app# cat > /app/src/program.cbl <<'EOF'
+[?2004l[?2004h> IDENTIFICATION DIVISION.
+[?2004l[?2004h> PROGRAM-ID. MORTGAGE-PROCESSOR.
+[?2004l[?2004h> AUTHOR. CHATGPT.
+[?2004l[?2004h> 
+[?2004l[?2004h> ENVIRONMENT DIVISION.
+[?2004l[?2004h> INPUT-OUTPUT SECTION.
+[?2004l[?2004h> FILE-CONTROL.
+[?2004l[?2004h>     SELECT INPUT-FILE ASSIGN TO '/app/src/INPUT.DAT'
+[?2004l[?2004h>         ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>     SELECT OUTPUT-FILE ASSIGN TO '/app/data/OUTPUT.DAT'
+[?2004l[?2004h>         ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> 
+[?2004l[?2004h> DATA DIVISION.
+[?2004l[?2004h> FILE SECTION.
+[?2004l[?2004h> FD  INPUT-FILE.
+[?2004l[?2004h> 01  INPUT-REC.
+[?2004l[?2004h>     05  IN-ID               PIC X(10).
+[?2004l[?2004h>     05  IN-NAME             PIC X(30).
+[?2004l[?2004h>     05  IN-LOAN-AMOUNT      PIC 9(10).
+[?2004l[?2004h>     05  IN-PROP-VALUE       PIC 9(10).
+[?2004l[?2004h>     05  IN-DOWN-PAYMENT     PIC 9(10).
+[?2004l[?2004h>     05  IN-TERM             PIC 9(2).
+[?2004l[?2004h>     05  IN-RATE             PIC 9(3)V9(2).
+[?2004l[?2004h> FD  OUTPUT-FILE.
+[?2004l[?2004h> 01  OUTPUT-REC            PIC X(200).
+[?2004l[?2004h> 
+[?2004l[?2004h> WORKING-STORAGE SECTION.
+[?2004l[?2004h> 01  WS-MIN-DOWN            PIC 9(10)V9(2).
+[?2004l[?2004h> 01  WS-MONTHLY-RATE       PIC 9(5)V9(6).
+[?2004l[?2004h> 01  WS-MONTHLY-PAYMENT    PIC 9(10)V9(2).
+[?2004l[?2004h> 01  WS-BALANCE            PIC 9(10)V9(2).
+[?2004l[?2004h> 01  WS-INTEREST           PIC 9(10)V9(2).
+[?2004l[?2004h> 01  WS-PRINCIPAL          PIC 9(10)V9(2).
+[?2004l[?2004h> 01  WS-MONTH-NUM          PIC 9(3).
+[?2004l[?2004h> 01  WS-REASON             PIC X(50).
+[?2004l[?2004h> 01  WS-STATUS             PIC X(5).
+[?2004l[?2004h> 01  WS-SPACE              PIC X VALUE SPACE.
+[?2004l[?2004h> 
+[?2004l[?2004h> PROCEDURE DIVISION.
+[?2004l[?2004h>     OPEN INPUT INPUT-FILE
+[?2004l[?2004h>     OPEN OUTPUT OUTPUT-FILE
+[?2004l[?2004h>     PERFORM UNTIL EOF
+[?2004l[?2004h>         READ INPUT-FILE AT END SET EOF TO TRUE
+[?2004l[?2004h>         NOT AT END
+[?2004l[?2004h>             PERFORM PROCESS-RECORD
+[?2004l[?2004h>         END-READ
+[?2004l[?2004h>     END-PERFORM
+[?2004l[?2004h>     CLOSE INPUT-FILE
+[?2004l[?2004h>     CLOSE OUTPUT-FILE
+[?2004l[?2004h>     STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h> PROCESS-RECORD.
+[?2004l[?2004h>     UNSTRING INPUT-REC DELIMITED BY ';'
+[?2004l[?2004h>         INTO IN-ID, IN-NAME, IN-LOAN-AMOUNT, IN-PROP-VALUE,
+[?2004l[?2004h>              IN-DOWN-PAYMENT, IN-TERM, IN-RATE.
+[?2004l[?2004h>     COMPUTE WS-MIN-DOWN = IN-PROP-VALUE * 0.15 ROUNDED.
+[?2004l[?2004h>     IF IN-DOWN-PAYMENT < WS-MIN-DOWN
+[?2004l[?2004h>         MOVE 'DENY' TO WS-STATUS
+[?2004l[?2004h>         MOVE 'INSUFFICIENT FUNDS FOR DOWN PAYMENT' TO WS-REASON
+[?2004l[?2004h>         STRING IN-ID WS-STATUS WS-SPACE WS-REASON
+[?2004l[?2004h>             INTO OUTPUT-REC
+[?2004l[?2004h>         END-STRING
+[?2004l[?2004h>         WRITE OUTPUT-REC
+[?2004l[?2004h>     ELSE
+[?2004l[?2004h>         MOVE 'APPRO' TO WS-STATUS
+[?2004l[?2004h>         STRING IN-ID WS-STATUS INTO OUTPUT-REC END-STRING
+[?2004l[?2004h>         WRITE OUTPUT-REC
+[?2004l[?2004h>         MOVE IN-LOAN-AMOUNT TO WS-BALANCE
+[?2004l[?2004h>         COMPUTE WS-MONTHLY-RATE = IN-RATE / 1200 ROUNDED
+[?2004l[?2004h>         COMPUTE WS-MONTHLY-PAYMENT = IN-LOAN-AMOUNT * WS-MONTHLY-RATE /
+[?2004l[?2004h>             (1 - (1 + WS-MONTHLY-RATE) ** (- IN-TERM)) ROUNDED
+[?2004l[?2004h>         PERFORM VARYING WS-MONTH-NUM FROM 1 BY 1 UNTIL WS-MONTH-NUM > IN-TERM
+[?2004l[?2004h>             COMPUTE WS-INTEREST = WS-BALANCE * WS-MONTHLY-RATE ROUNDED
+[?2004l[?2004h>             COMPUTE WS-PRINCIPAL = WS-MONTHLY-PAYMENT - WS-INTEREST ROUNDED
+[?2004l[?2004h>             SUBTRACT WS-PRINCIPAL FROM WS-BALANCE GIVING WS-BALANCE ROUNDED
+[?2004l[?2004h>             MOVE WS-MONTH-NUM TO WS-MONTH-NUM
+[?2004l[?2004h>             STRING
+[?2004l[?2004h>                 FUNCTION REVERSE(FUNCTION TRIM(WS-MONTH-NUM))
+[?2004l[?2004h>                 " "
+[?2004l[?2004h>                 WS-MONTHLY-PAYMENT " "
+[?2004l[?2004h>                 WS-INTEREST " "
+[?2004l[?2004h>                 WS-PRINCIPAL " "
+[?2004l[?2004h>                 WS-BALANCE
+[?2004l[?2004h>                 INTO OUTPUT-REC
+[?2004l[?2004h>             END-STRING
+[?2004l[?2004h>             WRITE OUTPUT-REC
+[?2004l[?2004h>         END-PERFORM
+[?2004l[?2004h>     END-IF.
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@907522a370a1:/app# cd /app/src
+[?2004l[?2004hroot@907522a370a1:/app/src# cobc -x program.cbl -o program
+[?2004lprogram.cbl:1: error: invalid indicator 'F' at column 7
+program.cbl:2: error: invalid indicator 'M' at column 7
+program.cbl:3: error: invalid indicator '.' at column 7
+program.cbl:5: error: invalid indicator 'N' at column 7
+program.cbl:6: error: invalid indicator 'O' at column 7
+program.cbl:7: error: invalid indicator 'O' at column 7
+program.cbl:8: error: invalid indicator 'L' at column 7
+program.cbl:10: error: invalid indicator 'L' at column 7
+program.cbl:13: error: invalid indicator 'I' at column 7
+program.cbl:14: error: invalid indicator 'E' at column 7
+program.cbl:15: error: invalid indicator 'P' at column 7
+program.cbl:16: error: invalid indicator 'P' at column 7
+program.cbl:24: error: invalid indicator 'T' at column 7
+program.cbl:25: error: invalid indicator 'T' at column 7
+program.cbl:27: error: invalid indicator 'G' at column 7
+program.cbl:28: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:29: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:30: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:31: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:32: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:33: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:34: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:35: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:36: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:37: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:39: error: invalid indicator 'U' at column 7
+program.cbl:40: error: invalid indicator 'E' at column 7
+program.cbl:41: error: invalid indicator 'E' at column 7
+program.cbl:42: error: invalid indicator 'R' at column 7
+program.cbl:48: error: invalid indicator 'O' at column 7
+program.cbl:49: error: invalid indicator 'O' at column 7
+program.cbl:50: error: invalid indicator 'O' at column 7
+program.cbl:52: error: invalid indicator 'S' at column 7
+program.cbl:53: error: invalid indicator 'S' at column 7
+program.cbl:56: error: invalid indicator 'M' at column 7
+program.cbl:64: error: invalid indicator 'S' at column 7
+program.cbl:9: error: PROGRAM-ID header missing
+program.cbl:9: error: PROCEDURE DIVISION header missing
+program.cbl:9: error: syntax error, unexpected ORGANIZATION
+program.cbl:11: error: syntax error, unexpected ORGANIZATION
+program.cbl:17: error: unknown statement 'IN-ID'
+program.cbl:18: error: unknown statement 'IN-NAME'
+program.cbl:19: error: unknown statement 'IN-LOAN-AMOUNT'
+program.cbl:20: error: unknown statement 'IN-PROP-VALUE'
+program.cbl:21: error: unknown statement 'IN-DOWN-PAYMENT'
+program.cbl:22: error: unknown statement 'IN-TERM'
+program.cbl:23: error: invalid PICTURE character 'M'
+program.cbl:23: error: invalid PICTURE character 'I'
+program.cbl:23: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+program.cbl:23: error: D must be followed by B
+program.cbl:23: error: invalid PICTURE character 'O'
+program.cbl:23: error: invalid PICTURE character 'W'
+program.cbl:23: error: . cannot follow V
+program.cbl:23: error: N cannot follow .
+program.cbl:23: error: N cannot follow 9
+program.cbl:23: error: N cannot follow V
+program.cbl:23: error: a leading +/- sign cannot follow .
+program.cbl:23: error: a leading +/- sign cannot follow 9
+program.cbl:23: error: a leading +/- sign cannot follow V
+program.cbl:23: error: a leading +/- sign cannot follow N
+program.cbl:23: error: CR or DB cannot follow a leading +/- sign
+program.cbl:23: error: CR or DB cannot follow N
+program.cbl:23: error: N cannot follow a leading +/- sign
+program.cbl:23: error: N cannot follow CR or DB
+program.cbl:23: error: unknown statement 'IN-RATE'
+program.cbl:23: error: invalid PICTURE character 'M'
+program.cbl:23: error: invalid PICTURE character 'O'
+program.cbl:23: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+program.cbl:23: error: invalid PICTURE character 'T'
+program.cbl:23: error: invalid PICTURE character 'H'
+program.cbl:23: error: invalid PICTURE character 'L'
+program.cbl:23: error: invalid PICTURE character 'Y'
+program.cbl:23: error: invalid PICTURE character 'R'
+program.cbl:23: error: invalid PICTURE character 'E'
+program.cbl:23: error: . cannot follow V
+program.cbl:23: error: N cannot follow .
+program.cbl:23: error: N cannot follow 9
+program.cbl:23: error: N cannot follow V
+program.cbl:23: error: a leading +/- sign cannot follow .
+program.cbl:23: error: a leading +/- sign cannot follow 9
+program.cbl:23: error: a leading +/- sign cannot follow V
+program.cbl:23: error: a leading +/- sign cannot follow N
+program.cbl:23: error: A or X cannot follow .
+program.cbl:23: error: A or X cannot follow a leading +/- sign
+program.cbl:23: error: A or X cannot follow V
+program.cbl:23: error: A or X cannot follow N
+program.cbl:23: error: E cannot follow A or X
+program.cbl:23: error: E cannot follow V
+program.cbl:23: error: E cannot follow N
+program.cbl:23: error: invalid PICTURE character 'M'
+program.cbl:23: error: invalid PICTURE character 'O'
+program.cbl:23: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+program.cbl:23: error: invalid PICTURE character 'T'
+program.cbl:23: error: invalid PICTURE character 'H'
+program.cbl:23: error: invalid PICTURE character 'L'
+program.cbl:23: error: invalid PICTURE character 'Y'
+program.cbl:23: error: P must be at start or end of PICTURE string
+program.cbl:23: error: invalid PICTURE character 'E'
+program.cbl:23: error: . cannot follow V
+program.cbl:23: error: N cannot follow .
+program.cbl:23: error: N cannot follow 9
+program.cbl:23: error: N cannot follow V
+program.cbl:23: error: a leading +/- sign cannot follow .
+program.cbl:23: error: a leading +/- sign cannot follow 9
+program.cbl:23: error: a leading +/- sign cannot follow V
+program.cbl:23: error: a leading +/- sign cannot follow N
+program.cbl:23: error: a P which is after the decimal point cannot follow .
+program.cbl:23: error: a P which is after the decimal point cannot follow 9
+program.cbl:23: error: a P which is after the decimal point cannot follow N
+program.cbl:23: error: A or X cannot follow .
+program.cbl:23: error: A or X cannot follow a leading +/- sign
+program.cbl:23: error: A or X cannot follow V
+program.cbl:23: error: A or X cannot follow a P which is after the decimal point
+program.cbl:23: error: A or X cannot follow N
+program.cbl:23: error: E cannot follow A or X
+program.cbl:23: error: E cannot follow V
+program.cbl:23: error: E cannot follow a P which is after the decimal point
+program.cbl:23: error: E cannot follow N
+program.cbl:23: error: N cannot follow a leading +/- sign
+program.cbl:23: error: N cannot follow A or X
+program.cbl:23: error: N cannot follow a P which is after the decimal point
+program.cbl:23: error: N cannot follow E
+program.cbl:23: error: invalid PICTURE character 'L'
+program.cbl:23: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+program.cbl:23: error: C must be followed by R
+program.cbl:23: error: invalid PICTURE character 'E'
+program.cbl:23: error: . cannot follow V
+program.cbl:23: error: A or X cannot follow .
+program.cbl:23: error: A or X cannot follow V
+program.cbl:23: error: N cannot follow .
+program.cbl:23: error: N cannot follow 9
+program.cbl:23: error: N cannot follow A or X
+program.cbl:23: error: N cannot follow V
+program.cbl:23: error: CR or DB cannot follow A or X
+program.cbl:23: error: CR or DB cannot follow N
+program.cbl:23: error: E cannot follow CR or DB
+program.cbl:23: error: E cannot follow A or X
+program.cbl:23: error: E cannot follow V
+program.cbl:23: error: E cannot follow N
+program.cbl:23: error: invalid PICTURE character 'I'
+program.cbl:23: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+program.cbl:23: error: invalid PICTURE character 'T'
+program.cbl:23: error: invalid PICTURE character 'E'
+program.cbl:23: error: invalid PICTURE character 'R'
+cobc: too many errors [-fmax-errors=128]
+
+cobc: aborting compile of program.cbl at line 23 (PROGRAM-ID: program)
+[?2004hroot@907522a370a1:/app/src# ./program
+[?2004lbash: ./program: No such file or directory
+[?2004hroot@907522a370a1:/app/src# cat /app/data/OUTPUT.DAT
+[?2004l
+[?2004hroot@907522a370a1:/app/src# rm -f /app/src/program.cbl
+[?2004l[?2004hroot@907522a370a1:/app/src# cat > /app/src/program.cbl <<'EOF'
+[?2004l[?2004h>       IDENTIFICATION DIVISION.
+[?2004l[?2004h>       PROGRAM-ID. MORTGAGE-PROCESSOR.
+[?2004l[?2004h> 
+[?2004l[?2004h>       ENVIRONMENT DIVISION.
+[?2004l[?2004h>       INPUT-OUTPUT SECTION.
+[?2004l[?2004h>       FILE-CONTROL.
+[?2004l[?2004h>           SELECT INPUT-FILE ASSIGN TO '/app/src/INPUT.DAT'
+[?2004l[?2004h>               ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>           SELECT OUTPUT-FILE ASSIGN TO '/app/data/OUTPUT.DAT'
+[?2004l[?2004h>               ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> 
+[?2004l[?2004h>       DATA DIVISION.
+[?2004l[?2004h>       FILE SECTION.
+[?2004l[?2004h>       FD  INPUT-FILE.
+[?2004l[?2004h>       01  INPUT-REC.
+[?2004l[?2004h>           05  IN-ID               PIC X(10).
+[?2004l[?2004h>           05  IN-NAME             PIC X(30).
+[?2004l[?2004h>           05  IN-LOAN-AMOUNT      PIC 9(10).
+[?2004l[?2004h>           05  IN-PROP-VALUE       PIC 9(10).
+[?2004l[?2004h>           05  IN-DOWN-PAYMENT     PIC 9(10).
+[?2004l[?2004h>           05  IN-TERM             PIC 9(2).
+[?2004l[?2004h>           05  IN-RATE             PIC 9(3)V9(2).
+[?2004l[?2004h>       FD  OUTPUT-FILE.
+[?2004l[?2004h>       01  OUTPUT-REC            PIC X(200).
+[?2004l[?2004h> 
+[?2004l[?2004h>       WORKING-STORAGE SECTION.
+[?2004l[?2004h>       01  EOF-FLAG                 PIC X VALUE 'N'.
+[?2004l[?2004h>       01  WS-MIN-DOWN              PIC 9(10)V9(2).
+[?2004l[?2004h>       01  WS-MONTHLY-RATE         PIC 9(5)V9(6).
+[?2004l[?2004h>       01  WS-MONTHLY-PAYMENT      PIC 9(10)V9(2).
+[?2004l[?2004h>       01  WS-DENOMINATOR          PIC 9(10)V9(6).
+[?2004l[?2004h>       01  WS-BALANCE              PIC 9(10)V9(2).
+[?2004l[?2004h>       01  WS-INTEREST             PIC 9(10)V9(2).
+[?2004l[?2004h>       01  WS-PRINCIPAL            PIC 9(10)V9(2).
+[?2004l[?2004h>       01  WS-MONTH-NUM            PIC 9(3).
+[?2004l[?2004h>       01  WS-SPACE                PIC X VALUE SPACE.
+[?2004l[?2004h>       01  WS-STATUS               PIC X(5).
+[?2004l[?2004h>       01  WS-REASON               PIC X(50).
+[?2004l[?2004h> 
+[?2004l[?2004h>       PROCEDURE DIVISION.
+[?2004l[?2004h>           OPEN INPUT INPUT-FILE
+[?2004l[?2004h>           OPEN OUTPUT OUTPUT-FILE
+[?2004l[?2004h>           PERFORM UNTIL EOF-FLAG = 'Y'
+[?2004l[?2004h>               READ INPUT-FILE AT END MOVE 'Y' TO EOF-FLAG
+[?2004l[?2004h>                   NOT AT END
+[?2004l[?2004h>                       PERFORM PROCESS-RECORD
+[?2004l[?2004h>               END-READ
+[?2004l[?2004h>           END-PERFORM
+[?2004l[?2004h>           CLOSE INPUT-FILE
+[?2004l[?2004h>           CLOSE OUTPUT-FILE
+[?2004l[?2004h>           STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h>       PROCESS-RECORD.
+[?2004l[?2004h>           UNSTRING INPUT-REC DELIMITED BY ';'
+[?2004l[?2004h>               INTO IN-ID, IN-NAME, IN-LOAN-AMOUNT, IN-PROP-VALUE,
+[?2004l[?2004h>                    IN-DOWN-PAYMENT, IN-TERM, IN-RATE.
+[?2004l[?2004h>           COMPUTE WS-MIN-DOWN = IN-PROP-VALUE * 0.15 ROUNDED.
+[?2004l[?2004h>           IF IN-DOWN-PAYMENT < WS-MIN-DOWN
+[?2004l[?2004h>               MOVE 'DENY' TO WS-STATUS
+[?2004l[?2004h>               MOVE 'INSUFFICIENT FUNDS FOR DOWN PAYMENT' TO WS-REASON
+[?2004l[?2004h>               STRING IN-ID WS-SPACE WS-STATUS WS-SPACE WS-REASON
+[?2004l[?2004h>                   INTO OUTPUT-REC
+[?2004l[?2004h>               END-STRING
+[?2004l[?2004h>               WRITE OUTPUT-REC
+[?2004l[?2004h>           ELSE
+[?2004l[?2004h>               MOVE 'APPRO' TO WS-STATUS
+[?2004l[?2004h>               STRING IN-ID WS-SPACE WS-STATUS INTO OUTPUT-REC END-STRING
+[?2004l[?2004h>               WRITE OUTPUT-REC
+[?2004l[?2004h>               MOVE IN-LOAN-AMOUNT TO WS-BALANCE
+[?2004l[?2004h>               COMPUTE WS-MONTHLY-RATE = IN-RATE / 1200 ROUNDED
+[?2004l[?2004h>               COMPUTE WS-DENOMINATOR = 1 - (1 + WS-MONTHLY-RATE) ** (-IN-TERM)
+[?2004l[?2004h>               COMPUTE WS-MONTHLY-PAYMENT = IN-LOAN-AMOUNT * WS-MONTHLY-RATE /
+[?2004l[?2004h>                       WS-DENOMINATOR ROUNDED
+[?2004l[?2004h>               PERFORM VARYING WS-MONTH-NUM FROM 1 BY 1 UNTIL WS-MONTH-NUM > IN-TERM
+[?2004l[?2004h>                   COMPUTE WS-INTEREST = WS-BALANCE * WS-MONTHLY-RATE ROUNDED
+[?2004l[?2004h>                   COMPUTE WS-PRINCIPAL = WS-MONTHLY-PAYMENT - WS-INTEREST ROUNDED
+[?2004l[?2004h>                   SUBTRACT WS-PRINCIPAL FROM WS-BALANCE GIVING WS-BALANCE ROUNDED
+[?2004l[?2004h>                   STRING WS-MONTH-NUM WS-SPACE WS-MONTHLY-PAYMENT WS-SPACE
+[?2004l[?2004h>                          WS-INTEREST WS-SPACE WS-PRINCIPAL WS-SPACE WS-BALANCE
+[?2004l[?2004h>                       INTO OUTPUT-REC
+[?2004l[?2004h>                   END-STRING
+[?2004l[?2004h>                   WRITE OUTPUT-REC
+[?2004l[?2004h>               END-PERFORM
+[?2004l[?2004h>           END-IF.
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@907522a370a1:/app/src# cd /app/src
+[?2004l[?2004hroot@907522a370a1:/app/src# cobc -x -fixed program.cbl -o program
+[?2004lprogram.cbl:1: error: invalid indicator 'I' at column 7
+program.cbl:2: error: invalid indicator 'P' at column 7
+program.cbl:4: error: invalid indicator 'E' at column 7
+program.cbl:5: error: invalid indicator 'I' at column 7
+program.cbl:6: error: invalid indicator 'F' at column 7
+program.cbl:13: error: invalid indicator 'F' at column 7
+program.cbl:14: error: invalid indicator 'F' at column 7
+program.cbl:15: error: invalid indicator '0' at column 7
+program.cbl:23: error: invalid indicator 'F' at column 7
+program.cbl:24: error: invalid indicator '0' at column 7
+program.cbl:26: error: invalid indicator 'W' at column 7
+program.cbl:27: error: invalid indicator '0' at column 7
+program.cbl:28: error: invalid indicator '0' at column 7
+program.cbl:29: error: invalid indicator '0' at column 7
+program.cbl:30: error: invalid indicator '0' at column 7
+program.cbl:31: error: invalid indicator '0' at column 7
+program.cbl:32: error: invalid indicator '0' at column 7
+program.cbl:33: error: invalid indicator '0' at column 7
+program.cbl:34: error: invalid indicator '0' at column 7
+program.cbl:35: error: invalid indicator '0' at column 7
+program.cbl:36: error: invalid indicator '0' at column 7
+program.cbl:37: error: invalid indicator '0' at column 7
+program.cbl:38: error: invalid indicator '0' at column 7
+program.cbl:40: error: invalid indicator 'P' at column 7
+program.cbl:53: error: invalid indicator 'P' at column 7
+program.cbl:7: error: PROGRAM-ID header missing
+program.cbl:7: error: ENVIRONMENT DIVISION header missing
+program.cbl:7: error: INPUT-OUTPUT SECTION header missing
+program.cbl:7: error: FILE-CONTROL header missing
+program.cbl:7: error: missing file description for FILE INPUT-FILE
+program.cbl:9: error: missing file description for FILE OUTPUT-FILE
+program.cbl:16: error: PROCEDURE DIVISION header missing
+program.cbl:16: error: syntax error, unexpected level-number
+program.cbl:17: error: unknown statement '05'
+program.cbl:18: error: unknown statement '05'
+program.cbl:19: error: unknown statement '05'
+program.cbl:20: error: unknown statement '05'
+program.cbl:21: error: unknown statement '05'
+program.cbl:22: error: unknown statement '05'
+program.cbl:43: error: 'EOF-FLAG' is not defined
+program.cbl:54: error: 'INPUT-REC' is not defined
+program.cbl:55: error: 'IN-ID' is not defined
+program.cbl:55: error: 'IN-NAME' is not defined
+program.cbl:55: error: 'IN-LOAN-AMOUNT' is not defined
+program.cbl:55: error: 'IN-PROP-VALUE' is not defined
+program.cbl:56: error: 'IN-DOWN-PAYMENT' is not defined
+program.cbl:56: error: 'IN-TERM' is not defined
+program.cbl:56: error: 'IN-RATE' is not defined
+program.cbl:57: error: 'WS-MIN-DOWN' is not defined
+program.cbl:57: error: syntax error, unexpected ROUNDED
+program.cbl:59: error: 'WS-STATUS' is not defined
+program.cbl:60: error: 'WS-REASON' is not defined
+program.cbl:61: error: 'WS-SPACE' is not defined
+program.cbl:62: error: 'OUTPUT-REC' is not defined
+program.cbl:69: error: 'WS-BALANCE' is not defined
+program.cbl:70: error: 'WS-MONTHLY-RATE' is not defined
+program.cbl:70: error: syntax error, unexpected ROUNDED
+program.cbl:71: error: 'WS-DENOMINATOR' is not defined
+program.cbl:71: error: syntax error, unexpected IN
+program.cbl:72: error: 'WS-MONTHLY-PAYMENT' is not defined
+program.cbl:72: error: 'WS-MONTHLY-R' is not defined
+program.cbl:73: error: syntax error, unexpected Identifier
+program.cbl:74: error: 'WS-MONTH-NUM' is not defined
+program.cbl:74: error: 'WS-MONTH-NU' is not defined
+program.cbl:75: error: 'WS-INTEREST' is not defined
+program.cbl:75: error: syntax error, unexpected Identifier
+program.cbl:76: error: 'WS-PRINCIPAL' is not defined
+program.cbl:76: error: 'WS-INTERES' is not defined
+program.cbl:77: error: 'WS-BALANC' is not defined
+program.cbl:78: error: 'WS-SPA' is not defined
+program.cbl:79: error: 'WS-B' is not defined
+program.cbl:46: error: 'PROCESS-RECORD' is not defined
+[?2004hroot@907522a370a1:/app/src# ./program
+[?2004lbash: ./program: No such file or directory
+[?2004hroot@907522a370a1:/app/src# cat /app/data/OUTPUT.DAT
+[?2004l
+[?2004hroot@907522a370a1:/app/src# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/agent.cast[0m
+[?2004hroot@907522a370a1:/app# 

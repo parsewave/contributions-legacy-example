@@ -1,0 +1,49 @@
+New Terminal Output:
+
+root@b9423b228534:/app/src# cd /app/src
+root@b9423b228534:/app/src# python3 - <<'PY'
+> from pathlib import Path
+> p = Path('program.cbl')
+> lines = p.read_text().splitlines(True)
+> out = []
+> for line in lines:
+>     stripped = line.lstrip()
+>     # Insert "MOVE SPACES TO OUT-REC" right before STRINGs that build OUT-REC
+>     if stripped.startswith('STRING OUT-ID OUT-STATUS OUT-REASON'):
+>         indent = line[:len(line)-len(stripped)]
+>         out.append(f"{indent}MOVE SPACES TO OUT-REC\n")
+>         out.append(line)
+>         continue
+>     if stripped.startswith('STRING OUT-ID OUT-STATUS') and 'OUT-REASON' not in stripped:
+>         indent = line[:len(line)-len(stripped)]
+>         out.append(f"{indent}MOVE SPACES TO OUT-REC\n")
+>         out.append(line)
+>         continue
+>     if stripped.startswith('STRING SCH-MON'):
+>         indent = line[:len(line)-len(stripped)]
+>         out.append(f"{indent}MOVE SPACES TO OUT-REC\n")
+>         out.append(line)
+>         continue
+>     out.append(line)
+>
+> p.write_text(''.join(out))
+> PY
+root@b9423b228534:/app/src# awk 'length($0)>80{print NR ":" length($0) ":" $0}' program.cbl | head
+root@b9423b228534:/app/src# cobc -x -Wall program.cbl
+root@b9423b228534:/app/src# ./program
+root@b9423b228534:/app/src# sed -n '1,40p' ../data/OUTPUT.DAT
+APP0000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT
+APP0000002APPRO
+001 00002316.70 00002291.66 00000025.03 0000004974.96
+002 00002316.70 00002280.19 00000036.51 0000004938.44
+003 00002316.70 00002263.45 00000053.24 0000004885.20
+004 00002316.70 00002239.05 00000077.65 0000004807.54
+005 00002316.70 00002203.45 00000113.24 0000004694.30
+006 00002316.70 00002151.55 00000165.14 0000004529.15
+007 00002316.70 00002075.86 00000240.84 0000004288.31
+008 00002316.70 00001965.47 00000351.22 0000003937.09
+009 00002316.70 00001804.49 00000512.20 0000003424.88
+010 00002316.70 00001569.73 00000746.96 0000002677.92
+011 00002316.70 00001227.38 00001089.32 0000001588.59
+012 00002316.70 00000728.10 00001588.59 0000000000.00
+root@b9423b228534:/app/src#

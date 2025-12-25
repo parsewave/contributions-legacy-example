@@ -1,0 +1,69 @@
+[?2004hroot@0a79ae91ae01:/app# asciinema rec --stdin /logs/tests.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/tests.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@0a79ae91ae01:/app# clear
+[?2004l[H[J[3J[?2004hroot@0a79ae91ae01:/app# bash /tests/run-tests.sh; tmux wait -S done
+[?2004l[1m===================================================================== test session starts ======================================================================[0m
+platform linux -- Python 3.13.1, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /tests
+[1mcollecting ... [0m[1mcollected 4 items                                                                                                                                              [0m
+
+../tests/test_outputs.py::test_required_files_exist [32mPASSED[0m[32m                                                                                               [ 25%][0m
+../tests/test_outputs.py::test_fixed_format_constraints [32mPASSED[0m[32m                                                                                           [ 50%][0m
+../tests/test_outputs.py::test_data_files_exist [32mPASSED[0m[32m                                                                                                   [ 75%][0m
+../tests/test_outputs.py::test_program_output [31mFAILED[0m[31m                                                                                                     [100%][0m
+
+=========================================================================== FAILURES ===========================================================================
+[31m[1m_____________________________________________________________________ test_program_output ______________________________________________________________________[0m
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92mtest_program_output[39;49;00m():[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Test that the program produces the expected output and file contents"""[39;49;00m[90m[39;49;00m
+        initial_OUTPUT = [33m"[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+    [90m[39;49;00m
+        data_dir = Path([33m"[39;49;00m[33m/app/data[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+        (data_dir / [33m"[39;49;00m[33mOUTPUT.DAT[39;49;00m[33m"[39;49;00m).write_text(initial_OUTPUT)[90m[39;49;00m
+    [90m[39;49;00m
+        Path([33m"[39;49;00m[33m/app/src/INPUT.DAT[39;49;00m[33m"[39;49;00m).write_text([90m[39;49;00m
+    [33m"""APP0000001;Williams David Robert         ;2000000000;3500000000;0500000000;20;00550[39;49;00m
+    [33mAPP0000002;John Smith Clark              ;0000005000;0000004000;0000003500;01;00550"""[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+        [90m# Compile the COBOL program[39;49;00m[90m[39;49;00m
+        compile_result = subprocess.run([[90m[39;49;00m
+            [33m'[39;49;00m[33mcobc[39;49;00m[33m'[39;49;00m,[90m[39;49;00m
+            [33m'[39;49;00m[33m-x[39;49;00m[33m'[39;49;00m,[90m[39;49;00m
+            [33m'[39;49;00m[33m-o[39;49;00m[33m'[39;49;00m,[90m[39;49;00m
+            [33m'[39;49;00m[33m/app/src/programCOMP[39;49;00m[33m'[39;49;00m,[90m[39;49;00m
+            [33m'[39;49;00m[33m/app/src/program.cbl[39;49;00m[33m'[39;49;00m[90m[39;49;00m
+        ], capture_output=[94mTrue[39;49;00m, text=[94mTrue[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+        [94massert[39;49;00m compile_result.returncode == [94m0[39;49;00m, [33mf[39;49;00m[33m"[39;49;00m[33mCompilation failed: [39;49;00m[33m{[39;49;00mcompile_result.stderr[33m}[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+    [90m[39;49;00m
+        [90m# Run the compiled program[39;49;00m[90m[39;49;00m
+        result = subprocess.run([90m[39;49;00m
+            [[33m'[39;49;00m[33m/app/src/programCOMP[39;49;00m[33m'[39;49;00m],[90m[39;49;00m
+            capture_output=[94mTrue[39;49;00m,[90m[39;49;00m
+            text=[94mTrue[39;49;00m[90m[39;49;00m
+        )[90m[39;49;00m
+    [90m[39;49;00m
+>       [94massert[39;49;00m result.returncode == [94m0[39;49;00m, [33mf[39;49;00m[33m"[39;49;00m[33mProgram failed: [39;49;00m[33m{[39;49;00mresult.stderr[33m}[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+[1m[31mE       AssertionError: Program failed: libcob: error: READ/START not allowed, file not open for input (status = 47) for file IN-FILE ('INPUT_DAT' => INPUT.DAT)[0m
+[1m[31mE         libcob: warning: implicit CLOSE of OUT-FILE ('/app/data/OUTPUT.DAT')[0m
+[1m[31mE         [0m
+[1m[31mE       assert 1 == 0[0m
+[1m[31mE        +  where 1 = CompletedProcess(args=['/app/src/programCOMP'], returncode=1, stdout='', stderr="libcob: error: READ/START not allowed, file not open for input (status = 47) for file IN-FILE ('INPUT_DAT' => INPUT.DAT)\nlibcob: warning: implicit CLOSE of OUT-FILE ('/app/data/OUTPUT.DAT')\n").returncode[0m
+
+[1m[31m/tests/test_outputs.py[0m:61: AssertionError
+============================================================================ PASSES ============================================================================
+[36m[1m=================================================================== short test summary info ====================================================================[0m
+[32mPASSED[0m ../tests/test_outputs.py::[1mtest_required_files_exist[0m
+[32mPASSED[0m ../tests/test_outputs.py::[1mtest_fixed_format_constraints[0m
+[32mPASSED[0m ../tests/test_outputs.py::[1mtest_data_files_exist[0m
+[31mFAILED[0m ../tests/test_outputs.py::[1mtest_program_output[0m - AssertionError: Program failed: libcob: error: READ/START not allowed, file not open for input (status = 47) for file IN-FILE ('INPUT_DAT' => INPUT.DAT)
+[31m================================================================= [31m[1m1 failed[0m, [32m3 passed[0m[31m in 0.25s[0m[31m ==================================================================[0m
+[?2004hroot@0a79ae91ae01:/app# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/tests.cast[0m
+[?2004hroot@0a79ae91ae01:/app# 

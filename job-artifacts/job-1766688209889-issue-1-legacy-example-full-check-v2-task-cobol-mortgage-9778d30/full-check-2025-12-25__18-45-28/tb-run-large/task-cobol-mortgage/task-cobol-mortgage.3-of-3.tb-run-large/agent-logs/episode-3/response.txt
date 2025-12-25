@@ -1,0 +1,15 @@
+{
+  "analysis": "The COBOL program now compiles and runs successfully from /app/src, reading INPUT.DAT and writing /app/data/OUTPUT.DAT. Output formatting is correct: rejected record has ID + DENY + reason; approved record has ID + APPRO on its own line followed by a detailed monthly payment schedule without a header. Lines are within 80 characters and there is no '>>SOURCE FORMAT IS FIXED'.",
+  "plan": "Do a final quick verification that /app/src/program.cbl exists and the output file is non-empty, then mark the task complete.",
+  "commands": [
+    {
+      "keystrokes": "ls -la /app/src/program.cbl /app/data/OUTPUT.DAT\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "wc -l /app/src/program.cbl /app/data/OUTPUT.DAT\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": true
+}

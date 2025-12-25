@@ -1,0 +1,10 @@
+{
+  "analysis": "We are at the root of the container in /app directory. No files have been created yet. The task requires creating a COBOL program file /app/src/program.cbl with specific functionality, then compiling it with GnuCOBOL 3 and executing it. We need to verify the existing directory structure (especially /app/src and /app/data) and the presence of INPUT.DAT. After confirming, we will create the program.cbl source file, compile it, and run it.",
+  "plan": "1. List the /app directory to see subdirectories and files. 2. List /app/src to verify INPUT.DAT exists. 3. Create /app/src/program.cbl with the required COBOL code (fixed format, each line <=80 chars). 4. Compile the program using cobc -x program.cbl -o program. 5. Execute the compiled program from /app/src. 6. Verify that /app/data/OUTPUT.DAT is created and contains expected output.",
+  "commands": [
+    {
+      "keystrokes": "ls -R /app\n",
+      "duration": 0.2
+    }
+  ]
+}

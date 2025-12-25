@@ -1,0 +1,544 @@
+[?2004hroot@b9423b228534:/app# asciinema rec --stdin /logs/agent.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@b9423b228534:/app# clear
+[?2004l[H[J[3J[?2004hroot@b9423b228534:/app# ls -la /app
+[?2004ltotal 16
+drwxr-xr-x  4 root root 4096 Dec 25 18:48 .
+drwxr-xr-x 20 root root 4096 Dec 25 18:56 ..
+drwxr-xr-x  2 root root 4096 Dec 25 18:45 data
+drwxr-xr-x  2 root root 4096 Dec 25 18:45 src
+[?2004hroot@b9423b228534:/app# ls -la /app/src /app/data
+[?2004l/app/data:
+total 12
+drwxr-xr-x 2 root root 4096 Dec 25 18:45 .
+drwxr-xr-x 4 root root 4096 Dec 25 18:48 ..
+-rw-r--r-- 1 root root    1 Dec 25 18:45 OUTPUT.DAT
+
+/app/src:
+total 12
+drwxr-xr-x 2 root root 4096 Dec 25 18:45 .
+drwxr-xr-x 4 root root 4096 Dec 25 18:48 ..
+-rw-r--r-- 1 root root  167 Dec 25 18:45 INPUT.DAT
+[?2004hroot@b9423b228534:/app# sed -n '1,5p' /app/src/INPUT.DAT
+[?2004lAPP0000001;Williams David Robert         ;2000000000;3500000000;0500000000;20;00550
+APP0000002;John Smith Clark              ;0000005000;0000004000;0000003500;01;00550[?2004hroot@b9423b228534:/app# cat > /app/src/program.cbl <<'EOF'
+[?2004l[?2004h>        IDENTIFICATION DIVISION.
+[?2004l[?2004h>        PROGRAM-ID. PROGRAM.
+[?2004l[?2004h> 
+[?2004l[?2004h>        ENVIRONMENT DIVISION.
+[?2004l[?2004h>        CONFIGURATION SECTION.
+[?2004l[?2004h>        SPECIAL-NAMES.
+[?2004l[?2004h>            DECIMAL-POINT IS DOT.
+[?2004l[?2004h> 
+[?2004l[?2004h>        INPUT-OUTPUT SECTION.
+[?2004l= N[?2004h>        FILE-CONTROL.
+[?2004l[?2004h>            SELECT INFILE ASSIGN TO "INPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>            SELECT OUTFILE ASSIGN TO "../data/OUTPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> 
+[?2004l[?2004h>        DATA DIVISION.
+[?2004l[?2004h>        FILE SECTION.
+[?2004l[?2004h>        FD  INFILE.
+[?2004l[?2004h>        01  IN-REC                      PIC X(256).
+[?2004l[?2004h> 
+[?2004l[?2004h>        FD  OUTFILE.
+[?2004lMO[?2004h>        01  OUT-REC                     PIC X(256).
+[?2004l[?2004h> 
+[?2004lS[?2004h>        WORKING-STORAGE SECTION.
+[?2004l[?2004h>        77  EOF-FLAG                    PIC X VALUE "N".
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-FIELDS.
+[?2004l[?2004h>            05  WS-ID-TXT               PIC X(40).
+[?2004l[?2004h>            05  WS-NAME-TXT             PIC X(80).
+[?2004l[?2004h>            05  WS-LOAN-TXT             PIC X(40).
+[?2004l-STAT[?2004h>            05  WS-PROP-TXT             PIC X(40).
+[?2004l[?2004h>            05  WS-DOWN-TXT             PIC X(40).
+[?2004l[?2004h>            05  WS-TERM-TXT             PIC X(40).
+[?2004l[?2004h>            05  WS-RATE-TXT             PIC X(40).
+[?2004l[?2004h> 
+[?2004l [?2004h>        01  WS-IN.
+[?2004l[?2004h>            05  WS-ID                   PIC X(10).
+[?2004l[?2004h>            05  WS-NAME                 PIC X(30).
+[?2004l[?2004h>            05  WS-LOAN                 PIC 9(10) VALUE 0.
+[?2004l[?2004h>            05  WS-PROP                 PIC 9(10) VALUE 0.
+[?2004l[?2004h>            05  WS-DOWN                 PIC 9(10) VALUE 0.
+[?2004lL[?2004h>            05  WS-TERM-YEARS           PIC 9(2)  VALUE 0.
+[?2004l[?2004h>            05  WS-RATE                 PIC 9(3)V9(2) VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-CALC.
+[?2004l[?2004h>            05  WS-MIN-DOWN             PIC 9(12)V99 VALUE 0.
+[?2004l[?2004h>            05  WS-TERM-MONTHS          PIC 9(4) VALUE 0.
+[?2004l[?2004h>            05  WS-MONTHLY-RATE         COMP-2 VALUE 0.
+[?2004l[?2004h>            05  WS-FACTOR               COMP-2 VALUE 0.
+[?2004l[?2004h>            05  WS-MONTHLY-PAY-RAW      COMP-2 VALUE 0.
+[?2004l[?2004h>            05  WS-BAL-RAW              COMP-2 VALUE 0.
+[?2004l[?2004h>            05  WS-INT-RAW              COMP-2 VALUE 0.
+[?2004l[?2004h>            05  WS-PRN-RAW              COMP-2 VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-OUT.
+[?2004l[?2004h>            05  OUT-ID                  PIC X(10).
+[?2004l[?2004h>            05  OUT-STATUS              PIC X(5).
+[?2004lAW ROUNDE[?2004h>            05  OUT-SPACE1              PIC X VALUE " ".
+[?2004l[?2004h>            05  OUT-REASON              PIC X(50).
+[?2004l[?2004h> 
+[?2004l [?2004h>        01  WS-SCHED.
+[?2004l[?2004h>            05  SCH-MON                 PIC 9(3).
+[?2004l[?2004h>            05  SCH-SP1                 PIC X VALUE " ".
+[?2004l[?2004h>            05  SCH-PAY                 PIC 9(8).99.
+[?2004l[?2004h>            05  SCH-SP2                 PIC X VALUE " ".
+[?2004l[?2004h>            05  SCH-INT                 PIC 9(8).99.
+[?2004l[?2004h>            05  SCH-SP3                 PIC X VALUE " ".
+[?2004l[?2004h>            05  SCH-PRN                 PIC 9(8).99.
+[?2004l[?2004h>            05  SCH-SP4                 PIC X VALUE " ".
+[?2004l[?2004h>            05  SCH-BAL                 PIC 9(10).99.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-NUM.
+[?2004l[?2004h>            05  N-LOAN                  COMP-2 VALUE 0.
+[?2004l[?2004h>            05  N-PROP                  COMP-2 VALUE 0.
+[?2004l[?2004h>            05  N-DOWN                  COMP-2 VALUE 0.
+[?2004l[?2004h>            05  N-RATE                  COMP-2 VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        77  I                           PIC 9(4) VALUE 0.
+[?2004l[?2004h>        77  WS-ZERO                     COMP-2 VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCEDURE DIVISION.
+[?2004l[?2004h>        MAIN.
+[?2004l[?2004h>            OPEN INPUT INFILE
+[?2004l[?2004h>            OPEN OUTPUT OUTFILE
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM UNTIL EOF-FLAG = "Y"
+[?2004l[?2004h>                READ INFILE
+[?2004l[?2004h>                    AT END
+[?2004l[?2004h>                        MOVE "Y" TO EOF-FLAG
+[?2004l[?2004h>                    NOT AT END
+[?2004l[?2004h>                        PERFORM PROCESS-REC
+[?2004l[?2004h>                END-READ
+[?2004l[?2004h>            END-PERFORM
+[?2004l[?2004h> 
+[?2004l[?2004h>            CLOSE INFILE
+[?2004l[?2004h>            CLOSE OUTFILE
+[?2004l[?2004h>            STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCESS-REC.
+[?2004l[?2004h>            PERFORM PARSE-REC
+[?2004l[?2004h>            PERFORM CHECK-AND-WRITE.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PARSE-REC.
+[?2004l[?2004h>            MOVE SPACES TO WS-FIELDS
+[?2004l[?2004h>            UNSTRING IN-REC DELIMITED BY ";"
+[?2004l[?2004h>                INTO WS-ID-TXT
+[?2004l[?2004h>                     WS-NAME-TXT
+[?2004l[?2004h>                     WS-LOAN-TXT
+[?2004l[?2004h>                     WS-PROP-TXT
+[?2004l[?2004h>                     WS-DOWN-TXT
+[?2004l[?2004h>                     WS-TERM-TXT
+[?2004l[?2004h>                     WS-RATE-TXT
+[?2004l[?2004h>            END-UNSTRING
+[?2004l[?2004h> 
+[?2004l[?2004h>            MOVE FUNCTION TRIM(WS-ID-TXT) TO WS-ID
+[?2004l[?2004h>            MOVE FUNCTION TRIM(WS-NAME-TXT) TO WS-NAME
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE N-LOAN = FUNCTION NUMVAL(WS-LOAN-TXT)
+[?2004l[?2004h>            COMPUTE N-PROP = FUNCTION NUMVAL(WS-PROP-TXT)
+[?2004l[?2004h>            COMPUTE N-DOWN = FUNCTION NUMVAL(WS-DOWN-TXT)
+[?2004l[?2004h>            COMPUTE N-RATE = FUNCTION NUMVAL(WS-RATE-TXT)
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-LOAN = N-LOAN
+[?2004l[?2004h>            COMPUTE WS-PROP = N-PROP
+[?2004l[?2004h>            COMPUTE WS-DOWN = N-DOWN
+[?2004l[?2004h>            COMPUTE WS-RATE = N-RATE
+[?2004l[?2004h>            COMPUTE WS-TERM-YEARS = FUNCTION NUMVAL(WS-TERM-TXT).
+[?2004l[?2004h> 
+[?2004l[?2004h>        CHECK-AND-WRITE.
+[?2004l[?2004h>            COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP * 0.15
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF WS-DOWN < WS-MIN-DOWN
+[?2004l[?2004h>                MOVE WS-ID TO OUT-ID
+[?2004l[?2004h>                MOVE "DENY " TO OUT-STATUS
+[?2004l[?2004h>                MOVE "INSUFFICIENT FUNDS FOR DOWN PAYMENT" TO OUT-REASON
+[?2004l[?2004h>                STRING OUT-ID OUT-STATUS OUT-SPACE1 OUT-REASON
+[?2004l[?2004h>                    DELIMITED BY SIZE INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                MOVE WS-ID TO OUT-ID
+[?2004l[?2004h>                MOVE "APPRO" TO OUT-STATUS
+[?2004l[?2004h>                MOVE SPACES TO OUT-REASON
+[?2004l[?2004h>                STRING OUT-ID OUT-STATUS
+[?2004l[?2004h>                    DELIMITED BY SIZE INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h>                PERFORM WRITE-SCHEDULE
+[?2004l[?2004h>            END-IF.
+[?2004l[?2004h> 
+[?2004l[?2004h>        WRITE-SCHEDULE.
+[?2004l[?2004h>            COMPUTE WS-TERM-MONTHS = WS-TERM-YEARS * 12
+[?2004l[?2004h>            IF WS-TERM-MONTHS = 0
+[?2004l[?2004h>                EXIT PARAGRAPH
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-MONTHLY-RATE ROUNDED = WS-RATE / 1200
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-BAL-RAW = WS-LOAN
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF WS-MONTHLY-RATE = WS-ZERO
+[?2004l[?2004h>                COMPUTE WS-MONTHLY-PAY-RAW ROUNDED = WS-BAL-RAW
+[?2004l[?2004h>                    / WS-TERM-MONTHS
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                COMPUTE WS-FACTOR = (1 + WS-MONTHLY-RATE)
+[?2004l[?2004h>                    ** (-1 * WS-TERM-MONTHS)
+[?2004l[?2004h>                COMPUTE WS-MONTHLY-PAY-RAW ROUNDED =
+[?2004l[?2004h>                    (WS-BAL-RAW * WS-MONTHLY-RATE) / (1 - WS-FACTOR)
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM VARYING I FROM 1 BY 1 UNTIL I > WS-TERM-MONTHS
+[?2004l[?2004h>                COMPUTE WS-INT-RAW ROUNDED = WS-BAL-RAW * WS-MONTHLY-RATE
+[?2004l[?2004h>                COMPUTE WS-PRN-RAW ROUNDED = WS-MONTHLY-PAY-RAW - WS-INT-RAW
+[?2004l[?2004h> 
+[?2004l[?2004h>                IF I = WS-TERM-MONTHS
+[?2004l[?2004h>                    COMPUTE WS-PRN-RAW ROUNDED = WS-BAL-RAW
+[?2004l[?2004h>                    COMPUTE WS-MONTHLY-PAY-RAW ROUNDED =
+[?2004l[?2004h>                        WS-PRN-RAW + WS-INT-RAW
+[?2004l[?2004h>                    COMPUTE WS-BAL-RAW = 0
+[?2004l[?2004h>                ELSE
+[?2004l[?2004h>                    COMPUTE WS-BAL-RAW ROUNDED = WS-BAL-RAW - WS-PRN-RAW
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE I TO SCH-MON
+[?2004l[?2004h>                MOVE WS-MONTHLY-PAY-RAW TO SCH-PAY
+[?2004l[?2004h>                MOVE WS-INT-RAW TO SCH-INT
+[?2004l[?2004h>                MOVE WS-PRN-RAW TO SCH-PRN
+[?2004l[?2004h>                MOVE WS-BAL-RAW TO SCH-BAL
+[?2004l[?2004h> 
+[?2004l[?2004h>                STRING SCH-MON SCH-SP1 SCH-PAY SCH-SP2 SCH-INT
+[?2004l[?2004h>                       SCH-SP3 SCH-PRN SCH-SP4 SCH-BAL
+[?2004l[?2004h>                    DELIMITED BY SIZE INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h>            END-PERFORM.
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@b9423b228534:/app# awk 'length($0)>80{print NR ":" length($0) ":" $0}' /app/src/program.cbl | head
+[?2004l[?2004hroot@b9423b228534:/app# cd /app/src
+[?2004l[?2004hroot@b9423b228534:/app/src# cobc -x -free -Wall program.cbl
+[?2004lprogram.cbl:7: error: syntax error, unexpected Identifier, expecting COMMA
+[?2004hroot@b9423b228534:/app/src# cobc -x -Wall program.cbl
+[?2004lprogram.cbl:7: error: syntax error, unexpected Identifier, expecting COMMA
+[?2004hroot@b9423b228534:/app/src# ./program
+[?2004lbash: ./program: No such file or directory
+[?2004hroot@b9423b228534:/app/src# ls -la ../data/OUTPUT.DAT
+[?2004l-rw-r--r-- 1 root root 1 Dec 25 18:45 ../data/OUTPUT.DAT
+[?2004hroot@b9423b228534:/app/src# sed -n '1,40p' ../data/OUTPUT.DAT
+[?2004l
+[?2004hroot@b9423b228534:/app/src# cd /app/src
+[?2004l[?2004hroot@b9423b228534:/app/src# nl -ba program.cbl | sed -n '1,40p'
+[?2004l     1	       IDENTIFICATION DIVISION.
+     2	       PROGRAM-ID. PROGRAM.
+     3	
+     4	       ENVIRONMENT DIVISION.
+     5	       CONFIGURATION SECTION.
+     6	       SPECIAL-NAMES.
+     7	           DECIMAL-POINT IS DOT.
+     8	
+     9	       INPUT-OUTPUT SECTION.
+    10	       FILE-CONTROL.
+    11	           SELECT INFILE ASSIGN TO "INPUT.DAT"
+    12	               ORGANIZATION IS LINE SEQUENTIAL.
+    13	           SELECT OUTFILE ASSIGN TO "../data/OUTPUT.DAT"
+    14	               ORGANIZATION IS LINE SEQUENTIAL.
+    15	
+    16	       DATA DIVISION.
+    17	       FILE SECTION.
+    18	       FD  INFILE.
+    19	       01  IN-REC                      PIC X(256).
+    20	
+    21	       FD  OUTFILE.
+    22	       01  OUT-REC                     PIC X(256).
+    23	
+    24	       WORKING-STORAGE SECTION.
+    25	       77  EOF-FLAG                    PIC X VALUE "N".
+    26	
+    27	       01  WS-FIELDS.
+    28	           05  WS-ID-TXT               PIC X(40).
+    29	           05  WS-NAME-TXT             PIC X(80).
+    30	           05  WS-LOAN-TXT             PIC X(40).
+    31	           05  WS-PROP-TXT             PIC X(40).
+    32	           05  WS-DOWN-TXT             PIC X(40).
+    33	           05  WS-TERM-TXT             PIC X(40).
+    34	           05  WS-RATE-TXT             PIC X(40).
+    35	
+    36	       01  WS-IN.
+    37	           05  WS-ID                   PIC X(10).
+    38	           05  WS-NAME                 PIC X(30).
+    39	           05  WS-LOAN                 PIC 9(10) VALUE 0.
+    40	           05  WS-PROP                 PIC 9(10) VALUE 0.
+[?2004hroot@b9423b228534:/app/src# cat > program.cbl <<'EOF'
+[?2004l[?2004h>        IDENTIFICATION DIVISION.
+[?2004l[?2004h>        PROGRAM-ID. PROGRAM.
+[?2004l[?2004h> 
+[?2004l[?2004h>        ENVIRONMENT DIVISION.
+[?2004l[?2004h>        INPUT-OUTPUT SECTION.
+[?2004l[?2004h>        FILE-CONTROL.
+[?2004l[?2004h>            SELECT INFILE ASSIGN TO "INPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>            SELECT OUTFILE ASSIGN TO "../data/OUTPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> 
+[?2004l[?2004h>        DATA DIVISION.
+[?2004l[?2004h>        FILE SECTION.
+[?2004l[?2004h>        FD  INFILE.
+[?2004l[?2004h>        01  IN-REC                      PIC X(256).
+[?2004l[?2004h> 
+[?2004l[?2004h>        FD  OUTFILE.
+[?2004l[?2004h>        01  OUT-REC                     PIC X(256).
+[?2004l [?2004h> 
+[?2004l[?2004h>        WORKING-STORAGE SECTION.
+[?2004l[?2004h>        77  EOF-FLAG                    PIC X VALUE "N".
+[?2004l[?2004h> 
+[?2004l [?2004h>        01  WS-FIELDS.
+[?2004l[?2004h>            05  WS-ID-TXT               PIC X(40).
+[?2004l[?2004h>            05  WS-NAME-TXT             PIC X(80).
+[?2004l[?2004h>            05  WS-LOAN-TXT             PIC X(40).
+[?2004l[?2004h>            05  WS-PROP-TXT             PIC X(40).
+[?2004l[?2004h>            05  WS-DOWN-TXT             PIC X(40).
+[?2004l[?2004h>            05  WS-TERM-TXT             PIC X(40).
+[?2004l[?2004h>            05  WS-RATE-TXT             PIC X(40).
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-IN.
+[?2004l[?2004h>            05  WS-ID                   PIC X(10).
+[?2004l[?2004h>            05  WS-NAME                 PIC X(30).
+[?2004l[?2004h>            05  WS-LOAN                 PIC 9(10) VALUE 0.
+[?2004l[?2004h>            05  WS-PROP                 PIC 9(10) VALUE 0.
+[?2004l[?2004h>            05  WS-DOWN                 PIC 9(10) VALUE 0.
+[?2004l[?2004h>            05  WS-TERM-YEARS           PIC 9(2)  VALUE 0.
+[?2004l[?2004h>            05  WS-RATE                 PIC 9(3)V9(2) VALUE 0.
+[?2004l[?2004h> 
+[?2004l [?2004h>        01  WS-CALC.
+[?2004l[?2004h>            05  WS-MIN-DOWN             PIC 9(12)V99 VALUE 0.
+[?2004l[?2004h>            05  WS-TERM-MONTHS          PIC 9(4) VALUE 0.
+[?2004l[?2004h>            05  WS-MONTHLY-RATE         COMP-2 VALUE 0.
+[?2004l[?2004h>            05  WS-FACTOR               COMP-2 VALUE 0.
+[?2004l[?2004h>            05  WS-MONTHLY-PAY-RAW      COMP-2 VALUE 0.
+[?2004l[?2004h>            05  WS-BAL-RAW              COMP-2 VALUE 0.
+[?2004l[?2004h>            05  WS-INT-RAW              COMP-2 VALUE 0.
+[?2004l[?2004h>            05  WS-PRN-RAW              COMP-2 VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-OUT.
+[?2004l[?2004h>            05  OUT-ID                  PIC X(10).
+[?2004l[?2004h>            05  OUT-STATUS              PIC X(5).
+[?2004l[?2004h>            05  OUT-REASON              PIC X(50).
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-SCHED.
+[?2004l[?2004h>            05  SCH-MON                 PIC 9(3).
+[?2004l[?2004h>            05  SCH-SP1                 PIC X VALUE " ".
+[?2004l[?2004h>            05  SCH-PAY                 PIC 9(8).99.
+[?2004l[?2004h>            05  SCH-SP2                 PIC X VALUE " ".
+[?2004l[?2004h>            05  SCH-INT                 PIC 9(8).99.
+[?2004l[?2004h>            05  SCH-SP3                 PIC X VALUE " ".
+[?2004l[?2004h>            05  SCH-PRN                 PIC 9(8).99.
+[?2004l[?2004h>            05  SCH-SP4                 PIC X VALUE " ".
+[?2004l[?2004h>            05  SCH-BAL                 PIC 9(10).99.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-NUM.
+[?2004l[?2004h>            05  N-LOAN                  COMP-2 VALUE 0.
+[?2004l[?2004h>            05  N-PROP                  COMP-2 VALUE 0.
+[?2004l[?2004h>            05  N-DOWN                  COMP-2 VALUE 0.
+[?2004l[?2004h>            05  N-RATE                  COMP-2 VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        77  I                           PIC 9(4) VALUE 0.
+[?2004l[?2004h>        77  WS-ZERO                     COMP-2 VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCEDURE DIVISION.
+[?2004l[?2004h>        MAIN.
+[?2004l[?2004h>            OPEN INPUT INFILE
+[?2004l[?2004h>            OPEN OUTPUT OUTFILE
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM UNTIL EOF-FLAG = "Y"
+[?2004l[?2004h>                READ INFILE
+[?2004l[?2004h>                    AT END
+[?2004l[?2004h>                        MOVE "Y" TO EOF-FLAG
+[?2004l[?2004h>                    NOT AT END
+[?2004l[?2004h>                        PERFORM PROCESS-REC
+[?2004l[?2004h>                END-READ
+[?2004l[?2004h>            END-PERFORM
+[?2004l[?2004h> 
+[?2004l[?2004h>            CLOSE INFILE
+[?2004l[?2004h>            CLOSE OUTFILE
+[?2004l[?2004h>            STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCESS-REC.
+[?2004l[?2004h>            PERFORM PARSE-REC
+[?2004l[?2004h>            PERFORM CHECK-AND-WRITE.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PARSE-REC.
+[?2004l[?2004h>            MOVE SPACES TO WS-FIELDS
+[?2004l[?2004h>            UNSTRING IN-REC DELIMITED BY ";"
+[?2004l[?2004h>                INTO WS-ID-TXT
+[?2004l[?2004h>                     WS-NAME-TXT
+[?2004l[?2004h>                     WS-LOAN-TXT
+[?2004l[?2004h>                     WS-PROP-TXT
+[?2004l[?2004h>                     WS-DOWN-TXT
+[?2004l[?2004h>                     WS-TERM-TXT
+[?2004l[?2004h>                     WS-RATE-TXT
+[?2004l[?2004h>            END-UNSTRING
+[?2004l[?2004h> 
+[?2004l[?2004h>            MOVE FUNCTION TRIM(WS-ID-TXT) TO WS-ID
+[?2004l[?2004h>            MOVE FUNCTION TRIM(WS-NAME-TXT) TO WS-NAME
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE N-LOAN = FUNCTION NUMVAL(WS-LOAN-TXT)
+[?2004l[?2004h>            COMPUTE N-PROP = FUNCTION NUMVAL(WS-PROP-TXT)
+[?2004l[?2004h>            COMPUTE N-DOWN = FUNCTION NUMVAL(WS-DOWN-TXT)
+[?2004l[?2004h>            COMPUTE N-RATE = FUNCTION NUMVAL(WS-RATE-TXT)
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-LOAN = N-LOAN
+[?2004l[?2004h>            COMPUTE WS-PROP = N-PROP
+[?2004l[?2004h>            COMPUTE WS-DOWN = N-DOWN
+[?2004l[?2004h>            COMPUTE WS-RATE = N-RATE
+[?2004l[?2004h>            COMPUTE WS-TERM-YEARS = FUNCTION NUMVAL(WS-TERM-TXT).
+[?2004l[?2004h> 
+[?2004l[?2004h>        CHECK-AND-WRITE.
+[?2004l[?2004h>            COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP * 0.15
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF WS-DOWN < WS-MIN-DOWN
+[?2004l[?2004h>                MOVE WS-ID TO OUT-ID
+[?2004l[?2004h>                MOVE "DENY " TO OUT-STATUS
+[?2004l[?2004h>                MOVE "INSUFFICIENT FUNDS FOR DOWN PAYMENT" TO OUT-REASON
+[?2004l[?2004h>                STRING OUT-ID OUT-STATUS OUT-REASON
+[?2004l[?2004h>                    DELIMITED BY SIZE INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                MOVE WS-ID TO OUT-ID
+[?2004l[?2004h>                MOVE "APPRO" TO OUT-STATUS
+[?2004l[?2004h>                STRING OUT-ID OUT-STATUS
+[?2004l[?2004h>                    DELIMITED BY SIZE INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h>                PERFORM WRITE-SCHEDULE
+[?2004l[?2004h>            END-IF.
+[?2004l[?2004h> 
+[?2004l[?2004h>        WRITE-SCHEDULE.
+[?2004l[?2004h>            COMPUTE WS-TERM-MONTHS = WS-TERM-YEARS * 12
+[?2004l[?2004h>            IF WS-TERM-MONTHS = 0
+[?2004l[?2004h>                EXIT PARAGRAPH
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-MONTHLY-RATE ROUNDED = WS-RATE / 1200
+[?2004l[?2004h>            COMPUTE WS-BAL-RAW = WS-LOAN
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF WS-MONTHLY-RATE = WS-ZERO
+[?2004l[?2004h>                COMPUTE WS-MONTHLY-PAY-RAW ROUNDED =
+[?2004l[?2004h>                    WS-BAL-RAW / WS-TERM-MONTHS
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                COMPUTE WS-FACTOR =
+[?2004l[?2004h>                    (1 + WS-MONTHLY-RATE) ** (-1 * WS-TERM-MONTHS)
+[?2004l[?2004h>                COMPUTE WS-MONTHLY-PAY-RAW ROUNDED =
+[?2004l[?2004h>                    (WS-BAL-RAW * WS-MONTHLY-RATE) / (1 - WS-FACTOR)
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM VARYING I FROM 1 BY 1 UNTIL I > WS-TERM-MONTHS
+[?2004l[?2004h>                COMPUTE WS-INT-RAW ROUNDED = WS-BAL-RAW * WS-MONTHLY-RATE
+[?2004l[?2004h>                COMPUTE WS-PRN-RAW ROUNDED =
+[?2004l[?2004h>                    WS-MONTHLY-PAY-RAW - WS-INT-RAW
+[?2004l[?2004h> 
+[?2004l[?2004h>                IF I = WS-TERM-MONTHS
+[?2004l[?2004h>                    COMPUTE WS-PRN-RAW ROUNDED = WS-BAL-RAW
+[?2004l[?2004h>                    COMPUTE WS-MONTHLY-PAY-RAW ROUNDED =
+[?2004l[?2004h>                        WS-PRN-RAW + WS-INT-RAW
+[?2004l[?2004h>                    COMPUTE WS-BAL-RAW = 0
+[?2004l[?2004h>                ELSE
+[?2004l[?2004h>                    COMPUTE WS-BAL-RAW ROUNDED = WS-BAL-RAW - WS-PRN-RAW
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE I TO SCH-MON
+[?2004l[?2004h>                MOVE WS-MONTHLY-PAY-RAW TO SCH-PAY
+[?2004l[?2004h>                MOVE WS-INT-RAW TO SCH-INT
+[?2004l[?2004h>                MOVE WS-PRN-RAW TO SCH-PRN
+[?2004l[?2004h>                MOVE WS-BAL-RAW TO SCH-BAL
+[?2004l[?2004h> 
+[?2004l[?2004h>                STRING SCH-MON SCH-SP1 SCH-PAY SCH-SP2 SCH-INT
+[?2004l[?2004h>                       SCH-SP3 SCH-PRN SCH-SP4 SCH-BAL
+[?2004l[?2004h>                    DELIMITED BY SIZE INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h>            END-PERFORM.
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@b9423b228534:/app/src# awk 'length($0)>80{print NR ":" length($0) ":" $0}' program.cbl | head
+[?2004l[?2004hroot@b9423b228534:/app/src# cobc -x -Wall program.cbl
+[?2004l[?2004hroot@b9423b228534:/app/src# ./program
+[?2004l[?2004hroot@b9423b228534:/app/src# wc -l ../data/OUTPUT.DAT
+[?2004l14 ../data/OUTPUT.DAT
+[?2004hroot@b9423b228534:/app/src# sed -n '1,80p' ../data/OUTPUT.DAT
+[?2004lAPP0000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT                                                                                                                                                                                                              
+APP0000002APPROINSUFFICIENT FUNDS FOR DOWN PAYMENT                                                                                                                                                                                                              
+001 00002316.70 00002291.66 00000025.03 0000004974.96                                                                                                                                                                                                           
+002 00002316.70 00002280.19 00000036.51 0000004938.44                                                                                                                                                                                                           
+003 00002316.70 00002263.45 00000053.24 0000004885.20                                                                                                                                                                                                           
+004 00002316.70 00002239.05 00000077.65 0000004807.54                                                                                                                                                                                                           
+005 00002316.70 00002203.45 00000113.24 0000004694.30                                                                                                                                                                                                           
+006 00002316.70 00002151.55 00000165.14 0000004529.15                                                                                                                                                                                                           
+007 00002316.70 00002075.86 00000240.84 0000004288.31                                                                                                                                                                                                           
+008 00002316.70 00001965.47 00000351.22 0000003937.09                                                                                                                                                                                                           
+009 00002316.70 00001804.49 00000512.20 0000003424.88                                                                                                                                                                                                           
+010 00002316.70 00001569.73 00000746.96 0000002677.92                                                                                                                                                                                                           
+011 00002316.70 00001227.38 00001089.32 0000001588.59                                                                                                                                                                                                           
+012 00002316.70 00000728.10 00001588.59 0000000000.00                                                                                                                                                                                                           
+[?2004hroot@b9423b228534:/app/src# cd /app/src
+[?2004l[?2004hroot@b9423b228534:/app/src# python3 - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> p = Path('program.cbl')
+[?2004l[?2004h> lines = p.read_text().splitlines(True)
+[?2004l[?2004h> out = []
+[?2004l[?2004h> for line in lines:
+[?2004l[?2004h>     stripped = line.lstrip()
+[?2004l[?2004h>     # Insert "MOVE SPACES TO OUT-REC" right before STRINGs that build OUT-REC
+[?2004l[?2004h>     if stripped.startswith('STRING OUT-ID OUT-STATUS OUT-REASON'):
+[?2004l[?2004h>         indent = line[:len(line)-len(stripped)]
+[?2004l[?2004h>         out.append(f"{indent}MOVE SPACES TO OUT-REC\n")
+[?2004l[?2004h>         out.append(line)
+[?2004l[?2004h>         continue
+[?2004l[?2004h>     if stripped.startswith('STRING OUT-ID OUT-STATUS') and 'OUT-REASON' not in stripped:
+[?2004l[?2004h>         indent = line[:len(line)-len(stripped)]
+[?2004l[?2004h>         out.append(f"{indent}MOVE SPACES TO OUT-REC\n")
+[?2004l[?2004h>         out.append(line)
+[?2004l[?2004h>         continue
+[?2004l[?2004h>     if stripped.startswith('STRING SCH-MON'):
+[?2004l[?2004h>         indent = line[:len(line)-len(stripped)]
+[?2004l[?2004h>         out.append(f"{indent}MOVE SPACES TO OUT-REC\n")
+[?2004l[?2004h>         out.append(line)
+[?2004l[?2004h>         continue
+[?2004l[?2004h>     out.append(line)
+[?2004l[?2004h> 
+[?2004l[?2004h> p.write_text(''.join(out))
+[?2004l[?2004h> PY
+[?2004l[?2004hroot@b9423b228534:/app/src# awk 'length($0)>80{print NR ":" length($0) ":" $0}' program.cbl | head
+[?2004l[?2004hroot@b9423b228534:/app/src# cobc -x -Wall program.cbl
+[?2004l[?2004hroot@b9423b228534:/app/src# ./program
+[?2004l[?2004hroot@b9423b228534:/app/src# sed -n '1,40p' ../data/OUTPUT.DAT
+[?2004lAPP0000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT
+APP0000002APPRO
+001 00002316.70 00002291.66 00000025.03 0000004974.96
+002 00002316.70 00002280.19 00000036.51 0000004938.44
+003 00002316.70 00002263.45 00000053.24 0000004885.20
+004 00002316.70 00002239.05 00000077.65 0000004807.54
+005 00002316.70 00002203.45 00000113.24 0000004694.30
+006 00002316.70 00002151.55 00000165.14 0000004529.15
+007 00002316.70 00002075.86 00000240.84 0000004288.31
+008 00002316.70 00001965.47 00000351.22 0000003937.09
+009 00002316.70 00001804.49 00000512.20 0000003424.88
+010 00002316.70 00001569.73 00000746.96 0000002677.92
+011 00002316.70 00001227.38 00001089.32 0000001588.59
+012 00002316.70 00000728.10 00001588.59 0000000000.00
+[?2004hroot@b9423b228534:/app/src# ls -la /app/src/program.cbl /app/data/OUTPUT.DAT
+[?2004l-rw-r--r-- 1 root root  715 Dec 25 18:58 /app/data/OUTPUT.DAT
+-rw-r--r-- 1 root root 6838 Dec 25 18:58 /app/src/program.cbl
+[?2004hroot@b9423b228534:/app/src# wc -l /app/src/program.cbl /app/data/OUTPUT.DAT
+[?2004l 192 /app/src/program.cbl
+  14 /app/data/OUTPUT.DAT
+ 206 total
+[?2004hroot@b9423b228534:/app/src# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/agent.cast[0m
+[?2004hroot@b9423b228534:/app# 

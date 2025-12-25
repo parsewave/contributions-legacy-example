@@ -1,0 +1,18 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.11, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /tests
+collecting ... collected 4 items
+
+../tests/test_outputs.py::test_required_files_exist PASSED               [ 25%]
+../tests/test_outputs.py::test_fixed_format_constraints PASSED           [ 50%]
+../tests/test_outputs.py::test_data_files_exist PASSED                   [ 75%]
+../tests/test_outputs.py::test_program_output PASSED                     [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_required_files_exist
+PASSED ../tests/test_outputs.py::test_fixed_format_constraints
+PASSED ../tests/test_outputs.py::test_data_files_exist
+PASSED ../tests/test_outputs.py::test_program_output
+============================== 4 passed in 0.17s ===============================

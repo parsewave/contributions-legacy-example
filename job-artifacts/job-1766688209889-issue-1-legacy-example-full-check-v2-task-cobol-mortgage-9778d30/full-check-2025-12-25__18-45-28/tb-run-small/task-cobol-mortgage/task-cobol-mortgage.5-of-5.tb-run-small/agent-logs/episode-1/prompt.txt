@@ -1,0 +1,220 @@
+Current terminal state:
+New Terminal Output:
+root@907522a370a1:/app# mkdir -p /app/src
+root@907522a370a1:/app# cat > /app/src/program.cbl <<'EOF'
+> IDENTIFICATION DIVISION.
+> PROGRAM-ID. MORTGAGE-PROCESSOR.
+> AUTHOR. CHATGPT.
+>
+> ENVIRONMENT DIVISION.
+> INPUT-OUTPUT SECTION.
+> FILE-CONTROL.
+>     SELECT INPUT-FILE ASSIGN TO '/app/src/INPUT.DAT'
+>         ORGANIZATION IS LINE SEQUENTIAL.
+>     SELECT OUTPUT-FILE ASSIGN TO '/app/data/OUTPUT.DAT'
+>         ORGANIZATION IS LINE SEQUENTIAL.
+>
+> DATA DIVISION.
+> FILE SECTION.
+> FD  INPUT-FILE.
+> 01  INPUT-REC.
+>     05  IN-ID               PIC X(10).
+>     05  IN-NAME             PIC X(30).
+>     05  IN-LOAN-AMOUNT      PIC 9(10).
+>     05  IN-PROP-VALUE       PIC 9(10).
+>     05  IN-DOWN-PAYMENT     PIC 9(10).
+>     05  IN-TERM             PIC 9(2).
+>     05  IN-RATE             PIC 9(3)V9(2).
+> FD  OUTPUT-FILE.
+> 01  OUTPUT-REC            PIC X(200).
+>
+> WORKING-STORAGE SECTION.
+> 01  WS-MIN-DOWN            PIC 9(10)V9(2).
+> 01  WS-MONTHLY-RATE       PIC 9(5)V9(6).
+> 01  WS-MONTHLY-PAYMENT    PIC 9(10)V9(2).
+> 01  WS-BALANCE            PIC 9(10)V9(2).
+> 01  WS-INTEREST           PIC 9(10)V9(2).
+> 01  WS-PRINCIPAL          PIC 9(10)V9(2).
+> 01  WS-MONTH-NUM          PIC 9(3).
+> 01  WS-REASON             PIC X(50).
+> 01  WS-STATUS             PIC X(5).
+> 01  WS-SPACE              PIC X VALUE SPACE.
+>
+> PROCEDURE DIVISION.
+>     OPEN INPUT INPUT-FILE
+>     OPEN OUTPUT OUTPUT-FILE
+>     PERFORM UNTIL EOF
+>         READ INPUT-FILE AT END SET EOF TO TRUE
+>         NOT AT END
+>             PERFORM PROCESS-RECORD
+>         END-READ
+>     END-PERFORM
+>     CLOSE INPUT-FILE
+>     CLOSE OUTPUT-FILE
+>     STOP RUN.
+>
+> PROCESS-RECORD.
+>     UNSTRING INPUT-REC DELIMITED BY ';'
+>         INTO IN-ID, IN-NAME, IN-LOAN-AMOUNT, IN-PROP-VALUE,
+>              IN-DOWN-PAYMENT, IN-TERM, IN-RATE.
+>     COMPUTE WS-MIN-DOWN = IN-PROP-VALUE * 0.15 ROUNDED.
+>     IF IN-DOWN-PAYMENT < WS-MIN-DOWN
+>         MOVE 'DENY' TO WS-STATUS
+>         MOVE 'INSUFFICIENT FUNDS FOR DOWN PAYMENT' TO WS-REASON
+>         STRING IN-ID WS-STATUS WS-SPACE WS-REASON
+>             INTO OUTPUT-REC
+>         END-STRING
+>         WRITE OUTPUT-REC
+>     ELSE
+>         MOVE 'APPRO' TO WS-STATUS
+>         STRING IN-ID WS-STATUS INTO OUTPUT-REC END-STRING
+>         WRITE OUTPUT-REC
+>         MOVE IN-LOAN-AMOUNT TO WS-BALANCE
+>         COMPUTE WS-MONTHLY-RATE = IN-RATE / 1200 ROUNDED
+>         COMPUTE WS-MONTHLY-PAYMENT = IN-LOAN-AMOUNT * WS-MONTHLY-RATE /
+>             (1 - (1 + WS-MONTHLY-RATE) ** (- IN-TERM)) ROUNDED
+>         PERFORM VARYING WS-MONTH-NUM FROM 1 BY 1 UNTIL WS-MONTH-NUM > IN-TERM
+>             COMPUTE WS-INTEREST = WS-BALANCE * WS-MONTHLY-RATE ROUNDED
+>             COMPUTE WS-PRINCIPAL = WS-MONTHLY-PAYMENT - WS-INTEREST ROUNDED
+>             SUBTRACT WS-PRINCIPAL FROM WS-BALANCE GIVING WS-BALANCE ROUNDED
+>             MOVE WS-MONTH-NUM TO WS-MONTH-NUM
+>             STRING
+>                 FUNCTION REVERSE(FUNCTION TRIM(WS-MONTH-NUM))
+>                 " "
+>                 WS-MONTHLY-PAYMENT " "
+>                 WS-INTEREST " "
+>                 WS-PRINCIPAL " "
+>                 WS-BALANCE
+>                 INTO OUTPUT-REC
+>             END-STRING
+>             WRITE OUTPUT-REC
+>         END-PERFORM
+>     END-IF.
+> EOF
+root@907522a370a1:/app# cd /app/src
+root@907522a370a1:/app/src# cobc -x program.cbl -o program
+program.cbl:1: error: invalid indicator 'F' at column 7
+program.cbl:2: error: invalid indicator 'M' at column 7
+program.cbl:3: error: invalid indicator '.' at column 7
+program.cbl:5: error: invalid indicator 'N' at column 7
+program.cbl:6: error: invalid indicator 'O' at column 7
+program.cbl:7: error: invalid indicator 'O' at column 7
+program.cbl:8: error: invalid indicator 'L' at column 7
+program.cbl:10: error: invalid indicator 'L' at column 7
+program.cbl:13: error: invalid indicator 'I' at column 7
+program.cbl:14: error: invalid indicator 'E' at column 7
+program.cbl:15: error: invalid indicator 'P' at column 7
+program.cbl:16: error: invalid indicator 'P' at column 7
+program.cbl:24: error: invalid indicator 'T' at column 7
+program.cbl:25: error: invalid indicator 'T' at column 7
+program.cbl:27: error: invalid indicator 'G' at column 7
+program.cbl:28: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:29: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:30: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:31: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:32: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:33: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:34: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:35: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:36: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:37: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:39: error: invalid indicator 'U' at column 7
+program.cbl:40: error: invalid in
+[... output limited to 10000 bytes; 1755 interior bytes omitted ...]
+cbl:23: error: a leading +/- sign cannot follow V
+program.cbl:23: error: a leading +/- sign cannot follow N
+program.cbl:23: error: CR or DB cannot follow a leading +/- sign
+program.cbl:23: error: CR or DB cannot follow N
+program.cbl:23: error: N cannot follow a leading +/- sign
+program.cbl:23: error: N cannot follow CR or DB
+program.cbl:23: error: unknown statement 'IN-RATE'
+program.cbl:23: error: invalid PICTURE character 'M'
+program.cbl:23: error: invalid PICTURE character 'O'
+program.cbl:23: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+program.cbl:23: error: invalid PICTURE character 'T'
+program.cbl:23: error: invalid PICTURE character 'H'
+program.cbl:23: error: invalid PICTURE character 'L'
+program.cbl:23: error: invalid PICTURE character 'Y'
+program.cbl:23: error: invalid PICTURE character 'R'
+program.cbl:23: error: invalid PICTURE character 'E'
+program.cbl:23: error: . cannot follow V
+program.cbl:23: error: N cannot follow .
+program.cbl:23: error: N cannot follow 9
+program.cbl:23: error: N cannot follow V
+program.cbl:23: error: a leading +/- sign cannot follow .
+program.cbl:23: error: a leading +/- sign cannot follow 9
+program.cbl:23: error: a leading +/- sign cannot follow V
+program.cbl:23: error: a leading +/- sign cannot follow N
+program.cbl:23: error: A or X cannot follow .
+program.cbl:23: error: A or X cannot follow a leading +/- sign
+program.cbl:23: error: A or X cannot follow V
+program.cbl:23: error: A or X cannot follow N
+program.cbl:23: error: E cannot follow A or X
+program.cbl:23: error: E cannot follow V
+program.cbl:23: error: E cannot follow N
+program.cbl:23: error: invalid PICTURE character 'M'
+program.cbl:23: error: invalid PICTURE character 'O'
+program.cbl:23: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+program.cbl:23: error: invalid PICTURE character 'T'
+program.cbl:23: error: invalid PICTURE character 'H'
+program.cbl:23: error: invalid PICTURE character 'L'
+program.cbl:23: error: invalid PICTURE character 'Y'
+program.cbl:23: error: P must be at start or end of PICTURE string
+program.cbl:23: error: invalid PICTURE character 'E'
+program.cbl:23: error: . cannot follow V
+program.cbl:23: error: N cannot follow .
+program.cbl:23: error: N cannot follow 9
+program.cbl:23: error: N cannot follow V
+program.cbl:23: error: a leading +/- sign cannot follow .
+program.cbl:23: error: a leading +/- sign cannot follow 9
+program.cbl:23: error: a leading +/- sign cannot follow V
+program.cbl:23: error: a leading +/- sign cannot follow N
+program.cbl:23: error: a P which is after the decimal point cannot follow .
+program.cbl:23: error: a P which is after the decimal point cannot follow 9
+program.cbl:23: error: a P which is after the decimal point cannot follow N
+program.cbl:23: error: A or X cannot follow .
+program.cbl:23: error: A or X cannot follow a leading +/- sign
+program.cbl:23: error: A or X cannot follow V
+program.cbl:23: error: A or X cannot follow a P which is after the decimal point
+program.cbl:23: error: A or X cannot follow N
+program.cbl:23: error: E cannot follow A or X
+program.cbl:23: error: E cannot follow V
+program.cbl:23: error: E cannot follow a P which is after the decimal point
+program.cbl:23: error: E cannot follow N
+program.cbl:23: error: N cannot follow a leading +/- sign
+program.cbl:23: error: N cannot follow A or X
+program.cbl:23: error: N cannot follow a P which is after the decimal point
+program.cbl:23: error: N cannot follow E
+program.cbl:23: error: invalid PICTURE character 'L'
+program.cbl:23: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+program.cbl:23: error: C must be followed by R
+program.cbl:23: error: invalid PICTURE character 'E'
+program.cbl:23: error: . cannot follow V
+program.cbl:23: error: A or X cannot follow .
+program.cbl:23: error: A or X cannot follow V
+program.cbl:23: error: N cannot follow .
+program.cbl:23: error: N cannot follow 9
+program.cbl:23: error: N cannot follow A or X
+program.cbl:23: error: N cannot follow V
+program.cbl:23: error: CR or DB cannot follow A or X
+program.cbl:23: error: CR or DB cannot follow N
+program.cbl:23: error: E cannot follow CR or DB
+program.cbl:23: error: E cannot follow A or X
+program.cbl:23: error: E cannot follow V
+program.cbl:23: error: E cannot follow N
+program.cbl:23: error: invalid PICTURE character 'I'
+program.cbl:23: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+program.cbl:23: error: invalid PICTURE character 'T'
+program.cbl:23: error: invalid PICTURE character 'E'
+program.cbl:23: error: invalid PICTURE character 'R'
+cobc: too many errors [-fmax-errors=128]
+
+cobc: aborting compile of program.cbl at line 23 (PROGRAM-ID: program)
+root@907522a370a1:/app/src# ./program
+bash: ./program: No such file or directory
+root@907522a370a1:/app/src# cat /app/data/OUTPUT.DAT
+
+root@907522a370a1:/app/src#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

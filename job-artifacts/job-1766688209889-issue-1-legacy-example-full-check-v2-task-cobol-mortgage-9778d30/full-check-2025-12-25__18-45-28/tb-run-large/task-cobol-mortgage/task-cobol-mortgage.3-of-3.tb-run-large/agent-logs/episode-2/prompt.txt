@@ -1,0 +1,256 @@
+New Terminal Output:
+
+root@b9423b228534:/app/src# cd /app/src
+root@b9423b228534:/app/src# nl -ba program.cbl | sed -n '1,40p'
+     1         IDENTIFICATION DIVISION.
+     2         PROGRAM-ID. PROGRAM.
+     3
+     4         ENVIRONMENT DIVISION.
+     5         CONFIGURATION SECTION.
+     6         SPECIAL-NAMES.
+     7             DECIMAL-POINT IS DOT.
+     8
+     9         INPUT-OUTPUT SECTION.
+    10         FILE-CONTROL.
+    11             SELECT INFILE ASSIGN TO "INPUT.DAT"
+    12                 ORGANIZATION IS LINE SEQUENTIAL.
+    13             SELECT OUTFILE ASSIGN TO "../data/OUTPUT.DAT"
+    14                 ORGANIZATION IS LINE SEQUENTIAL.
+    15
+    16         DATA DIVISION.
+    17         FILE SECTION.
+    18         FD  INFILE.
+    19         01  IN-REC                      PIC X(256).
+    20
+    21         FD  OUTFILE.
+    22         01  OUT-REC                     PIC X(256).
+    23
+    24         WORKING-STORAGE SECTION.
+    25         77  EOF-FLAG                    PIC X VALUE "N".
+    26
+    27         01  WS-FIELDS.
+    28             05  WS-ID-TXT               PIC X(40).
+    29             05  WS-NAME-TXT             PIC X(80).
+    30             05  WS-LOAN-TXT             PIC X(40).
+    31             05  WS-PROP-TXT             PIC X(40).
+    32             05  WS-DOWN-TXT             PIC X(40).
+    33             05  WS-TERM-TXT             PIC X(40).
+    34             05  WS-RATE-TXT             PIC X(40).
+    35
+    36         01  WS-IN.
+    37             05  WS-ID                   PIC X(10).
+    38             05  WS-NAME                 PIC X(30).
+    39             05  WS-LOAN                 PIC 9(10) VALUE 0.
+    40             05  WS-PROP                 PIC 9(10) VALUE 0.
+root@b9423b228534:/app/src# cat > program.cbl <<'EOF'
+>        IDENTIFICATION DIVISION.
+>        PROGRAM-ID. PROGRAM.
+>
+>        ENVIRONMENT DIVISION.
+>        INPUT-OUTPUT SECTION.
+>        FILE-CONTROL.
+>            SELECT INFILE ASSIGN TO "INPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>            SELECT OUTFILE ASSIGN TO "../data/OUTPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>
+>        DATA DIVISION.
+>        FILE SECTION.
+>        FD  INFILE.
+>        01  IN-REC                      PIC X(256).
+>
+>        FD  OUTFILE.
+>        01  OUT-REC                     PIC X(256).
+ >
+>        WORKING-STORAGE SECTION.
+>        77  EOF-FLAG                    PIC X VALUE "N".
+>
+ >        01  WS-FIELDS.
+>            05  WS-ID-TXT               PIC X(40).
+>            05  WS-NAME-TXT             PIC X(80).
+>            05  WS-LOAN-TXT             PIC X(40).
+>            05  WS-PROP-TXT             PIC X(40).
+>            05  WS-DOWN-TXT             PIC X(40).
+>            05  WS-TERM-TXT             PIC X(40).
+>            05  WS-RATE-TXT             PIC X(40).
+>
+>        01  WS-IN.
+>            05  WS-ID                   PIC X(10).
+>            05  WS-NAME                 PIC X(30).
+>            05  WS-LOAN                 PIC 9(10) VALUE 0.
+>            05  WS-PROP                 PIC 9(10) VALUE 0.
+>            05  WS-DOWN                 PIC 9(10) VALUE 0.
+>            05  WS-TERM-YEARS           PIC 9(2)  VALUE 0.
+>            05  WS-RATE                 PIC 9(3)V9(2) VALUE 0.
+>
+ >        01  WS-CALC.
+>            05  WS-MIN-DOWN             PIC 9(12)V99 VALUE 0.
+>            05  WS-TERM-MONTHS          PIC 9(4) VALUE 0.
+>            05  WS-MONTHLY-RATE         COMP-2 VALUE 0.
+>            05  WS-FACTOR               COMP-2 VALUE 0.
+>            05  WS-MONTHLY-PAY-RAW      COMP-2 VALUE 0.
+>            05  WS-BAL-RAW              COMP-2 VALUE 0.
+>            05  WS-INT-RAW              COMP-2 VALUE 0.
+>            05  WS-PRN-RAW              COMP-2 VALUE 0.
+>
+>        01  WS-OUT.
+>            05  OUT-ID                  PIC X(10).
+>            05  OUT-STATUS              PIC X(5).
+>            05  OUT-REASON              PIC X(50).
+>
+>        01  WS-SCHED.
+>            05  SCH-MON                 PIC 9(3).
+>            05  SCH-SP1                 PIC X VALUE " ".
+>            05  SCH-PAY                 PIC 9(8).99.
+>            05  SCH-SP2                 PIC X VALUE " ".
+>            05  SCH-INT                 PIC 9(8).99.
+>            05  SCH-SP3                 PIC X VALUE " ".
+>            05  SCH-PRN                 PIC 9(8).99.
+>            05  SCH-SP4                 PIC X VALUE " ".
+>            05  SCH-BAL                 PIC 9(10).99.
+>
+>        01  WS-NUM.
+>            05  N-LOAN                  COMP-2 VALUE 0.
+>            05  N-PROP                  COMP-2 VALUE 0.
+>            05  N-DOWN                  COMP-2 VALUE 0.
+>            05  N-RATE                  COMP-2 VALUE 0.
+>
+>        77  I                           PIC 9(4) VALUE 0.
+>        77  WS-ZERO                     COMP-2 VALUE 0.
+>
+>        PROCEDURE DIVISION.
+>        MAIN.
+>            OPEN INPUT INFILE
+>            OPEN OUTPUT OUTFILE
+>
+>            PERFORM UNTIL EOF-FLAG = "Y"
+>                READ INFILE
+>                    AT END
+>                        MOVE "Y" TO EOF-FLAG
+>                    NOT AT END
+>                        PERFORM PROCESS-REC
+>                END-READ
+>            END-PERFORM
+>
+>            CLOSE INFILE
+>            CLOSE OUTFILE
+>            STOP RUN.
+>
+>        PROCESS-REC.
+>            PERFORM PARSE-REC
+>            PERFORM CHECK-AND-WRITE.
+>
+>        PARSE-REC.
+>            MOVE SPACES TO WS-FIELDS
+>            UNSTRING IN-REC DELIMITED BY ";"
+>                INTO WS-ID-TXT
+>                     WS-NAME-TXT
+>                     WS-LOAN-TXT
+>                     WS-PROP-TXT
+>                     WS-DOWN-TXT
+>                     WS-TERM-TXT
+>                     WS-RATE-TXT
+>            END-UNSTRING
+>
+>            MOVE FUNCTION TRIM(WS-ID-TXT) TO WS-ID
+>            MOVE FUNCTION TRIM(WS-NAME-TXT) TO WS-NAME
+>
+>            COMPUTE N-LOAN = FUNCTION NUMVAL(WS-LOAN-TXT)
+>            COMPUTE N-PROP = FUNCTION NUMVAL(WS-PROP-TXT)
+>            COMPUTE N-DOWN = FUNCTION NUMVAL(WS-DOWN-TXT)
+>            COMPUTE N-RATE = FUNCTION NUMVAL(WS-RATE-TXT)
+>
+>            COMPUTE WS-LOAN = N-LOAN
+>            COMPUTE WS-PROP = N-PROP
+>            COMPUTE WS-DOWN = N-DOWN
+>            COMPUTE WS-RATE = N-RATE
+>            COMPUTE WS-TERM-YEARS = FUNCTION NUMVAL(WS-TERM-TXT).
+>
+>        CHECK-AND-WRITE.
+>            COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP * 0.15
+>
+>            IF WS-DOWN < WS-MIN-DOWN
+>                MOVE WS-ID TO OUT-ID
+>                MOVE "DENY " TO OUT-STATUS
+>                MOVE "INSUFFICIENT FUNDS FOR DOWN PAYMENT" TO OUT-REASON
+>                STRING OUT-ID OUT-STATUS OUT-REASON
+>                    DELIMITED BY SIZE INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>            ELSE
+>                MOVE WS-ID TO OUT-ID
+>                MOVE "APPRO" TO OUT-STATUS
+>                STRING OUT-ID OUT-STATUS
+>                    DELIMITED BY SIZE INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>                PERFORM WRITE-SCHEDULE
+>            END-IF.
+>
+>        WRITE-SCHEDULE.
+>            COMPUTE WS-TERM-MONTHS = WS-TERM-YEARS * 12
+>            IF WS-TERM-MONTHS = 0
+>                EXIT PARAGRAPH
+>            END-IF
+>
+>            COMPUTE WS-MONTHLY-RATE ROUNDED = WS-RATE / 1200
+>            COMPUTE WS-BAL-RAW = WS-LOAN
+>
+>            IF WS-MONTHLY-RATE = WS-ZERO
+>                COMPUTE WS-MONTHLY-PAY-RAW ROUNDED =
+>                    WS-BAL-RAW / WS-TERM-MONTHS
+>            ELSE
+>                COMPUTE WS-FACTOR =
+>                    (1 + WS-MONTHLY-RATE) ** (-1 * WS-TERM-MONTHS)
+>                COMPUTE WS-MONTHLY-PAY-RAW ROUNDED =
+>                    (WS-BAL-RAW * WS-MONTHLY-RATE) / (1 - WS-FACTOR)
+>            END-IF
+>
+>            PERFORM VARYING I FROM 1 BY 1 UNTIL I > WS-TERM-MONTHS
+>                COMPUTE WS-INT-RAW ROUNDED = WS-BAL-RAW * WS-MONTHLY-RATE
+>                COMPUTE WS-PRN-RAW ROUNDED =
+>                    WS-MONTHLY-PAY-RAW - WS-INT-RAW
+>
+>                IF I = WS-TERM-MONTHS
+>                    COMPUTE WS-PRN-RAW ROUNDED = WS-BAL-RAW
+>                    COMPUTE WS-MONTHLY-PAY-RAW ROUNDED =
+>                        WS-PRN-RAW + WS-INT-RAW
+>                    COMPUTE WS-BAL-RAW = 0
+>                ELSE
+>                    COMPUTE WS-BAL-RAW ROUNDED = WS-BAL-RAW - WS-PRN-RAW
+>                END-IF
+>
+>                MOVE I TO SCH-MON
+>                MOVE WS-MONTHLY-PAY-RAW TO SCH-PAY
+>                MOVE WS-INT-RAW TO SCH-INT
+>                MOVE WS-PRN-RAW TO SCH-PRN
+>                MOVE WS-BAL-RAW TO SCH-BAL
+>
+>                STRING SCH-MON SCH-SP1 SCH-PAY SCH-SP2 SCH-INT
+>                       SCH-SP3 SCH-PRN SCH-SP4 SCH-BAL
+>                    DELIMITED BY SIZE INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>            END-PERFORM.
+> EOF
+root@b9423b228534:/app/src# awk 'length($0)>80{print NR ":" length($0) ":" $0}' program.cbl | head
+root@b9423b228534:/app/src# cobc -x -Wall program.cbl
+root@b9423b228534:/app/src# ./program
+root@b9423b228534:/app/src# wc -l ../data/OUTPUT.DAT
+14 ../data/OUTPUT.DAT
+root@b9423b228534:/app/src# sed -n '1,80p' ../data/OUTPUT.DAT
+APP0000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT
+APP0000002APPROINSUFFICIENT FUNDS FOR DOWN PAYMENT
+001 00002316.70 00002291.66 00000025.03 0000004974.96
+002 00002316.70 00002280.19 00000036.51 0000004938.44
+003 00002316.70 00002263.45 00000053.24 0000004885.20
+004 00002316.70 00002239.05 00000077.65 0000004807.54
+005 00002316.70 00002203.45 00000113.24 0000004694.30
+006 00002316.70 00002151.55 00000165.14 0000004529.15
+007 00002316.70 00002075.86 00000240.84 0000004288.31
+008 00002316.70 00001965.47 00000351.22 0000003937.09
+009 00002316.70 00001804.49 00000512.20 0000003424.88
+010 00002316.70 00001569.73 00000746.96 0000002677.92
+011 00002316.70 00001227.38 00001089.32 0000001588.59
+012 00002316.70 00000728.10 00001588.59 0000000000.00
+root@b9423b228534:/app/src#

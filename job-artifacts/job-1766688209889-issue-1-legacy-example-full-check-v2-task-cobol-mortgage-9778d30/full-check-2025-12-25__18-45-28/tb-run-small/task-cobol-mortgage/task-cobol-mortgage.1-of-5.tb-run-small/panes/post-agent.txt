@@ -1,0 +1,310 @@
+root@7f1b4e49b628:/app# mkdir -p /app/src /app/data
+root@7f1b4e49b628:/app# cat > /app/src/program.cbl <<'EOF'
+> IDENTIFICATION DIVISION.
+> PROGRAM-ID. PROGRAM.
+> ENVIRONMENT DIVISION.
+> INPUT-OUTPUT SECTION.
+> FILE-CONTROL.
+>     SELECT INPUT-FILE ASSIGN TO "/app/src/INPUT.DAT"
+>         ORGANIZATION IS LINE SEQUENTIAL.
+>     SELECT OUTPUT-FILE ASSIGN TO "/app/data/OUTPUT.DAT"
+>         ORGANIZATION IS LINE SEQUENTIAL.
+> DATA DIVISION.
+> FILE SECTION.
+> FD INPUT-FILE.
+> 01 INPUT-REC PIC X(200).
+> FD OUTPUT-FILE.
+> 01 OUTPUT-REC PIC X(200).
+> WORKING-STORAGE SECTION.
+> 01 WS-EOF PIC X VALUE 'N'.
+> 01 WS-ID PIC X(10).
+> 01 WS-NAME PIC X(30).
+> 01 WS-LOAN-AMOUNT PIC 9(10).
+> 01 WS-PROP-VALUE PIC 9(10).
+> 01 WS-DOWN-PAYMENT PIC 9(10).
+> 01 WS-TERM PIC 9(2).
+> 01 WS-RATE PIC 9(3)V9(2).
+> 01 WS-MIN-DOWN PIC 9(10)V9(2).
+> 01 WS-MONTHLY-RATE PIC 9(5)V9(6).
+> 01 WS-MONTHLY-PAYMENT PIC 9(8)V9(2).
+> 01 WS-BALANCE PIC 9(10)V9(2).
+> 01 WS-INTEREST PIC 9(8)V9(2).
+> 01 WS-PRINCIPAL PIC 9(8)V9(2).
+> 01 WS-MONTH-NUM PIC 9(3).
+> 01 WS-MONTH-NUM-ED PIC 9(3).
+> 01 WS-MONTHLY-PAYMENT-ED PIC 9(8).99.
+> 01 WS-INTEREST-ED PIC 9(8).99.
+> 01 WS-PRINCIPAL-ED PIC 9(8).99.
+> 01 WS-BALANCE-ED PIC 9(10).99.
+> PROCEDURE DIVISION.
+>     OPEN INPUT INPUT-FILE
+>     OPEN OUTPUT OUTPUT-FILE
+>     PERFORM UNTIL WS-EOF = 'Y'
+>         READ INPUT-FILE
+>             AT END MOVE 'Y' TO WS-EOF
+>         NOT AT END
+>             PERFORM PROCESS-RECORD
+>         END-READ
+>     END-PERFORM
+>     CLOSE INPUT-FILE
+>     CLOSE OUTPUT-FILE
+>     STOP RUN.
+> PROCESS-RECORD.
+>     UNSTRING INPUT-REC DELIMITED BY ALL ';'
+>         INTO WS-ID
+>              WS-NAME
+>              WS-LOAN-AMOUNT
+>              WS-PROP-VALUE
+>              WS-DOWN-PAYMENT
+>              WS-TERM
+>              WS-RATE
+>     END-UNSTRING
+>     * Minimum down payment (15% of property value)
+>     COMPUTE WS-MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED
+>     IF WS-DOWN-PAYMENT < WS-MIN-DOWN
+>         * Rejected application
+>         MOVE WS-ID TO OUTPUT-REC(1:10)
+>         STRING "DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT"
+>             DELIMITED BY SIZE
+>             INTO OUTPUT-REC(11:200)
+>         END-STRING
+>         WRITE OUTPUT-REC
+>     ELSE
+>         * Approved application
+>         MOVE WS-ID TO OUTPUT-REC(1:10)
+>         STRING "APPRO"
+>             DELIMITED BY SIZE
+>             INTO OUTPUT-REC(11:200)
+>         END-STRING
+>         WRITE OUTPUT-REC
+>         * Compute monthly rate and payment
+>         COMPUTE WS-MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+>         COMPUTE WS-MONTHLY-PAYMENT = WS-LOAN-AMOUNT * WS-MONTHLY-RATE /
+>             (1 - FUNCTION POWER(1 + WS-MONTHLY-RATE, -WS-TERM)) ROUNDED
+>         MOVE WS-LOAN-AMOUNT TO WS-BALANCE
+>         PERFORM VARYING WS-MONTH-NUM FROM 1 BY 1 UNTIL WS-MONTH-NUM > WS-TERM
+>             COMPUTE WS-INTEREST = WS-BALANCE * WS-MONTHLY-RATE ROUNDED
+>             COMPUTE WS-PRINCIPAL = WS-MONTHLY-PAYMENT - WS-INTEREST ROUNDED
+>             COMPUTE WS-BALANCE = WS-BALANCE - WS-PRINCIPAL ROUNDED
+>             * Prepare formatted fields
+>             MOVE WS-MONTH-NUM TO WS-MONTH-NUM-ED
+>             MOVE WS-MONTHLY-PAYMENT TO WS-MONTHLY-PAYMENT-ED
+>             MOVE WS-INTEREST TO WS-INTEREST-ED
+>             MOVE WS-PRINCIPAL TO WS-PRINCIPAL-ED
+>             MOVE WS-BALANCE TO WS-BALANCE-ED
+>             STRING WS-MONTH-NUM-ED " "
+>                    WS-MONTHLY-PAYMENT-ED " "
+>                    WS-INTEREST-ED " "
+>                    WS-PRINCIPAL-ED " "
+>                    WS-BALANCE-ED DELIMITED BY SIZE
+>                    INTO OUTPUT-REC
+>             END-STRING
+>             WRITE OUTPUT-REC
+>         END-PERFORM
+>     END-IF.
+> EOF
+root@7f1b4e49b628:/app# cobc -x /app/src/program.cbl -o /app/src/program
+/app/src/program.cbl:1: error: invalid indicator 'F' at column 7
+/app/src/program.cbl:2: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:3: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:4: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:5: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:6: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:8: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:10: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:11: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:12: error: invalid indicator 'U' at column 7
+/app/src/program.cbl:13: error: invalid indicator 'U' at column 7
+/app/src/program.cbl:14: error: invalid indicator 'P' at column 7
+/app/src/program.cbl:15: error: invalid indicator 'P' at column 7
+/app/src/program.cbl:16: error: invalid indicator 'G' at column 7
+/app/src/program.cbl:17: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:18: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:19: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:20: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:21: error: invalid indicator 'P' at column 7
+/app/src/program.cbl:23: error: invalid indicator 'T' at column 7
+/app/src/program.cbl:24: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:25: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:26: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:27: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:28: error: invalid indicator 'B' at column 7
+/app/src/program.cbl:29: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:30: error: invalid indicator 'P' at column 7
+/app/src/program.cbl:31: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:32: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:33: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:34: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:35: error: invalid indicator 'P' at column 7
+/app/src/program.cbl:36: error: invalid indicator 'B' at column 7
+/app/src/program.cbl:37: error: invalid indicator 'U' at column 7
+/app/src/program.cbl:38: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:39: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:40: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:47: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:48: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:49: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:50: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:51: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:60: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:61: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:70: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:7: error: PROGRAM-ID header missing
+/app/src/program.cbl:7: error: PROCEDURE DIVISION header missing
+/app/src/program.cbl:7: error: syntax error, unexpected ORGANIZATION
+/app/src/program.cbl:9: error: syntax error, unexpected ORGANIZATION
+/app/src/program.cbl:41: error: 'INPUT-FILE' is not defined
+/app/src/program.cbl:41: error: 'INPUT-FILE' is not a file name
+/app/src/program.cbl:42: error: 'WS-EOF' is not defined
+/app/src/program.cbl:52: error: syntax error, unexpected INTO
+/app/src/program.cbl:64: error: 'WS-ID' is not defined
+/app/src/program.cbl:64: error: 'OUTPUT-REC' is not defined
+/app/src/program.cbl:71: error: syntax error, unexpected *
+/app/src/program.cbl:78: error: syntax error, unexpected *
+/app/src/program.cbl:78: error: 'monthly' is not defined
+/app/src/program.cbl:78: error: 'rate' is not defined
+/app/src/program.cbl:78: error: syntax error, unexpected AND
+/app/src/program.cbl:79: error: 'WS-MONTHLY-RATE' is not defined
+/app/src/program.cbl:79: error: 'WS-RATE' is not defined
+/app/src/program.cbl:79: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:80: error: 'WS-MONTHLY-PAYMENT' is not defined
+/app/src/program.cbl:80: error: 'WS-LOAN-AMOUNT' is not defined
+/app/src/program.cbl:81: error: 'WS-TERM' is not defined
+/app/src/program.cbl:81: error: FUNCTION 'POWER' unknown
+/app/src/program.cbl:81: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:82: error: 'WS-BALANCE' is not defined
+/app/src/program.cbl:83: error: 'WS-MONTH-NUM' is not defined
+/app/src/program.cbl:83: error: 'WS' is not defined
+/app/src/program.cbl:84: error: 'WS-INTEREST' is not defined
+/app/src/program.cbl:84: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:85: error: 'WS-PRINCIPAL' is not defined
+/app/src/program.cbl:85: error: syntax error, unexpected Identifier
+/app/src/program.cbl:86: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:88: error: 'WS-MONTH-NUM-ED' is not defined
+/app/src/program.cbl:89: error: 'WS-MONTHLY-PAYMENT-ED' is not defined
+/app/src/program.cbl:90: error: 'WS-INTEREST-ED' is not defined
+/app/src/program.cbl:91: error: 'WS-PRINCIPAL-ED' is not defined
+/app/src/program.cbl:92: error: 'WS-BALANCE-ED' is not defined
+/app/src/program.cbl:103: error: syntax error, unexpected end of file
+root@7f1b4e49b628:/app# /app/src/program
+bash: /app/src/program: No such file or directory
+root@7f1b4e49b628:/app# head -n 20 /app/data/OUTPUT.DAT
+
+root@7f1b4e49b628:/app# rm -f /app/src/program.cbl
+root@7f1b4e49b628:/app# cat > /app/src/program.cbl <<'EOF'
+>        IDENTIFICATION DIVISION.
+>        PROGRAM-ID.    PROGRAM.
+>        ENVIRONMENT DIVISION.
+>        INPUT-OUTPUT SECTION.
+>        FILE-CONTROL.
+>            SELECT INPUT-FILE ASSIGN TO "/app/src/INPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>            SELECT OUTPUT-FILE ASSIGN TO "/app/data/OUTPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>        DATA DIVISION.
+>        FILE SECTION.
+>        FD  INPUT-FILE.
+>        01  INPUT-REC            PIC X(200).
+>        FD  OUTPUT-FILE.
+>        01  OUTPUT-REC           PIC X(200).
+>        WORKING-STORAGE SECTION.
+>        01  WS-EOF               PIC X VALUE 'N'.
+>        01  WS-ID                PIC X(10).
+>        01  WS-NAME              PIC X(30).
+>        01  WS-LOAN-AMOUNT       PIC 9(10)V9(2).
+>        01  WS-PROP-VALUE        PIC 9(10)V9(2).
+>        01  WS-DOWN-PAYMENT      PIC 9(10)V9(2).
+>        01  WS-TERM              PIC 9(2).
+>        01  WS-RATE              PIC 9(3)V9(2).
+>        01  WS-MIN-DOWN          PIC 9(10)V9(2).
+>        01  WS-MONTHLY-RATE      PIC 9(5)V9(6).
+>        01  WS-MONTHLY-PAYMENT   PIC 9(8)V9(2).
+>        01  WS-BALANCE           PIC 9(10)V9(2).
+>        01  WS-INTEREST          PIC 9(8)V9(2).
+>        01  WS-PRINCIPAL         PIC 9(8)V9(2).
+>        01  WS-MONTH-NUM         PIC 9(3).
+>        01  WS-MONTH-NUM-ED      PIC Z(3).
+>        01  WS-MONTHLY-PAY-ED    PIC Z(8).99.
+>        01  WS-INTEREST-ED       PIC Z(8).99.
+>        01  WS-PRINCIPAL-ED      PIC Z(8).99.
+>        01  WS-BALANCE-ED        PIC Z(10).99.
+>        PROCEDURE DIVISION.
+>            OPEN INPUT INPUT-FILE
+>            OPEN OUTPUT OUTPUT-FILE
+>            PERFORM UNTIL WS-EOF = 'Y'
+>                READ INPUT-FILE
+>                    AT END MOVE 'Y' TO WS-EOF
+>                NOT AT END
+>                    PERFORM PROCESS-RECORD
+>                END-READ
+>            END-PERFORM
+>            CLOSE INPUT-FILE
+>            CLOSE OUTPUT-FILE
+>            STOP RUN.
+>        PROCESS-RECORD.
+>            UNSTRING INPUT-REC DELIMITED BY ALL ';'
+>                INTO WS-ID
+>                     WS-NAME
+>                     WS-LOAN-AMOUNT
+>                     WS-PROP-VALUE
+>                     WS-DOWN-PAYMENT
+>                     WS-TERM
+>                     WS-RATE
+>            END-UNSTRING
+>            COMPUTE WS-MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED
+>            IF WS-DOWN-PAYMENT < WS-MIN-DOWN
+>                MOVE WS-ID TO OUTPUT-REC(1:10)
+>                STRING "DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT"
+>                    DELIMITED BY SIZE
+>                    INTO OUTPUT-REC(11:200)
+>                END-STRING
+>                WRITE OUTPUT-REC
+>            ELSE
+>                MOVE WS-ID TO OUTPUT-REC(1:10)
+>                STRING "APPRO"
+>                    DELIMITED BY SIZE
+>                    INTO OUTPUT-REC(11:200)
+>                END-STRING
+>                WRITE OUTPUT-REC
+>                COMPUTE WS-MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+>                COMPUTE WS-MONTHLY-PAYMENT =
+>                    WS-LOAN-AMOUNT * WS-MONTHLY-RATE /
+>                    (1 - FUNCTION POWER(1 + WS-MONTHLY-RATE, -WS-TERM)) ROUNDED
+>                MOVE WS-LOAN-AMOUNT TO WS-BALANCE
+>                PERFORM VARYING WS-MONTH-NUM FROM 1 BY 1 UNTIL WS-MONTH-NUM > WS-TERM
+>                    COMPUTE WS-INTEREST = WS-BALANCE * WS-MONTHLY-RATE ROUNDED
+>                    COMPUTE WS-PRINCIPAL = WS-MONTHLY-PAYMENT - WS-INTEREST ROUNDED
+>                    COMPUTE WS-BALANCE = WS-BALANCE - WS-PRINCIPAL ROUNDED
+>                    MOVE WS-MONTH-NUM TO WS-MONTH-NUM-ED
+>                    MOVE WS-MONTHLY-PAYMENT TO WS-MONTHLY-PAY-ED
+>                    MOVE WS-INTEREST TO WS-INTEREST-ED
+>                    MOVE WS-PRINCIPAL TO WS-PRINCIPAL-ED
+>                    MOVE WS-BALANCE TO WS-BALANCE-ED
+>                    STRING WS-MONTH-NUM-ED " "
+>                           WS-MONTHLY-PAY-ED " "
+>                           WS-INTEREST-ED " "
+>                           WS-PRINCIPAL-ED " "
+>                           WS-BALANCE-ED DELIMITED BY SIZE
+>                           INTO OUTPUT-REC
+>                    END-STRING
+>                    WRITE OUTPUT-REC
+>                END-PERFORM
+>            END-IF.
+> EOF
+root@7f1b4e49b628:/app# cobc -x /app/src/program.cbl -o /app/src/program
+/app/src/program.cbl: in paragraph 'PROCESS-RECORD':
+/app/src/program.cbl:60: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:65: error: length of 'OUTPUT-REC' out of bounds: 200
+/app/src/program.cbl:72: error: length of 'OUTPUT-REC' out of bounds: 200
+/app/src/program.cbl:75: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:78: error: FUNCTION 'POWER' unknown
+/app/src/program.cbl:78: error: syntax error, unexpected Identifier
+/app/src/program.cbl:80: error: 'WS-MONTH-N' is not defined
+/app/src/program.cbl:81: error: syntax error, unexpected Identifier
+/app/src/program.cbl:82: error: 'WS-INTERE' is not defined
+/app/src/program.cbl:83: error: syntax error, unexpected Identifier
+root@7f1b4e49b628:/app# /app/src/program
+bash: /app/src/program: No such file or directory
+root@7f1b4e49b628:/app# head -n 20 /app/data/OUTPUT.DAT
+
+root@7f1b4e49b628:/app#

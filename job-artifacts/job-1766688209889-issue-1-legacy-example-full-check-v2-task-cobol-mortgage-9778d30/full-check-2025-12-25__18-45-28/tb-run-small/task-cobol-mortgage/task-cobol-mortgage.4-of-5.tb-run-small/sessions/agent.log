@@ -1,0 +1,375 @@
+[?2004hroot@1a131b779730:/app# asciinema rec --stdin /logs/agent.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@1a131b779730:/app# clear
+[?2004l[H[J[3J[?2004hroot@1a131b779730:/app# ls -R /app
+[?2004l/app:
+data  src
+
+/app/data:
+OUTPUT.DAT
+
+/app/src:
+INPUT.DAT
+[?2004hroot@1a131b779730:/app# cat > /app/src/program.cbl <<'EOF'
+[?2004l[?2004h> IDENTIFICATION DIVISION.
+[?2004l      COMPUTE MONTHLY-PMT = WS-LOAN-AMT * MONTHLY-RATE
+            / (1 - (1 + MONTHLY-RATE) ** (-WS-TERM)) ROUNDED
+        MOVE WS-LOAN-AMT TO BALANCE
+        PERFORM VARYING MON-NUM FROM 1 BY 1 UNTIL MON-NUM > WS-TERM
+            COMPUTE INTEREST = BALANCE * MONTHLY-RATE ROUNDED
+            COMPUTE PRINCIPAL = MONTHLY-PMT - INTEREST ROUNDED
+            COMPUTE BALANCE = BALANCE - PRINCIPAL ROUNDED
+            * Build output line: mon-num payment interest principal balance
+            MOVE MON-NUM TO LINE-OUT(1:3)
+            MOVE " " TO LINE-OUT(4:4)
+            MOVE MONTHLY-PMT TO LINE-OUT(5:14)
+            MOVE " " TO LINE-OUT(15:15)
+            MOVE INTEREST TO LINE-OUT(16:25)
+            MOVE " " TO LINE-OUT(26:26)
+            MOVE PRINCIPAL TO LINE-OUT(27:36)
+            MOVE " " TO LINE-OUT(37:37)
+            MOVE BALANCE TO LINE-OUT(38:47)
+            MOVE LINE-OUT TO OUT-REC
+            WRITE OUTFILE FROM OUT-REC
+        END-PERFORM
+    END-IF.
+EOF
+[?2004h> PROGRAM-ID. MORTGAGE.
+[?2004l[?2004h> 
+[?2004l[?2004h> ENVIRONMENT DIVISION.
+[?2004l[?2004h> INPUT-OUTPUT SECTION.
+[?2004l[?2004h> FILE-CONTROL.
+[?2004l[?2004h>     SELECT INFILE ASSIGN TO '/app/src/INPUT.DAT'
+[?2004l[?2004h>         ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>     SELECT OUTFILE ASSIGN TO '/app/data/OUTPUT.DAT'
+[?2004l[?2004h>         ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> 
+[?2004l[?2004h> DATA DIVISION.
+[?2004l[?2004h> FILE SECTION.
+[?2004l[?2004h> FD INFILE.
+[?2004l[?2004h> 01 IN-REC PIC X(200).
+[?2004l[?2004h> FD OUTFILE.
+[?2004l[?2004h> 01 OUT-REC PIC X(200).
+[?2004l[?2004h> 
+[?2004l[?2004h> WORKING-STORAGE SECTION.
+[?2004l[?2004h> 01 WS-EOF        PIC X VALUE 'N'.
+[?2004l[?2004h>    88 END-OF-FILE VALUE 'Y'.
+[?2004l[?2004h> 01 WS-ID         PIC X(10).
+[?2004l[?2004h> 01 WS-NAME       PIC X(30).
+[?2004l[?2004h> 01 WS-LOAN-AMT   PIC 9(10)V99.
+[?2004l[?2004h> 01 WS-PROP-VALUE PIC 9(10)V99.
+[?2004l[?2004h> 01 WS-DOWN-PAY   PIC 9(10)V99.
+[?2004l[?2004h> 01 WS-TERM       PIC 9(2).
+[?2004l[?2004h> 01 WS-RATE       PIC 9(3)V99.
+[?2004l[?2004h> 01 MIN-DOWN     PIC 9(10)V99.
+[?2004l[?2004h> 01 MONTHLY-RATE PIC V9(6).
+[?2004l[?2004h> 01 MONTHLY-PMT  PIC 9(10)V99.
+[?2004l[?2004h> 01 BALANCE      PIC 9(10)V99.
+[?2004l[?2004h> 01 INTEREST     PIC 9(10)V99.
+[?2004l[?2004h> 01 PRINCIPAL    PIC 9(10)V99.
+[?2004l[?2004h> 01 MON-NUM      PIC 9(3).
+[?2004l[?2004h> 01 LINE-OUT.
+[?2004l[?2004h>    05 FILLER     PIC X(200).
+[?2004l[?2004h> 
+[?2004l[?2004h> PROCEDURE DIVISION.
+[?2004l[?2004h>     OPEN INPUT INFILE
+[?2004l[?2004h>     OPEN OUTPUT OUTFILE
+[?2004l[?2004h>     PERFORM UNTIL END-OF-FILE
+[?2004l[?2004h>         READ INFILE INTO IN-REC
+[?2004l[?2004h>             AT END MOVE 'Y' TO WS-EOF
+[?2004l[?2004h>         NOT AT END
+[?2004l[?2004h>             PERFORM PROCESS-RECORD
+[?2004l[?2004h>         END-READ
+[?2004l[?2004h>     END-PERFORM
+[?2004l[?2004h>     CLOSE INFILE OUTFILE
+[?2004l[?2004h>     STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h> PROCESS-RECORD.
+[?2004l[?2004h>     UNSTRING IN-REC DELIMITED BY ';'
+[?2004l[?2004h>         INTO WS-ID,
+[?2004l[?2004h>              WS-NAME,
+[?2004l[?2004h>              WS-LOAN-AMT,
+[?2004l[?2004h>              WS-PROP-VALUE,
+[?2004l[?2004h>              WS-DOWN-PAY,
+[?2004l[?2004h>              WS-TERM,
+[?2004l[?2004h>              WS-RATE
+[?2004l[?2004h>     END-UNSTRING
+[?2004l[?2004h>     COMPUTE MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED
+[?2004l[?2004h>     IF WS-DOWN-PAY < MIN-DOWN
+[?2004l[?2004h>         MOVE WS-ID TO OUT-REC(1:10)
+[?2004l[?2004h>         STRING "DENY" DELIMITED BY SIZE
+[?2004l[?2004h>                " INSUFFICIENT FUNDS FOR DOWN PAYMENT"
+[?2004l[?2004h>                INTO OUT-REC(11:)
+[?2004l[?2004h>         WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>     ELSE
+[?2004l[?2004h>         *--- Approved application ---*
+[?2004l[?2004h>         MOVE WS-ID TO OUT-REC(1:10)
+[?2004l[?2004h>         STRING "APPRO" DELIMITED BY SIZE INTO OUT-REC(11:)
+[?2004l[?2004h>         WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>         *--- Compute payment schedule ---*
+[?2004l[?2004h>         COMPUTE MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+[?2004l[?2004h>         COMPUTE MONTHLY-PMT = WS-LOAN-AMT * MONTHLY-RATE
+[?2004l[?2004h>             / (1 - (1 + MONTHLY-RATE) ** (-WS-TERM)) ROUNDED
+[?2004l[?2004h>         MOVE WS-LOAN-AMT TO BALANCE
+[?2004l[?2004h>         PERFORM VARYING MON-NUM FROM 1 BY 1 UNTIL MON-NUM > WS-TERM
+[?2004l[?2004h>             COMPUTE INTEREST = BALANCE * MONTHLY-RATE ROUNDED
+[?2004l[?2004h>             COMPUTE PRINCIPAL = MONTHLY-PMT - INTEREST ROUNDED
+[?2004l[?2004h>             COMPUTE BALANCE = BALANCE - PRINCIPAL ROUNDED
+[?2004l[?2004h>             * Build output line: mon-num payment interest principal balance
+[?2004l[?2004h>             MOVE MON-NUM TO LINE-OUT(1:3)
+[?2004l[?2004h>             MOVE " " TO LINE-OUT(4:4)
+[?2004l[?2004h>             MOVE MONTHLY-PMT TO LINE-OUT(5:14)
+[?2004l[?2004h>             MOVE " " TO LINE-OUT(15:15)
+[?2004l[?2004h>             MOVE INTEREST TO LINE-OUT(16:25)
+[?2004l[?2004h>             MOVE " " TO LINE-OUT(26:26)
+[?2004l[?2004h>             MOVE PRINCIPAL TO LINE-OUT(27:36)
+[?2004l[?2004h>             MOVE " " TO LINE-OUT(37:37)
+[?2004l[?2004h>             MOVE BALANCE TO LINE-OUT(38:47)
+[?2004l[?2004h>             MOVE LINE-OUT TO OUT-REC
+[?2004l[?2004h>             WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>         END-PERFORM
+[?2004l[?2004h>     END-IF.
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@1a131b779730:/app# cobc -x /app/src/program.cbl -o /app/src/program
+[?2004l/app/src/program.cbl:1: error: invalid indicator 'F' at column 7
+/app/src/program.cbl:2: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:4: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:5: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:6: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:7: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:9: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:12: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:13: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:14: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:15: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:16: error: invalid indicator 'F' at column 7
+/app/src/program.cbl:17: warning: continuation of COBOL words used [-Wdialect]
+/app/src/program.cbl:19: error: invalid indicator 'G' at column 7
+/app/src/program.cbl:20: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:21: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:22: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:23: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:24: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:25: error: invalid indicator 'P' at column 7
+/app/src/program.cbl:27: error: invalid indicator 'T' at column 7
+/app/src/program.cbl:28: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:29: warning: continuation of COBOL words used [-Wdialect]
+/app/src/program.cbl:30: error: invalid indicator 'T' at column 7
+/app/src/program.cbl:31: error: invalid indicator 'T' at column 7
+/app/src/program.cbl:32: error: invalid indicator 'A' at column 7
+/app/src/program.cbl:33: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:34: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:35: warning: continuation of COBOL words used [-Wdialect]
+/app/src/program.cbl:36: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:37: error: invalid indicator 'F' at column 7
+/app/src/program.cbl:39: error: invalid indicator 'U' at column 7
+/app/src/program.cbl:40: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:41: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:42: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:49: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:50: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:52: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:53: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:62: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:69: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:8: error: PROGRAM-ID header missing
+/app/src/program.cbl:8: error: PROCEDURE DIVISION header missing
+/app/src/program.cbl:8: error: syntax error, unexpected ORGANIZATION
+/app/src/program.cbl:10: error: syntax error, unexpected ORGANIZATION
+/app/src/program.cbl:10: error: D must be followed by B
+/app/src/program.cbl:10: error: invalid PICTURE character 'O'
+/app/src/program.cbl:10: error: invalid PICTURE character 'W'
+/app/src/program.cbl:10: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+/app/src/program.cbl:10: error: . cannot follow A or X
+/app/src/program.cbl:10: error: CR or DB cannot follow A or X
+/app/src/program.cbl:10: error: N cannot follow .
+/app/src/program.cbl:10: error: N cannot follow CR or DB
+/app/src/program.cbl:10: error: N cannot follow A or X
+/app/src/program.cbl:10: error: unknown statement 'REC'
+/app/src/program.cbl:10: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+/app/src/program.cbl:10: error: invalid PICTURE character 'U'
+/app/src/program.cbl:10: error: invalid PICTURE character 'M'
+/app/src/program.cbl:10: error: . cannot follow V
+/app/src/program.cbl:10: error: N cannot follow .
+/app/src/program.cbl:10: error: N cannot follow 9
+/app/src/program.cbl:10: error: N cannot follow V
+/app/src/program.cbl:43: error: 'INFILE' is not defined
+/app/src/program.cbl:43: error: 'INFILE' is not a file name
+/app/src/program.cbl:43: error: 'IN-REC' is not defined
+/app/src/program.cbl:44: error: 'WS-EOF' is not defined
+/app/src/program.cbl:54: error: syntax error, unexpected INTO
+/app/src/program.cbl:64: error: 'WS-ID' is not defined
+/app/src/program.cbl:64: error: 'OUT-REC' is not defined
+/app/src/program.cbl:68: error: 'OUTFILE' is not defined
+/app/src/program.cbl:70: error: syntax error, unexpected *
+/app/src/program.cbl:74: error: syntax error, unexpected *
+/app/src/program.cbl:74: error: 'payment' is not defined
+/app/src/program.cbl:74: error: 'schedule' is not defined
+/app/src/program.cbl:74: error: syntax error, unexpected -
+/app/src/program.cbl:75: error: 'MONTHLY-RATE' is not defined
+/app/src/program.cbl:75: error: 'WS-RATE' is not defined
+/app/src/program.cbl:75: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:76: error: 'MONTHLY-PMT' is not defined
+/app/src/program.cbl:76: error: 'WS-LOAN-AMT' is not defined
+/app/src/program.cbl:77: error: 'WS-TERM' is not defined
+/app/src/program.cbl:77: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:78: error: 'BALANCE' is not defined
+/app/src/program.cbl:79: error: 'MON-NUM' is not defined
+/app/src/program.cbl:80: error: 'INTEREST' is not defined
+/app/src/program.cbl:80: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:81: error: 'PRINCIPAL' is not defined
+/app/src/program.cbl:81: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:82: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:84: error: 'LINE-OUT' is not defined
+/app/src/program.cbl:97: error: syntax error, unexpected end of file
+[?2004hroot@1a131b779730:/app# /app/src/program
+[?2004lbash: /app/src/program: No such file or directory
+[?2004hroot@1a131b779730:/app# cat /app/data/OUTPUT.DAT
+[?2004l
+[?2004hroot@1a131b779730:/app# cat > /app/src/program.cbl <<'EOF'
+[?2004lBY SIZE
+                      " INSUFFICIENT FUNDS FOR DOWN PAYMENT"
+                      INTO OUT-REC(11:)
+               WRITE OUTFILE FROM OUT-REC
+           ELSE
+               *--- Approved application ---*
+               MOVE WS-ID TO OUT-REC(1:10)
+               STRING "APPRO" DELIMITED BY SIZE INTO OUT-REC(11:)
+               WRITE OUTFILE FROM OUT-REC
+               *--- Compute payment schedule ---*
+               COMPUTE MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+               COMPUTE MONTHLY-PMT = WS-LOAN-AMT * MONTHLY-RATE
+                     / (1 - (1 + MONTHLY-RATE) ** (-WS-TERM)) ROUNDED
+               MOVE WS-LOAN-AMT TO BALANCE
+               PERFORM VARYING MON-NUM FROM 1 BY 1 UNTIL MON-NUM > WS-TERM
+                   COMPUTE INTEREST = BALANCE * MONTHLY-RATE ROUNDED
+                   COMPUTE PRINCIPAL = MONTHLY-PMT - INTEREST ROUNDED
+                   COMPUTE BALANCE = BALANCE - PRINCIPAL ROUNDED
+                   * Build output line for this month *
+                   MOVE MON-NUM TO LI[?2004h>        IDENTIFICATION DIVISION.
+[?2004l[?2004h>        PROGRAM-ID. MORTGAGE.
+[?2004l[?2004h> 
+[?2004l[?2004h>        ENVIRONMENT DIVISION.
+[?2004l[?2004h>        INPUT-OUTPUT SECTION.
+[?2004l[?2004h>        FILE-CONTROL.
+[?2004l[?2004h>            SELECT INFILE ASSIGN TO '/app/src/INPUT.DAT'
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>            SELECT OUTFILE ASSIGN TO '/app/data/OUTPUT.DAT'
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> 
+[?2004l[?2004h>        DATA DIVISION.
+[?2004l[?2004h>        FILE SECTION.
+[?2004l[?2004h>        FD INFILE.
+[?2004l[?2004h>        01 IN-REC PIC X(200).
+[?2004l[?2004h>        FD OUTFILE.
+[?2004l[?2004h>        01 OUT-REC PIC X(200).
+[?2004l[?2004h> 
+[?2004l[?2004h>        WORKING-STORAGE SECTION.
+[?2004l[?2004h>        01 WS-EOF        PIC X VALUE 'N'.
+[?2004l[?2004h>           88 END-OF-FILE VALUE 'Y'.
+[?2004l[?2004h>        01 WS-ID         PIC X(10).
+[?2004l[?2004h>        01 WS-NAME       PIC X(30).
+[?2004l[?2004h>        01 WS-LOAN-AMT   PIC 9(10)V99.
+[?2004l[?2004h>        01 WS-PROP-VALUE PIC 9(10)V99.
+[?2004l[?2004h>        01 WS-DOWN-PAY   PIC 9(10)V99.
+[?2004l[?2004h>        01 WS-TERM       PIC 9(2).
+[?2004l[?2004h>        01 WS-RATE       PIC 9(3)V99.
+[?2004l[?2004h>        01 MIN-DOWN      PIC 9(10)V99.
+[?2004l[?2004h>        01 MONTHLY-RATE  PIC V9(6).
+[?2004l[?2004h>        01 MONTHLY-PMT   PIC 9(10)V99.
+[?2004l[?2004h>        01 BALANCE       PIC 9(10)V99.
+[?2004l[?2004h>        01 INTEREST      PIC 9(10)V99.
+[?2004l[?2004h>        01 PRINCIPAL     PIC 9(10)V99.
+[?2004l[?2004h>        01 MON-NUM       PIC 9(3).
+[?2004l[?2004h>        01 LINE-OUT      PIC X(200).
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCEDURE DIVISION.
+[?2004l[?2004h>            OPEN INPUT INFILE
+[?2004l[?2004h>            OPEN OUTPUT OUTFILE
+[?2004l[?2004h>            PERFORM UNTIL END-OF-FILE
+[?2004l[?2004h>                READ INFILE INTO IN-REC
+[?2004l[?2004h>                    AT END MOVE 'Y' TO WS-EOF
+[?2004l[?2004h>                NOT AT END
+[?2004l[?2004h>                    PERFORM PROCESS-RECORD
+[?2004l[?2004h>                END-READ
+[?2004l[?2004h>            END-PERFORM
+[?2004l[?2004h>            CLOSE INFILE OUTFILE
+[?2004l[?2004h>            STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCESS-RECORD.
+[?2004l[?2004h>            UNSTRING IN-REC DELIMITED BY ';'
+[?2004l[?2004h>                INTO WS-ID,
+[?2004l[?2004h>                     WS-NAME,
+[?2004l[?2004h>                     WS-LOAN-AMT,
+[?2004l[?2004h>                     WS-PROP-VALUE,
+[?2004l[?2004h>                     WS-DOWN-PAY,
+[?2004l[?2004h>                     WS-TERM,
+[?2004l[?2004h>                     WS-RATE
+[?2004l[?2004h>            END-UNSTRING
+[?2004l[?2004h>            COMPUTE MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED
+[?2004l[?2004h>            IF WS-DOWN-PAY < MIN-DOWN
+[?2004l[?2004h>                MOVE WS-ID TO OUT-REC(1:10)
+[?2004l[?2004h>                STRING "DENY" DELIMITED BY SIZE
+[?2004l[?2004h>                       " INSUFFICIENT FUNDS FOR DOWN PAYMENT"
+[?2004l[?2004h>                       INTO OUT-REC(11:)
+[?2004l[?2004h>                WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                *--- Approved application ---*
+[?2004l[?2004h>                MOVE WS-ID TO OUT-REC(1:10)
+[?2004l[?2004h>                STRING "APPRO" DELIMITED BY SIZE INTO OUT-REC(11:)
+[?2004l[?2004h>                WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>                *--- Compute payment schedule ---*
+[?2004l[?2004h>                COMPUTE MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+[?2004l[?2004h>                COMPUTE MONTHLY-PMT = WS-LOAN-AMT * MONTHLY-RATE
+[?2004l[?2004h>                      / (1 - (1 + MONTHLY-RATE) ** (-WS-TERM)) ROUNDED
+[?2004l[?2004h>                MOVE WS-LOAN-AMT TO BALANCE
+[?2004l[?2004h>                PERFORM VARYING MON-NUM FROM 1 BY 1 UNTIL MON-NUM > WS-TERM
+[?2004l[?2004h>                    COMPUTE INTEREST = BALANCE * MONTHLY-RATE ROUNDED
+[?2004l[?2004h>                    COMPUTE PRINCIPAL = MONTHLY-PMT - INTEREST ROUNDED
+[?2004l[?2004h>                    COMPUTE BALANCE = BALANCE - PRINCIPAL ROUNDED
+[?2004l[?2004h>                    * Build output line for this month *
+[?2004l[?2004h>                    MOVE MON-NUM TO LINE-OUT(1:3)
+[?2004l[?2004h>                    MOVE " " TO LINE-OUT(4:4)
+[?2004l[?2004h>                    MOVE MONTHLY-PMT TO LINE-OUT(5:14)
+[?2004l[?2004h>                    MOVE " " TO LINE-OUT(15:15)
+[?2004l[?2004h>                    MOVE INTEREST TO LINE-OUT(16:25)
+[?2004l[?2004h>                    MOVE " " TO LINE-OUT(26:26)
+[?2004l[?2004h>                    MOVE PRINCIPAL TO LINE-OUT(27:36)
+[?2004l[?2004h>                    MOVE " " TO LINE-OUT(37:37)
+[?2004l[?2004h>                    MOVE BALANCE TO LINE-OUT(38:47)
+[?2004l[?2004h>                    MOVE LINE-OUT TO OUT-REC
+[?2004l[?2004h>                    WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>                END-PERFORM
+[?2004l[?2004h>            END-IF.
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@1a131b779730:/app# cobc -x /app/src/program.cbl -o /app/src/program
+[?2004l/app/src/program.cbl: in paragraph 'PROCESS-RECORD':
+/app/src/program.cbl:61: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:67: error: WRITE requires a record name as subject
+/app/src/program.cbl:69: error: syntax error, unexpected *
+/app/src/program.cbl:72: error: WRITE requires a record name as subject
+/app/src/program.cbl:73: error: syntax error, unexpected *
+/app/src/program.cbl:73: error: 'payment' is not defined
+/app/src/program.cbl:73: error: 'schedule' is not defined
+/app/src/program.cbl:73: error: syntax error, unexpected -
+/app/src/program.cbl:74: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:76: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:78: error: 'WS-TE' is not defined
+/app/src/program.cbl:79: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:80: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:81: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:85: error: invalid MOVE statement
+/app/src/program.cbl:87: error: invalid MOVE statement
+/app/src/program.cbl:89: error: invalid MOVE statement
+/app/src/program.cbl:91: error: invalid MOVE statement
+/app/src/program.cbl:93: error: WRITE requires a record name as subject
+[?2004hroot@1a131b779730:/app# /app/src/program
+[?2004lbash: /app/src/program: No such file or directory
+[?2004hroot@1a131b779730:/app# cat /app/data/OUTPUT.DAT
+[?2004l
+[?2004hroot@1a131b779730:/app# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/agent.cast[0m
+[?2004hroot@1a131b779730:/app# 

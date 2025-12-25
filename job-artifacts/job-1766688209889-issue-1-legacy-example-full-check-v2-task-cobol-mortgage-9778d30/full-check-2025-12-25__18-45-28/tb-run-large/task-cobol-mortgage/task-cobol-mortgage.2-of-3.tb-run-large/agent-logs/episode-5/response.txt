@@ -1,0 +1,6 @@
+{
+  "analysis": "program.cbl is present in /app/src, compiles and runs with GnuCOBOL 3, reads INPUT.DAT, and writes /app/data/OUTPUT.DAT with correct DENY/APPRO records and a payment schedule for approvals. Verification shows no stray '>' characters and no lines exceed 80 characters. The fixed-format requirement is satisfied (no SOURCE FORMAT directive, and the compiler defaults to fixed).",
+  "plan": "No further changes are needed; mark the task complete.",
+  "commands": [],
+  "task_complete": true
+}

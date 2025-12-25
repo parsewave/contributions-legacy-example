@@ -1,0 +1,6 @@
+{
+  "analysis": "The COBOL source /app/src/program.cbl exists, contains only printable characters, and follows fixed-format layout. It compiles cleanly with GnuCOBOL (cobc -x -Wall) and runs from /app/src using INPUT.DAT in the same directory. The program generates /app/data/OUTPUT.DAT with the required DENY/APPRO lines and, for approved applications, a detailed payment schedule matching the requested numeric formatting and no header.",
+  "plan": "No further changes are needed. Mark the task as complete for grading.",
+  "commands": [],
+  "task_complete": true
+}

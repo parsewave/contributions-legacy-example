@@ -1,0 +1,4 @@
+{
+    "outcome": "PASS",
+    "explanation": "The instructions clearly specify file locations, input format, calculations (including rounding), and required output structure and destination. The tests compile and run the program successfully but the OUTPUT.DAT file is empty, indicating the agent’s implementation didn’t write results rather than a mismatch caused by unspecified requirements. While the exact rejection status string (“DENY”) is implied more by the example than an explicit mandate, the observed failure is due to no output at all, not a minor formatting or naming discrepancy. Thus, the failure is due to agent implementation, not insufficient task instructions."
+}

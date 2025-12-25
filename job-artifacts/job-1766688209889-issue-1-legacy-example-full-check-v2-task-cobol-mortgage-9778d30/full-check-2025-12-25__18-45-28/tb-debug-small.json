@@ -1,0 +1,4 @@
+{
+    "outcome": "PASS",
+    "explanation": "The task instructions are detailed and sufficient: required file path, fixed-format COBOL constraints (no directive, lines ≤80), compiler (GnuCOBOL 3), input format (semicolon-separated with specific PIC sizes), decision rule (15% minimum down payment), annuity formula, rounding requirement, and exact output structure including schedule fields. Test failures stem from agent implementation issues: multiple compilation errors due to incorrect fixed-format column placement (invalid indicator at column 7), misuse of ROUNDED in COMPUTE statements, use of unsupported FUNCTION POWER, invalid WRITE subjects, and record/field definition errors. Some trials also violated the explicit ≤80 chars line rule. There is no evidence the tests rely on hidden or unspecified requirements; they compile and run the program as stated. Hence failures are due to agent limitations, not insufficient instructions."
+}

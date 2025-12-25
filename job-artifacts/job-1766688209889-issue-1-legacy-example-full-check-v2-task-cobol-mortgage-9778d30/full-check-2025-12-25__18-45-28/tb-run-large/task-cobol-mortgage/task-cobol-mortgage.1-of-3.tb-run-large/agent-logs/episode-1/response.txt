@@ -1,0 +1,31 @@
+{
+  "analysis": "program.cbl was created, compiles in fixed-format mode (no -free needed), runs from /app/src, reads INPUT.DAT, and produces /app/data/OUTPUT.DAT with DENY/APPRO plus a schedule for approved applications. The output preview matches the required formatting. One remaining risk is that the interactive paste showed some screen artifacts; we should verify program.cbl contains only valid text (no stray/non-printable characters) and recompile/run once more to confirm reproducibility.",
+  "plan": "1) Scan program.cbl for non-printable/stray characters and show key sections with visible whitespace. 2) Recompile in fixed format (default) and rerun. 3) Re-check OUTPUT.DAT header lines to confirm format remains correct.",
+  "commands": [
+    {
+      "keystrokes": "cd /app/src\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "grep -nP \"[^\\x09\\x0A\\x0D\\x20-\\x7E]\" program.cbl || echo \"OK: no non-printable chars\"\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,40p' program.cbl | cat -A\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cobc -x -Wall -o program program.cbl\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "./program\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "head -n 20 /app/data/OUTPUT.DAT\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": true
+}

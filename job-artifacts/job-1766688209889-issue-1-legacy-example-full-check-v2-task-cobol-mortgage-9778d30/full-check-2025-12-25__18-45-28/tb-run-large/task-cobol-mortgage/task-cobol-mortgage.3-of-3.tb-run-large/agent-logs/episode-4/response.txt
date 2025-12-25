@@ -1,0 +1,6 @@
+{
+  "analysis": "Verified that /app/src/program.cbl exists and /app/data/OUTPUT.DAT is generated and non-empty. The program compiles with GnuCOBOL 3 and runs from /app/src, producing the required decision lines and (for approvals) the payment schedule in the specified format.",
+  "plan": "No further changes needed. Mark task as complete for grading.",
+  "commands": [],
+  "task_complete": true
+}

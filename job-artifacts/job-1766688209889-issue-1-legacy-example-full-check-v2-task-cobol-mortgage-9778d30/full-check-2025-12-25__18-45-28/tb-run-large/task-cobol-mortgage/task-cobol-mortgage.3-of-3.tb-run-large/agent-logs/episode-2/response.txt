@@ -1,0 +1,31 @@
+{
+  "analysis": "The program now compiles and runs, producing OUTPUT.DAT, but the approved application line is wrong: it shows `APP0000002APPROINSUFFICIENT...` because OUT-REC (PIC X(256)) is not cleared before writing the APPRO line, so leftover text from the prior DENY record remains. We must clear OUT-REC (MOVE SPACES) before each STRING/WRITE, especially for APPRO and schedule lines, then re-run to regenerate clean output.",
+  "plan": "Patch /app/src/program.cbl to `MOVE SPACES TO OUT-REC` immediately before each `STRING ... INTO OUT-REC` (DENY, APPRO, and schedule lines). Recompile with cobc, run from /app/src to recreate ../data/OUTPUT.DAT, and verify the output no longer has leftover text on the APPRO line.",
+  "commands": [
+    {
+      "keystrokes": "cd /app/src\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "python3 - <<'PY'\nfrom pathlib import Path\np = Path('program.cbl')\nlines = p.read_text().splitlines(True)\nout = []\nfor line in lines:\n    stripped = line.lstrip()\n    # Insert \"MOVE SPACES TO OUT-REC\" right before STRINGs that build OUT-REC\n    if stripped.startswith('STRING OUT-ID OUT-STATUS OUT-REASON'):\n        indent = line[:len(line)-len(stripped)]\n        out.append(f\"{indent}MOVE SPACES TO OUT-REC\\n\")\n        out.append(line)\n        continue\n    if stripped.startswith('STRING OUT-ID OUT-STATUS') and 'OUT-REASON' not in stripped:\n        indent = line[:len(line)-len(stripped)]\n        out.append(f\"{indent}MOVE SPACES TO OUT-REC\\n\")\n        out.append(line)\n        continue\n    if stripped.startswith('STRING SCH-MON'):\n        indent = line[:len(line)-len(stripped)]\n        out.append(f\"{indent}MOVE SPACES TO OUT-REC\\n\")\n        out.append(line)\n        continue\n    out.append(line)\n\np.write_text(''.join(out))\nPY\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "awk 'length($0)>80{print NR \":\" length($0) \":\" $0}' program.cbl | head\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cobc -x -Wall program.cbl\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "./program\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "sed -n '1,40p' ../data/OUTPUT.DAT\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

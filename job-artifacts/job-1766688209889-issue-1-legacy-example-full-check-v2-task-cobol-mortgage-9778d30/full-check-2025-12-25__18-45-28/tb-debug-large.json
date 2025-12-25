@@ -1,0 +1,4 @@
+{
+    "outcome": "PASS",
+    "explanation": "The failures are due to the program’s implementation (file not opened before READ, using incorrect/relative paths) rather than missing or ambiguous instructions. The task explicitly specifies the input path (/app/src/INPUT.DAT) and output path (/app/data/OUTPUT.DAT), fixed-format COBOL, and the required processing. Tests only require that the program compiles and runs successfully; they do not enforce hidden or unspecified behaviors. Different trials failed for different runtime errors (status 47, 30, 35), indicating agent implementation issues, not a systematic mismatch with the instructions."
+}

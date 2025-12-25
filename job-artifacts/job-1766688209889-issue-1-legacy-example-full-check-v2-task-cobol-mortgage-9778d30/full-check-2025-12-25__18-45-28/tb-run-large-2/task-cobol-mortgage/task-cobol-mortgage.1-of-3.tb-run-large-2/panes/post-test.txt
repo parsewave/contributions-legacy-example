@@ -1,0 +1,40 @@
+root@a8c652f5aa7d:/app# bash /tests/run-tests.sh; tmux wait -S done
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.13.1, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /tests
+collected 4 items
+
+../tests/test_outputs.py::test_required_files_exist PASSED                                                                                               [ 25%]
+../tests/test_outputs.py::test_fixed_format_constraints PASSED                                                                                           [ 50%]
+../tests/test_outputs.py::test_data_files_exist PASSED                                                                                                   [ 75%]
+../tests/test_outputs.py::test_program_output
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

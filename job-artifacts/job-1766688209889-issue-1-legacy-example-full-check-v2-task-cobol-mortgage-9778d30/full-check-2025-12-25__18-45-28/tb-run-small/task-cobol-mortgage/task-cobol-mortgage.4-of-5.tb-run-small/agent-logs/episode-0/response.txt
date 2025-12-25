@@ -1,0 +1,10 @@
+{
+  "analysis": "We are at the root of the container in /app directory. We need to create /app/src/program.cbl with a COBOL fixed-format program that reads /app/src/INPUT.DAT, processes mortgage applications, and writes results to /app/data/OUTPUT.DAT. First, we should verify the directory structure and existing files. We'll list /app, then /app/src and /app/data to see what exists.",
+  "plan": "1. List the /app directory to see its contents. 2. List /app/src to confirm INPUT.DAT exists and to ensure we have write permission. 3. List /app/data to ensure OUTPUT.DAT can be created there. After confirming, we'll create the COBOL source file with the required logic, compile it with cobc, and run it.",
+  "commands": [
+    {
+      "keystrokes": "ls -R /app\n",
+      "duration": 0.2
+    }
+  ]
+}

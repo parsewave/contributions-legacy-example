@@ -1,0 +1,41 @@
+New Terminal Output:
+root@1a131b779730:/app# ls -R /app
+/app:
+data  src
+
+/app/data:
+OUTPUT.DAT
+
+/app/src:
+INPUT.DAT
+root@1a131b779730:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

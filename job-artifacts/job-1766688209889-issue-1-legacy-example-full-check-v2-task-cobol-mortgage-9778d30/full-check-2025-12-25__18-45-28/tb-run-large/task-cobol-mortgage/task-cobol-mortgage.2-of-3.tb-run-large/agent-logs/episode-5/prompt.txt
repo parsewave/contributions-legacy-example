@@ -1,0 +1,51 @@
+Current terminal state:
+New Terminal Output:
+
+root@acf1ecf3cb49:/app/src# cd /app/src
+root@acf1ecf3cb49:/app/src# grep -n '^[>]' program.cbl | head
+root@acf1ecf3cb49:/app/src# awk 'length($0)>80{print NR ":" length($0) ":" $0}' program.cbl | head
+root@acf1ecf3cb49:/app/src# sed -n '1,40p' program.cbl
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PROGRAM.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+               ORGANIZATION IS LINE SEQUENTIAL.
+           SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  IN-FILE.
+       01  IN-REC                       PIC X(256).
+
+       FD  OUT-FILE.
+       01  OUT-REC                      PIC X(200).
+
+       WORKING-STORAGE SECTION.
+       77  WS-EOF                       PIC X VALUE "N".
+       77  WS-DOT-COUNT                 PIC 9(4) COMP VALUE 0.
+
+       01  WS-PARSED.
+           05  WS-ID                    PIC X(10).
+           05  WS-NAME                  PIC X(30).
+           05  WS-LOAN-STR              PIC X(40).
+           05  WS-PROP-STR              PIC X(40).
+           05  WS-DOWN-STR              PIC X(40).
+           05  WS-TERM-STR              PIC X(10).
+           05  WS-RATE-STR              PIC X(20).
+
+       01  WS-NUM.
+           05  WS-LOAN-AMT              PIC 9(13)V99 COMP-3.
+           05  WS-PROP-VAL              PIC 9(13)V99 COMP-3.
+           05  WS-DOWN-PAY              PIC 9(13)V99 COMP-3.
+           05  WS-MIN-DOWN              PIC 9(13)V99 COMP-3.
+           05  WS-RATE                  PIC 9(3)V9(5)  COMP-3.
+           05  WS-MONTHLY-RATE          PIC 9V9(9)     COMP-3.
+           05  WS-BALANCE               PIC 9(13)V99 COMP-3.
+root@acf1ecf3cb49:/app/src#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

@@ -1,0 +1,29 @@
+{
+    "id": "0be831c7-75bf-4ec9-99cc-e947813a4eea",
+    "started_at": "2025-12-25T18:45:44.250521",
+    "finished_at": "2025-12-25T18:46:22.337757",
+    "n_total_trials": 1,
+    "stats": {
+        "n_trials": 1,
+        "n_errors": 0,
+        "evals": {
+            "nop__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 0.0
+                    }
+                ],
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "task-cobol-mortgage__o5kKuE6"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

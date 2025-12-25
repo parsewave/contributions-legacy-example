@@ -1,0 +1,14 @@
+Current terminal state:
+New Terminal Output:
+
+root@b9423b228534:/app/src# ls -la /app/src/program.cbl /app/data/OUTPUT.DAT
+-rw-r--r-- 1 root root  715 Dec 25 18:58 /app/data/OUTPUT.DAT
+-rw-r--r-- 1 root root 6838 Dec 25 18:58 /app/src/program.cbl
+root@b9423b228534:/app/src# wc -l /app/src/program.cbl /app/data/OUTPUT.DAT
+ 192 /app/src/program.cbl
+  14 /app/data/OUTPUT.DAT
+ 206 total
+root@b9423b228534:/app/src#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

@@ -1,0 +1,367 @@
+root@1a131b779730:/app# ls -R /app
+/app:
+data  src
+
+/app/data:
+OUTPUT.DAT
+
+/app/src:
+INPUT.DAT
+root@1a131b779730:/app# cat > /app/src/program.cbl <<'EOF'
+> IDENTIFICATION DIVISION.
+      COMPUTE MONTHLY-PMT = WS-LOAN-AMT * MONTHLY-RATE
+            / (1 - (1 + MONTHLY-RATE) ** (-WS-TERM)) ROUNDED
+        MOVE WS-LOAN-AMT TO BALANCE
+        PERFORM VARYING MON-NUM FROM 1 BY 1 UNTIL MON-NUM > WS-TERM
+            COMPUTE INTEREST = BALANCE * MONTHLY-RATE ROUNDED
+            COMPUTE PRINCIPAL = MONTHLY-PMT - INTEREST ROUNDED
+            COMPUTE BALANCE = BALANCE - PRINCIPAL ROUNDED
+            * Build output line: mon-num payment interest principal balance
+            MOVE MON-NUM TO LINE-OUT(1:3)
+            MOVE " " TO LINE-OUT(4:4)
+            MOVE MONTHLY-PMT TO LINE-OUT(5:14)
+            MOVE " " TO LINE-OUT(15:15)
+            MOVE INTEREST TO LINE-OUT(16:25)
+            MOVE " " TO LINE-OUT(26:26)
+            MOVE PRINCIPAL TO LINE-OUT(27:36)
+            MOVE " " TO LINE-OUT(37:37)
+            MOVE BALANCE TO LINE-OUT(38:47)
+            MOVE LINE-OUT TO OUT-REC
+            WRITE OUTFILE FROM OUT-REC
+        END-PERFORM
+    END-IF.
+EOF
+> PROGRAM-ID. MORTGAGE.
+>
+> ENVIRONMENT DIVISION.
+> INPUT-OUTPUT SECTION.
+> FILE-CONTROL.
+>     SELECT INFILE ASSIGN TO '/app/src/INPUT.DAT'
+>         ORGANIZATION IS LINE SEQUENTIAL.
+>     SELECT OUTFILE ASSIGN TO '/app/data/OUTPUT.DAT'
+>         ORGANIZATION IS LINE SEQUENTIAL.
+>
+> DATA DIVISION.
+> FILE SECTION.
+> FD INFILE.
+> 01 IN-REC PIC X(200).
+> FD OUTFILE.
+> 01 OUT-REC PIC X(200).
+>
+> WORKING-STORAGE SECTION.
+> 01 WS-EOF        PIC X VALUE 'N'.
+>    88 END-OF-FILE VALUE 'Y'.
+> 01 WS-ID         PIC X(10).
+> 01 WS-NAME       PIC X(30).
+> 01 WS-LOAN-AMT   PIC 9(10)V99.
+> 01 WS-PROP-VALUE PIC 9(10)V99.
+> 01 WS-DOWN-PAY   PIC 9(10)V99.
+> 01 WS-TERM       PIC 9(2).
+> 01 WS-RATE       PIC 9(3)V99.
+> 01 MIN-DOWN     PIC 9(10)V99.
+> 01 MONTHLY-RATE PIC V9(6).
+> 01 MONTHLY-PMT  PIC 9(10)V99.
+> 01 BALANCE      PIC 9(10)V99.
+> 01 INTEREST     PIC 9(10)V99.
+> 01 PRINCIPAL    PIC 9(10)V99.
+> 01 MON-NUM      PIC 9(3).
+> 01 LINE-OUT.
+>    05 FILLER     PIC X(200).
+>
+> PROCEDURE DIVISION.
+>     OPEN INPUT INFILE
+>     OPEN OUTPUT OUTFILE
+>     PERFORM UNTIL END-OF-FILE
+>         READ INFILE INTO IN-REC
+>             AT END MOVE 'Y' TO WS-EOF
+>         NOT AT END
+>             PERFORM PROCESS-RECORD
+>         END-READ
+>     END-PERFORM
+>     CLOSE INFILE OUTFILE
+>     STOP RUN.
+>
+> PROCESS-RECORD.
+>     UNSTRING IN-REC DELIMITED BY ';'
+>         INTO WS-ID,
+>              WS-NAME,
+>              WS-LOAN-AMT,
+>              WS-PROP-VALUE,
+>              WS-DOWN-PAY,
+>              WS-TERM,
+>              WS-RATE
+>     END-UNSTRING
+>     COMPUTE MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED
+>     IF WS-DOWN-PAY < MIN-DOWN
+>         MOVE WS-ID TO OUT-REC(1:10)
+>         STRING "DENY" DELIMITED BY SIZE
+>                " INSUFFICIENT FUNDS FOR DOWN PAYMENT"
+>                INTO OUT-REC(11:)
+>         WRITE OUTFILE FROM OUT-REC
+>     ELSE
+>         *--- Approved application ---*
+>         MOVE WS-ID TO OUT-REC(1:10)
+>         STRING "APPRO" DELIMITED BY SIZE INTO OUT-REC(11:)
+>         WRITE OUTFILE FROM OUT-REC
+>         *--- Compute payment schedule ---*
+>         COMPUTE MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+>         COMPUTE MONTHLY-PMT = WS-LOAN-AMT * MONTHLY-RATE
+>             / (1 - (1 + MONTHLY-RATE) ** (-WS-TERM)) ROUNDED
+>         MOVE WS-LOAN-AMT TO BALANCE
+>         PERFORM VARYING MON-NUM FROM 1 BY 1 UNTIL MON-NUM > WS-TERM
+>             COMPUTE INTEREST = BALANCE * MONTHLY-RATE ROUNDED
+>             COMPUTE PRINCIPAL = MONTHLY-PMT - INTEREST ROUNDED
+>             COMPUTE BALANCE = BALANCE - PRINCIPAL ROUNDED
+>             * Build output line: mon-num payment interest principal balance
+>             MOVE MON-NUM TO LINE-OUT(1:3)
+>             MOVE " " TO LINE-OUT(4:4)
+>             MOVE MONTHLY-PMT TO LINE-OUT(5:14)
+>             MOVE " " TO LINE-OUT(15:15)
+>             MOVE INTEREST TO LINE-OUT(16:25)
+>             MOVE " " TO LINE-OUT(26:26)
+>             MOVE PRINCIPAL TO LINE-OUT(27:36)
+>             MOVE " " TO LINE-OUT(37:37)
+>             MOVE BALANCE TO LINE-OUT(38:47)
+>             MOVE LINE-OUT TO OUT-REC
+>             WRITE OUTFILE FROM OUT-REC
+>         END-PERFORM
+>     END-IF.
+> EOF
+root@1a131b779730:/app# cobc -x /app/src/program.cbl -o /app/src/program
+/app/src/program.cbl:1: error: invalid indicator 'F' at column 7
+/app/src/program.cbl:2: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:4: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:5: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:6: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:7: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:9: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:12: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:13: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:14: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:15: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:16: error: invalid indicator 'F' at column 7
+/app/src/program.cbl:17: warning: continuation of COBOL words used [-Wdialect]
+/app/src/program.cbl:19: error: invalid indicator 'G' at column 7
+/app/src/program.cbl:20: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:21: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:22: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:23: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:24: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:25: error: invalid indicator 'P' at column 7
+/app/src/program.cbl:27: error: invalid indicator 'T' at column 7
+/app/src/program.cbl:28: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:29: warning: continuation of COBOL words used [-Wdialect]
+/app/src/program.cbl:30: error: invalid indicator 'T' at column 7
+/app/src/program.cbl:31: error: invalid indicator 'T' at column 7
+/app/src/program.cbl:32: error: invalid indicator 'A' at column 7
+/app/src/program.cbl:33: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:34: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:35: warning: continuation of COBOL words used [-Wdialect]
+/app/src/program.cbl:36: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:37: error: invalid indicator 'F' at column 7
+/app/src/program.cbl:39: error: invalid indicator 'U' at column 7
+/app/src/program.cbl:40: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:41: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:42: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:49: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:50: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:52: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:53: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:62: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:69: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:8: error: PROGRAM-ID header missing
+/app/src/program.cbl:8: error: PROCEDURE DIVISION header missing
+/app/src/program.cbl:8: error: syntax error, unexpected ORGANIZATION
+/app/src/program.cbl:10: error: syntax error, unexpected ORGANIZATION
+/app/src/program.cbl:10: error: D must be followed by B
+/app/src/program.cbl:10: error: invalid PICTURE character 'O'
+/app/src/program.cbl:10: error: invalid PICTURE character 'W'
+/app/src/program.cbl:10: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+/app/src/program.cbl:10: error: . cannot follow A or X
+/app/src/program.cbl:10: error: CR or DB cannot follow A or X
+/app/src/program.cbl:10: error: N cannot follow .
+/app/src/program.cbl:10: error: N cannot follow CR or DB
+/app/src/program.cbl:10: error: N cannot follow A or X
+/app/src/program.cbl:10: error: unknown statement 'REC'
+/app/src/program.cbl:10: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+/app/src/program.cbl:10: error: invalid PICTURE character 'U'
+/app/src/program.cbl:10: error: invalid PICTURE character 'M'
+/app/src/program.cbl:10: error: . cannot follow V
+/app/src/program.cbl:10: error: N cannot follow .
+/app/src/program.cbl:10: error: N cannot follow 9
+/app/src/program.cbl:10: error: N cannot follow V
+/app/src/program.cbl:43: error: 'INFILE' is not defined
+/app/src/program.cbl:43: error: 'INFILE' is not a file name
+/app/src/program.cbl:43: error: 'IN-REC' is not defined
+/app/src/program.cbl:44: error: 'WS-EOF' is not defined
+/app/src/program.cbl:54: error: syntax error, unexpected INTO
+/app/src/program.cbl:64: error: 'WS-ID' is not defined
+/app/src/program.cbl:64: error: 'OUT-REC' is not defined
+/app/src/program.cbl:68: error: 'OUTFILE' is not defined
+/app/src/program.cbl:70: error: syntax error, unexpected *
+/app/src/program.cbl:74: error: syntax error, unexpected *
+/app/src/program.cbl:74: error: 'payment' is not defined
+/app/src/program.cbl:74: error: 'schedule' is not defined
+/app/src/program.cbl:74: error: syntax error, unexpected -
+/app/src/program.cbl:75: error: 'MONTHLY-RATE' is not defined
+/app/src/program.cbl:75: error: 'WS-RATE' is not defined
+/app/src/program.cbl:75: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:76: error: 'MONTHLY-PMT' is not defined
+/app/src/program.cbl:76: error: 'WS-LOAN-AMT' is not defined
+/app/src/program.cbl:77: error: 'WS-TERM' is not defined
+/app/src/program.cbl:77: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:78: error: 'BALANCE' is not defined
+/app/src/program.cbl:79: error: 'MON-NUM' is not defined
+/app/src/program.cbl:80: error: 'INTEREST' is not defined
+/app/src/program.cbl:80: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:81: error: 'PRINCIPAL' is not defined
+/app/src/program.cbl:81: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:82: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:84: error: 'LINE-OUT' is not defined
+/app/src/program.cbl:97: error: syntax error, unexpected end of file
+root@1a131b779730:/app# /app/src/program
+bash: /app/src/program: No such file or directory
+root@1a131b779730:/app# cat /app/data/OUTPUT.DAT
+
+root@1a131b779730:/app# cat > /app/src/program.cbl <<'EOF'
+BY SIZE
+                      " INSUFFICIENT FUNDS FOR DOWN PAYMENT"
+                      INTO OUT-REC(11:)
+               WRITE OUTFILE FROM OUT-REC
+           ELSE
+               *--- Approved application ---*
+               MOVE WS-ID TO OUT-REC(1:10)
+               STRING "APPRO" DELIMITED BY SIZE INTO OUT-REC(11:)
+               WRITE OUTFILE FROM OUT-REC
+               *--- Compute payment schedule ---*
+               COMPUTE MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+               COMPUTE MONTHLY-PMT = WS-LOAN-AMT * MONTHLY-RATE
+                     / (1 - (1 + MONTHLY-RATE) ** (-WS-TERM)) ROUNDED
+               MOVE WS-LOAN-AMT TO BALANCE
+               PERFORM VARYING MON-NUM FROM 1 BY 1 UNTIL MON-NUM > WS-TERM
+                   COMPUTE INTEREST = BALANCE * MONTHLY-RATE ROUNDED
+                   COMPUTE PRINCIPAL = MONTHLY-PMT - INTEREST ROUNDED
+                   COMPUTE BALANCE = BALANCE - PRINCIPAL ROUNDED
+                   * Build output line for this month *
+                   MOVE MON-NUM TO LI>        IDENTIFICATION DIVISION.
+>        PROGRAM-ID. MORTGAGE.
+>
+>        ENVIRONMENT DIVISION.
+>        INPUT-OUTPUT SECTION.
+>        FILE-CONTROL.
+>            SELECT INFILE ASSIGN TO '/app/src/INPUT.DAT'
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>            SELECT OUTFILE ASSIGN TO '/app/data/OUTPUT.DAT'
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>
+>        DATA DIVISION.
+>        FILE SECTION.
+>        FD INFILE.
+>        01 IN-REC PIC X(200).
+>        FD OUTFILE.
+>        01 OUT-REC PIC X(200).
+>
+>        WORKING-STORAGE SECTION.
+>        01 WS-EOF        PIC X VALUE 'N'.
+>           88 END-OF-FILE VALUE 'Y'.
+>        01 WS-ID         PIC X(10).
+>        01 WS-NAME       PIC X(30).
+>        01 WS-LOAN-AMT   PIC 9(10)V99.
+>        01 WS-PROP-VALUE PIC 9(10)V99.
+>        01 WS-DOWN-PAY   PIC 9(10)V99.
+>        01 WS-TERM       PIC 9(2).
+>        01 WS-RATE       PIC 9(3)V99.
+>        01 MIN-DOWN      PIC 9(10)V99.
+>        01 MONTHLY-RATE  PIC V9(6).
+>        01 MONTHLY-PMT   PIC 9(10)V99.
+>        01 BALANCE       PIC 9(10)V99.
+>        01 INTEREST      PIC 9(10)V99.
+>        01 PRINCIPAL     PIC 9(10)V99.
+>        01 MON-NUM       PIC 9(3).
+>        01 LINE-OUT      PIC X(200).
+>
+>        PROCEDURE DIVISION.
+>            OPEN INPUT INFILE
+>            OPEN OUTPUT OUTFILE
+>            PERFORM UNTIL END-OF-FILE
+>                READ INFILE INTO IN-REC
+>                    AT END MOVE 'Y' TO WS-EOF
+>                NOT AT END
+>                    PERFORM PROCESS-RECORD
+>                END-READ
+>            END-PERFORM
+>            CLOSE INFILE OUTFILE
+>            STOP RUN.
+>
+>        PROCESS-RECORD.
+>            UNSTRING IN-REC DELIMITED BY ';'
+>                INTO WS-ID,
+>                     WS-NAME,
+>                     WS-LOAN-AMT,
+>                     WS-PROP-VALUE,
+>                     WS-DOWN-PAY,
+>                     WS-TERM,
+>                     WS-RATE
+>            END-UNSTRING
+>            COMPUTE MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED
+>            IF WS-DOWN-PAY < MIN-DOWN
+>                MOVE WS-ID TO OUT-REC(1:10)
+>                STRING "DENY" DELIMITED BY SIZE
+>                       " INSUFFICIENT FUNDS FOR DOWN PAYMENT"
+>                       INTO OUT-REC(11:)
+>                WRITE OUTFILE FROM OUT-REC
+>            ELSE
+>                *--- Approved application ---*
+>                MOVE WS-ID TO OUT-REC(1:10)
+>                STRING "APPRO" DELIMITED BY SIZE INTO OUT-REC(11:)
+>                WRITE OUTFILE FROM OUT-REC
+>                *--- Compute payment schedule ---*
+>                COMPUTE MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+>                COMPUTE MONTHLY-PMT = WS-LOAN-AMT * MONTHLY-RATE
+>                      / (1 - (1 + MONTHLY-RATE) ** (-WS-TERM)) ROUNDED
+>                MOVE WS-LOAN-AMT TO BALANCE
+>                PERFORM VARYING MON-NUM FROM 1 BY 1 UNTIL MON-NUM > WS-TERM
+>                    COMPUTE INTEREST = BALANCE * MONTHLY-RATE ROUNDED
+>                    COMPUTE PRINCIPAL = MONTHLY-PMT - INTEREST ROUNDED
+>                    COMPUTE BALANCE = BALANCE - PRINCIPAL ROUNDED
+>                    * Build output line for this month *
+>                    MOVE MON-NUM TO LINE-OUT(1:3)
+>                    MOVE " " TO LINE-OUT(4:4)
+>                    MOVE MONTHLY-PMT TO LINE-OUT(5:14)
+>                    MOVE " " TO LINE-OUT(15:15)
+>                    MOVE INTEREST TO LINE-OUT(16:25)
+>                    MOVE " " TO LINE-OUT(26:26)
+>                    MOVE PRINCIPAL TO LINE-OUT(27:36)
+>                    MOVE " " TO LINE-OUT(37:37)
+>                    MOVE BALANCE TO LINE-OUT(38:47)
+>                    MOVE LINE-OUT TO OUT-REC
+>                    WRITE OUTFILE FROM OUT-REC
+>                END-PERFORM
+>            END-IF.
+> EOF
+root@1a131b779730:/app# cobc -x /app/src/program.cbl -o /app/src/program
+/app/src/program.cbl: in paragraph 'PROCESS-RECORD':
+/app/src/program.cbl:61: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:67: error: WRITE requires a record name as subject
+/app/src/program.cbl:69: error: syntax error, unexpected *
+/app/src/program.cbl:72: error: WRITE requires a record name as subject
+/app/src/program.cbl:73: error: syntax error, unexpected *
+/app/src/program.cbl:73: error: 'payment' is not defined
+/app/src/program.cbl:73: error: 'schedule' is not defined
+/app/src/program.cbl:73: error: syntax error, unexpected -
+/app/src/program.cbl:74: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:76: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:78: error: 'WS-TE' is not defined
+/app/src/program.cbl:79: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:80: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:81: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:85: error: invalid MOVE statement
+/app/src/program.cbl:87: error: invalid MOVE statement
+/app/src/program.cbl:89: error: invalid MOVE statement
+/app/src/program.cbl:91: error: invalid MOVE statement
+/app/src/program.cbl:93: error: WRITE requires a record name as subject
+root@1a131b779730:/app# /app/src/program
+bash: /app/src/program: No such file or directory
+root@1a131b779730:/app# cat /app/data/OUTPUT.DAT
+
+root@1a131b779730:/app#

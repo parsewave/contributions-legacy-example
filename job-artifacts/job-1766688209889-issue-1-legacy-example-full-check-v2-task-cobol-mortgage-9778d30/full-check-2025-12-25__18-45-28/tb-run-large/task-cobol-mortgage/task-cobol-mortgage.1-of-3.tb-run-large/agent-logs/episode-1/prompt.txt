@@ -1,0 +1,212 @@
+New Terminal Output:
+root@0a79ae91ae01:/app# ls -la /app/src /app/data
+/app/data:
+total 12
+drwxr-xr-x 2 root root 4096 Dec 25 18:45 .
+drwxr-xr-x 4 root root 4096 Dec 25 18:48 ..
+-rw-r--r-- 1 root root    1 Dec 25 18:45 OUTPUT.DAT
+
+/app/src:
+total 12
+drwxr-xr-x 2 root root 4096 Dec 25 18:45 .
+drwxr-xr-x 4 root root 4096 Dec 25 18:48 ..
+-rw-r--r-- 1 root root  167 Dec 25 18:45 INPUT.DAT
+root@0a79ae91ae01:/app# ls -la /app/src/INPUT.DAT
+-rw-r--r-- 1 root root 167 Dec 25 18:45 /app/src/INPUT.DAT
+root@0a79ae91ae01:/app# cat > /app/src/program.cbl <<'COBOL'
+>        IDENTIFICATION DIVISION.
+>        PROGRAM-ID. PROGRAM.
+>
+>        ENVIRONMENT DIVISION.
+>        INPUT-OUTPUT SECTION.
+>        FILE-CONTROL.
+>            SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>            SELECT OUT-FILE ASSIGN TO "/app/data/OUTPUT.DAT"
+(->                ORGANIZATION IS LINE SEQUENTIAL.
+ENOM >
+>        DATA DIVISION.
+>        FILE SECTION.
+>        FD  IN-FILE.
+>        01  IN-REC                      PIC X(200).
+>        FD  OUT-FILE.
+>        01  OUT-REC                     PIC X(200).
+    >
+ >        WORKING-STORAGE SECTION.
+>        01  WS-EOF                      PIC X VALUE "N".
+>
+ >        01  WS-FIELDS.
+* W>            05  WS-ID                   PIC X(10).
+>            05  WS-NAME                 PIC X(30).
+>            05  WS-LOAN-TXT             PIC X(20).
+DED >            05  WS-PROP-TXT             PIC X(20).
+ES>            05  WS-DOWN-TXT             PIC X(20).
+   >            05  WS-TERM-TXT             PIC X(10).
+>            05  WS-RATE-TXT             PIC X(20).
+>
+>        01  WS-NUMERIC.
+>            05  WS-LOAN                 PIC 9(12)V99 COMP-3.
+>            05  WS-PROP                 PIC 9(12)V99 COMP-3.
+    >            05  WS-DOWN                 PIC 9(12)V99 COMP-3.
+>            05  WS-MIN-DOWN             PIC 9(12)V99 COMP-3.
+>            05  WS-RATE                 COMP-2.
+>            05  WS-MONTH-RATE           COMP-2.
+E-PR>            05  WS-TERM-YEARS           PIC 9(3) COMP-3.
+>            05  WS-TERM-MONTHS          PIC 9(4) COMP-3.
+>            05  WS-PAYMENT              PIC 9(12)V99 COMP-3.
+>            05  WS-INTEREST             PIC 9(12)V99 COMP-3.
+DEL>            05  WS-PRINCIPAL            PIC 9(12)V99 COMP-3.
+>            05  WS-BALANCE              PIC 9(12)V99 COMP-3.
+>            05  WS-DENOM                COMP-2.
+>            05  WS-POWER                COMP-2.
+>
+T>        01  WS-EDIT.
+>            05  E-MON                   PIC 9(3).
+>            05  E-PAY                   PIC 9(8).99.
+>            05  E-INT                   PIC 9(8).99.
+>            05  E-PRN                   PIC 9(8).99.
+>            05  E-BAL                   PIC 9(10).99.
+>
+>        01  WS-I                        PIC 9(4) COMP-3.
+>
+>        PROCEDURE DIVISION.
+>        MAIN.
+>            OPEN INPUT IN-FILE
+>                 OUTPUT OUT-FILE
+>            PERFORM UNTIL WS-EOF = "Y"
+>                READ IN-FILE
+>                    AT END
+>                        MOVE "Y" TO WS-EOF
+>                    NOT AT END
+>                        PERFORM PROCESS-REC
+>                END-READ
+>            END-PERFORM
+>            CLOSE IN-FILE OUT-FILE
+>            STOP RUN.
+>
+>        PROCESS-REC.
+>            MOVE SPACES TO WS-FIELDS
+>            UNSTRING IN-REC DELIMITED BY ";"
+>                INTO WS-ID
+>                     WS-NAME
+>                     WS-LOAN-TXT
+>                     WS-PROP-TXT
+>                     WS-DOWN-TXT
+>                     WS-TERM-TXT
+>                     WS-RATE-TXT
+>            END-UNSTRING
+>
+>            MOVE FUNCTION NUMVAL(WS-LOAN-TXT) TO WS-LOAN
+>            MOVE FUNCTION NUMVAL(WS-PROP-TXT) TO WS-PROP
+>            MOVE FUNCTION NUMVAL(WS-DOWN-TXT) TO WS-DOWN
+>            MOVE FUNCTION NUMVAL(WS-TERM-TXT) TO WS-TERM-YEARS
+>            MOVE FUNCTION NUMVAL(WS-RATE-TXT) TO WS-RATE
+>
+>            COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP * 0.15
+>
+>            IF WS-DOWN < WS-MIN-DOWN
+>                PERFORM WRITE-DENY
+>            ELSE
+>                PERFORM WRITE-APPROVE
+>                PERFORM BUILD-SCHEDULE
+>            END-IF.
+>
+>        WRITE-DENY.
+>            MOVE SPACES TO OUT-REC
+>            STRING WS-ID DELIMITED BY SIZE
+>                   "DENY " DELIMITED BY SIZE
+>                   "INSUFFICIENT FUNDS FOR DOWN PAYMENT"
+>                     DELIMITED BY SIZE
+>              INTO OUT-REC
+>            END-STRING
+>            WRITE OUT-REC.
+>
+>        WRITE-APPROVE.
+>            MOVE SPACES TO OUT-REC
+>            STRING WS-ID DELIMITED BY SIZE
+>                   "APPRO" DELIMITED BY SIZE
+>              INTO OUT-REC
+>            END-STRING
+>            WRITE OUT-REC.
+>
+>        BUILD-SCHEDULE.
+>            COMPUTE WS-TERM-MONTHS ROUNDED = WS-TERM-YEARS * 12
+>            COMPUTE WS-MONTH-RATE = WS-RATE / 1200.0
+>            MOVE WS-LOAN TO WS-BALANCE
+>
+>            IF WS-TERM-MONTHS = 0
+>                EXIT PARAGRAPH
+>            END-IF
+>
+>            IF WS-MONTH-RATE = 0
+>                COMPUTE WS-PAYMENT ROUNDED = WS-LOAN / WS-TERM-MONTHS
+>            ELSE
+>                COMPUTE WS-POWER = (1.0 + WS-MONTH-RATE)
+>                    ** (-WS-TERM-MONTHS)
+>                COMPUTE WS-DENOM = 1.0 - WS-POWER
+>                COMPUTE WS-PAYMENT ROUNDED =
+>                    WS-LOAN * WS-MONTH-RATE / WS-DENOM
+>            END-IF
+>
+>            PERFORM VARYING WS-I FROM 1 BY 1
+>                UNTIL WS-I > WS-TERM-MONTHS
+>                COMPUTE WS-INTEREST ROUNDED =
+>                    WS-BALANCE * WS-MONTH-RATE
+>                IF WS-I = WS-TERM-MONTHS
+>                    MOVE WS-BALANCE TO WS-PRINCIPAL
+>                    COMPUTE WS-PAYMENT ROUNDED =
+>                        WS-PRINCIPAL + WS-INTEREST
+>                    MOVE 0 TO WS-BALANCE
+>                ELSE
+>                    COMPUTE WS-PRINCIPAL ROUNDED =
+>                        WS-PAYMENT - WS-INTEREST
+>                    COMPUTE WS-BALANCE ROUNDED =
+>                        WS-BALANCE - WS-PRINCIPAL
+>                END-IF
+>                PERFORM WRITE-SCHED-LINE
+>            END-PERFORM.
+>
+>        WRITE-SCHED-LINE.
+>            MOVE WS-I TO E-MON
+>            MOVE WS-PAYMENT TO E-PAY
+>            MOVE WS-INTEREST TO E-INT
+>            MOVE WS-PRINCIPAL TO E-PRN
+>            MOVE WS-BALANCE TO E-BAL
+>
+>            MOVE SPACES TO OUT-REC
+>            STRING E-MON DELIMITED BY SIZE
+>                   SPACE
+>                   E-PAY DELIMITED BY SIZE
+>                   SPACE
+>                   E-INT DELIMITED BY SIZE
+>                   SPACE
+>                   E-PRN DELIMITED BY SIZE
+>                   SPACE
+>                   E-BAL DELIMITED BY SIZE
+>              INTO OUT-REC
+>            END-STRING
+>            WRITE OUT-REC.
+> COBOL
+root@0a79ae91ae01:/app# cd /app/src
+root@0a79ae91ae01:/app/src# awk 'length($0)>80{print NR ":" length($0) ":" $0}' program.cbl | head
+root@0a79ae91ae01:/app/src# cobc -x -free -Wall -o program program.cbl
+root@0a79ae91ae01:/app/src# cobc -x -Wall -o program program.cbl
+root@0a79ae91ae01:/app/src# ./program
+root@0a79ae91ae01:/app/src# ls -la /app/data/OUTPUT.DAT
+-rw-r--r-- 1 root root 715 Dec 25 18:52 /app/data/OUTPUT.DAT
+root@0a79ae91ae01:/app/src# head -n 20 /app/data/OUTPUT.DAT
+APP0000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT
+APP0000002APPRO
+001 00002316.70 00002291.67 00000025.03 0000004974.97
+002 00002316.70 00002280.19 00000036.51 0000004938.46
+003 00002316.70 00002263.46 00000053.24 0000004885.22
+004 00002316.70 00002239.06 00000077.64 0000004807.58
+005 00002316.70 00002203.47 00000113.23 0000004694.35
+006 00002316.70 00002151.58 00000165.12 0000004529.23
+007 00002316.70 00002075.90 00000240.80 0000004288.43
+008 00002316.70 00001965.53 00000351.17 0000003937.26
+009 00002316.70 00001804.58 00000512.12 0000003425.14
+010 00002316.70 00001569.86 00000746.84 0000002678.30
+011 00002316.70 00001227.55 00001089.15 0000001589.15
+012 00002317.51 00000728.36 00001589.15 0000000000.00
+root@0a79ae91ae01:/app/src#

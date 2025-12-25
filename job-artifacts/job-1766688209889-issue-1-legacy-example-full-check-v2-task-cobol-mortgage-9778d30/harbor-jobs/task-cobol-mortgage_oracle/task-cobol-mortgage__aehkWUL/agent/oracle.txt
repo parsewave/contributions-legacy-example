@@ -1,0 +1,3 @@
+src/program.cbl: in paragraph 'OPEN-FILES':
+src/program.cbl:95: warning: IF without imperative statement used [-Wdialect]
+libcob: warning: implicit CLOSE of INPUT-FILE ('src/INPUT.DAT')
