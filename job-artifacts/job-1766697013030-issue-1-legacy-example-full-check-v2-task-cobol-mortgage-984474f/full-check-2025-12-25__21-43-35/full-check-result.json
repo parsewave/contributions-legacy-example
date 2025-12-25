@@ -1,0 +1,21 @@
+{
+  "task_id": "task-cobol-mortgage",
+  "tasks_dir": "/workspace/parsewave/contributions-legacy-example/contributor_tasks",
+  "timestamp": "2025-12-25 21:43:35",
+  "basic_check": {
+    "result_type": "tb_negative",
+    "duration": 0.008247852325439453,
+    "return_code": 1,
+    "original_result": {
+      "errors": [
+        "docker-compose.yaml: extra key: services.client.depends_on",
+        "docker-compose.yaml: length mismatch at services.client.environment: expected 1, got 6",
+        "docker-compose.yaml: extra key: services.h2db",
+        "docker-compose.yaml: extra key: volumes"
+      ],
+      "warnings": [],
+      "task_size_mb": 0.02
+    }
+  },
+  "overall_success": false
+}
