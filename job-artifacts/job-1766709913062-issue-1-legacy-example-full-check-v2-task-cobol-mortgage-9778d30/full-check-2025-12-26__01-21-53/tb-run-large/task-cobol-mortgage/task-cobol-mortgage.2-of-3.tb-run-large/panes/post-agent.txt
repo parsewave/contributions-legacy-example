@@ -1,0 +1,513 @@
+root@89ebd35e8c9b:/app# ls -la /app
+total 16
+drwxr-xr-x  4 root root 4096 Dec 26 01:24 .
+drwxr-xr-x 20 root root 4096 Dec 26 01:33 ..
+drwxr-xr-x  2 root root 4096 Dec 26 01:21 data
+drwxr-xr-x  2 root root 4096 Dec 26 01:21 src
+root@89ebd35e8c9b:/app# ls -la /app/src
+total 12
+drwxr-xr-x 2 root root 4096 Dec 26 01:21 .
+drwxr-xr-x 4 root root 4096 Dec 26 01:24 ..
+-rw-r--r-- 1 root root  167 Dec 26 01:21 INPUT.DAT
+root@89ebd35e8c9b:/app# ls -la /app/data || true
+total 12
+drwxr-xr-x 2 root root 4096 Dec 26 01:21 .
+drwxr-xr-x 4 root root 4096 Dec 26 01:24 ..
+-rw-r--r-- 1 root root    1 Dec 26 01:21 OUTPUT.DAT
+root@89ebd35e8c9b:/app# mkdir -p /app/data
+root@89ebd35e8c9b:/app# cd /app/src
+root@89ebd35e8c9b:/app/src# wc -l INPUT.DAT && head -n 5 INPUT.DAT
+1 INPUT.DAT
+APP0000001;Williams David Robert         ;2000000000;3500000000;0500000000;20;00550
+APP0000002;John Smith Clark              ;0000005000;0000004000;0000003500;01;00550root@89ebd35e8c9b:/app/src# cat > program.cbl <<'EOF'
+>        IDENTIFICATION DIVISION.
+5) VALUE "DENY ".
+       01  WS-REASON                PIC X(50) VALUE SPACES.
+
+       01  WS-DOT-COUNT             PIC 9 COMP VALUE 0.
+
+       01  WS-L                     COMP-2 VALUE 0.
+       01  WS-R                     COMP-2 VALUE 0.
+       01  WS-N                     COMP-2 VALUE 0.
+       01  WS-FACTOR                COMP-2 VALUE 0.
+       01  WS-TMP                   COMP-2 VALUE 0.
+
+       01  WS-MON-ED                PIC 9(3).
+       01  WS-PAY-ED                PIC 9(8).99.
+       01  WS-INT-ED                PIC 9(8).99.
+       01  WS-PRN-ED                PIC 9(8).99.
+       01  WS-BAL-ED                PIC 9(10).99.
+
+       PROCEDURE DIVISION.
+       MAIN.
+           OPEN INPUT INFILE
+           OPEN OUTPUT OUTFILE
+
+           PERFORM UNTIL WS-EOF = "Y"
+               READ INFILE
+                   AT END
+                       MOVE "Y" TO WS-EOF
+                   NOT AT END
+                       PERFORM PROCESS-REC
+               END-READ
+           END-PERFORM
+
+           CLOSE INFILE
+           CLOSE OUTFILE
+           STOP RUN.
+
+       PROCESS-REC.
+           MOVE SPACES TO WS-ID
+           MOVE SPACES TO WS-NAME
+           MOVE SPACES TO WS-LOAN-TXT
+           MOVE SPACES TO WS-PROP-TXT
+           MOVE SPACES TO WS-DOWN-TXT
+           MOVE SPACES TO WS-TERM-TXT
+           MOVE SPACES TO WS-RATE-TXT
+
+           UNSTRING IN-REC DELIMITED BY ";"
+               INTO WS-ID
+                    WS-NAME
+                    WS-LOAN-TXT
+                    WS-PROP-TXT
+                    WS-DOWN-TXT
+                    WS-TERM-TXT
+                    WS-RATE-TXT
+           END-UNSTRING
+
+           PERFORM CONVERT-FIELDS
+           PERFORM DECIDE-AND-WRITE.
+
+       CONVERT-FIELDS.
+           COMPUTE WS-LOAN-AMT ROUNDED = FUNCTION NUMVAL(WS-LOAN-TXT)
+           COMPUTE WS-PROP-VALUE ROUNDED = FUNCTION NUMVAL(WS-PROP-TXT)
+           COMPUTE WS-DOWN-PAY ROUNDED = FUNCTION NUMVAL(WS-DOWN-TXT)
+
+           COMPUTE WS-TERM-YEARS = FUNCTION NUMVAL(WS-TERM-TXT)
+           COMPUTE WS-TERM-MONTHS = WS-TERM-YEARS * 12
+
+           MOVE 0 TO WS-DOT-COUNT
+           INSPE>        PROGRAM-ID. MORTGAGE.
+>
+T>        ENVIRONMENT DIVISION.
+>        CONFIGURATION SECTION.
+   >        SPECIAL-NAMES.
+>            DECIMAL-POINT IS DOT.
+>        INPUT-OUTPUT SECTION.
+>        FILE-CONTROL.
+>            SELECT INFILE ASSIGN TO "INPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>            SELECT OUTFILE ASSIGN TO "/app/data/OUTPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>
+->        DATA DIVISION.
+DOWN>        FILE SECTION.
+>        FD  INFILE.
+>        01  IN-REC                   PIC X(200).
+>        FD  OUTFILE.
+>        01  OUT-REC                  PIC X(200).
+ >
+ >        WORKING-STORAGE SECTION.
+>        01  WS-EOF                   PIC X VALUE "N".
+    >
+>        01  WS-ID                    PIC X(10).
+>        01  WS-NAME                  PIC X(30).
+>        01  WS-LOAN-TXT              PIC X(20).
+>        01  WS-PROP-TXT              PIC X(20).
+>        01  WS-DOWN-TXT              PIC X(20).
+>        01  WS-TERM-TXT              PIC X(10).
+
+>        01  WS-RATE-TXT              PIC X(20).
+>
+>        01  WS-LOAN-AMT              PIC 9(11)V99 COMP-3 VALUE 0.
+>        01  WS-PROP-VALUE            PIC 9(11)V99 COMP-3 VALUE 0.
+ >        01  WS-DOWN-PAY              PIC 9(11)V99 COMP-3 VALUE 0.
+>        01  WS-MIN-DOWN              PIC 9(11)V99 COMP-3 VALUE 0.
+>
+ >        01  WS-TERM-YEARS            PIC 9(2) COMP VALUE 0.
+>        01  WS-TERM-MONTHS           PIC 9(4) COMP VALUE 0.
+>
+>        01  WS-RATE-PCT              PIC 9(3)V9(4) COMP-3 VALUE 0.
+>        01  WS-MONTHLY-RATE          PIC 9V9(9) COMP-3 VALUE 0.
+>        01  WS-MONTHLY-PAY           PIC 9(11)V99 COMP-3 VALUE 0.
+>
+>        01  WS-BALANCE               PIC 9(11)V99 COMP-3 VALUE 0.
+>        01  WS-INTEREST              PIC 9(11)V99 COMP-3 VALUE 0.
+>        01  WS-PRINCIPAL             PIC 9(11)V99 COMP-3 VALUE 0.
+>        01  WS-PAYMENT               PIC 9(11)V99 COMP-3 VALUE 0.
+>
+ >        01  WS-MON                   PIC 9(4) COMP VALUE 0.
+N>
+>        01  WS-STATUS-APPRO          PIC X(5) VALUE "APPRO".
+M 1 >        01  WS-STATUS-DENY           PIC X(5) VALUE "DENY ".
+>        01  WS-REASON                PIC X(50) VALUE SPACES.
+>
+>        01  WS-DOT-COUNT             PIC 9 COMP VALUE 0.
+E>
+>        01  WS-L                     COMP-2 VALUE 0.
+>        01  WS-R                     COMP-2 VALUE 0.
+NDE>        01  WS-N                     COMP-2 VALUE 0.
+>        01  WS-FACTOR                COMP-2 VALUE 0.
+>        01  WS-TMP                   COMP-2 VALUE 0.
+>
+>        01  WS-MON-ED                PIC 9(3).
+>        01  WS-PAY-ED                PIC 9(8).99.
+>        01  WS-INT-ED                PIC 9(8).99.
+>        01  WS-PRN-ED                PIC 9(8).99.
+>        01  WS-BAL-ED                PIC 9(10).99.
+>
+>        PROCEDURE DIVISION.
+>        MAIN.
+>            OPEN INPUT INFILE
+>            OPEN OUTPUT OUTFILE
+>
+>            PERFORM UNTIL WS-EOF = "Y"
+>                READ INFILE
+    >                    AT END
+>                        MOVE "Y" TO WS-EOF
+AL>                    NOT AT END
+>                        PERFORM PROCESS-REC
+>                END-READ
+>            END-PERFORM
+   >
+ >            CLOSE INFILE
+>            CLOSE OUTFILE
+>            STOP RUN.
+  >
+>        PROCESS-REC.
+>            MOVE SPACES TO WS-ID
+>            MOVE SPACES TO WS-NAME
+    >            MOVE SPACES TO WS-LOAN-TXT
+    >            MOVE SPACES TO WS-PROP-TXT
+>            MOVE SPACES TO WS-DOWN-TXT
+>            MOVE SPACES TO WS-TERM-TXT
+ING
+>            MOVE SPACES TO WS-RATE-TXT
+>
+>            UNSTRING IN-REC DELIMITED BY ";"
+>                INTO WS-ID
+>                     WS-NAME
+>                     WS-LOAN-TXT
+>                     WS-PROP-TXT
+>                     WS-DOWN-TXT
+>                     WS-TERM-TXT
+>                     WS-RATE-TXT
+>            END-UNSTRING
+>
+>            PERFORM CONVERT-FIELDS
+>            PERFORM DECIDE-AND-WRITE.
+>
+>        CONVERT-FIELDS.
+>            COMPUTE WS-LOAN-AMT ROUNDED = FUNCTION NUMVAL(WS-LOAN-TXT)
+>            COMPUTE WS-PROP-VALUE ROUNDED = FUNCTION NUMVAL(WS-PROP-TXT)
+>            COMPUTE WS-DOWN-PAY ROUNDED = FUNCTION NUMVAL(WS-DOWN-TXT)
+>
+>            COMPUTE WS-TERM-YEARS = FUNCTION NUMVAL(WS-TERM-TXT)
+>            COMPUTE WS-TERM-MONTHS = WS-TERM-YEARS * 12
+>
+>            MOVE 0 TO WS-DOT-COUNT
+>            INSPECT WS-RATE-TXT TALLYING WS-DOT-COUNT FOR ALL "."
+>            IF WS-DOT-COUNT > 0
+>                MOVE FUNCTION NUMVAL(WS-RATE-TXT) TO WS-R
+>            ELSE
+>                COMPUTE WS-R ROUNDED = FUNCTION NUMVAL(WS-RATE-TXT) / 100
+>            END-IF
+>            COMPUTE WS-RATE-PCT ROUNDED = WS-R
+>
+>            COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP-VALUE * 0.15.
+>
+>        DECIDE-AND-WRITE.
+>            IF WS-DOWN-PAY < WS-MIN-DOWN
+>                MOVE "INSUFFICIENT FUNDS FOR DOWN PAYMENT" TO WS-REASON
+>                MOVE SPACES TO OUT-REC
+>                STRING WS-ID
+>                       WS-STATUS-DENY
+>                       SPACE
+>                       WS-REASON
+>                       DELIMITED BY SIZE
+>                       INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>            ELSE
+>                MOVE SPACES TO OUT-REC
+>                STRING WS-ID
+>                       WS-STATUS-APPRO
+>                       DELIMITED BY SIZE
+>                       INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>                PERFORM CALC-MONTHLY-PAY
+>                PERFORM WRITE-SCHEDULE
+>            END-IF.
+>
+>        CALC-MONTHLY-PAY.
+>            COMPUTE WS-MONTHLY-RATE ROUNDED = WS-RATE-PCT / 1200
+>
+>            IF WS-TERM-MONTHS = 0
+>                MOVE 0 TO WS-MONTHLY-PAY
+>                EXIT PARAGRAPH
+>            END-IF
+>
+>            IF WS-MONTHLY-RATE = 0
+>                COMPUTE WS-MONTHLY-PAY ROUNDED =
+>                    WS-LOAN-AMT / WS-TERM-MONTHS
+>            ELSE
+>                MOVE WS-LOAN-AMT TO WS-L
+>                MOVE WS-MONTHLY-RATE TO WS-R
+>                MOVE WS-TERM-MONTHS TO WS-N
+>                COMPUTE WS-FACTOR = (1 + WS-R) ** WS-N
+>                COMPUTE WS-TMP = (WS-L * WS-R * WS-FACTOR) /
+>                    (WS-FACTOR - 1)
+>                COMPUTE WS-MONTHLY-PAY ROUNDED = WS-TMP
+>            END-IF.
+>
+>        WRITE-SCHEDULE.
+>            MOVE WS-LOAN-AMT TO WS-BALANCE
+>
+>            PERFORM VARYING WS-MON FROM 1 BY 1
+>                UNTIL WS-MON > WS-TERM-MONTHS
+>
+>                COMPUTE WS-INTEREST ROUNDED =
+>                    WS-BALANCE * WS-MONTHLY-RATE
+>
+>                IF WS-MON = WS-TERM-MONTHS
+>                    MOVE WS-BALANCE TO WS-PRINCIPAL
+>                    COMPUTE WS-PAYMENT ROUNDED =
+>                        WS-PRINCIPAL + WS-INTEREST
+>                    MOVE 0 TO WS-BALANCE
+>                ELSE
+>                    COMPUTE WS-PRINCIPAL ROUNDED =
+>                        WS-MONTHLY-PAY - WS-INTEREST
+>                    COMPUTE WS-PAYMENT ROUNDED =
+>                        WS-PRINCIPAL + WS-INTEREST
+>                    COMPUTE WS-BALANCE ROUNDED =
+>                        WS-BALANCE - WS-PRINCIPAL
+>                END-IF
+>
+>                MOVE WS-MON TO WS-MON-ED
+>                MOVE WS-PAYMENT TO WS-PAY-ED
+>                MOVE WS-INTEREST TO WS-INT-ED
+>                MOVE WS-PRINCIPAL TO WS-PRN-ED
+>                MOVE WS-BALANCE TO WS-BAL-ED
+>
+>                MOVE SPACES TO OUT-REC
+>                STRING WS-MON-ED
+>                       SPACE
+>                       WS-PAY-ED
+>                       SPACE
+>                       WS-INT-ED
+>                       SPACE
+>                       WS-PRN-ED
+>                       SPACE
+>                       WS-BAL-ED
+>                       DELIMITED BY SIZE
+>                       INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>
+>            END-PERFORM.
+> EOF
+root@89ebd35e8c9b:/app/src# wc -l program.cbl && sed -n '1,60p' program.cbl
+218 program.cbl
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. MORTGAGE.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS DOT.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT INFILE ASSIGN TO "INPUT.DAT"
+               ORGANIZATION IS LINE SEQUENTIAL.
+           SELECT OUTFILE ASSIGN TO "/app/data/OUTPUT.DAT"
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  INFILE.
+       01  IN-REC                   PIC X(200).
+       FD  OUTFILE.
+       01  OUT-REC                  PIC X(200).
+
+       WORKING-STORAGE SECTION.
+       01  WS-EOF                   PIC X VALUE "N".
+
+       01  WS-ID                    PIC X(10).
+       01  WS-NAME                  PIC X(30).
+       01  WS-LOAN-TXT              PIC X(20).
+       01  WS-PROP-TXT              PIC X(20).
+       01  WS-DOWN-TXT              PIC X(20).
+       01  WS-TERM-TXT              PIC X(10).
+       01  WS-RATE-TXT              PIC X(20).
+
+       01  WS-LOAN-AMT              PIC 9(11)V99 COMP-3 VALUE 0.
+       01  WS-PROP-VALUE            PIC 9(11)V99 COMP-3 VALUE 0.
+       01  WS-DOWN-PAY              PIC 9(11)V99 COMP-3 VALUE 0.
+       01  WS-MIN-DOWN              PIC 9(11)V99 COMP-3 VALUE 0.
+
+       01  WS-TERM-YEARS            PIC 9(2) COMP VALUE 0.
+       01  WS-TERM-MONTHS           PIC 9(4) COMP VALUE 0.
+
+       01  WS-RATE-PCT              PIC 9(3)V9(4) COMP-3 VALUE 0.
+       01  WS-MONTHLY-RATE          PIC 9V9(9) COMP-3 VALUE 0.
+       01  WS-MONTHLY-PAY           PIC 9(11)V99 COMP-3 VALUE 0.
+
+       01  WS-BALANCE               PIC 9(11)V99 COMP-3 VALUE 0.
+       01  WS-INTEREST              PIC 9(11)V99 COMP-3 VALUE 0.
+       01  WS-PRINCIPAL             PIC 9(11)V99 COMP-3 VALUE 0.
+       01  WS-PAYMENT               PIC 9(11)V99 COMP-3 VALUE 0.
+
+       01  WS-MON                   PIC 9(4) COMP VALUE 0.
+
+       01  WS-STATUS-APPRO          PIC X(5) VALUE "APPRO".
+       01  WS-STATUS-DENY           PIC X(5) VALUE "DENY ".
+       01  WS-REASON                PIC X(50) VALUE SPACES.
+
+       01  WS-DOT-COUNT             PIC 9 COMP VALUE 0.
+
+       01  WS-L                     COMP-2 VALUE 0.
+       01  WS-R                     COMP-2 VALUE 0.
+       01  WS-N                     COMP-2 VALUE 0.
+root@89ebd35e8c9b:/app/src# cobc -x -Wall -Wextra -std=default program.cbl -o program
+program.cbl:7: error: syntax error, unexpected Identifier, expecting COMMA
+root@89ebd35e8c9b:/app/src# ./program
+bash: ./program: No such file or directory
+root@89ebd35e8c9b:/app/src# ls -la /app/data/OUTPUT.DAT && head -n 40 /app/data/OUTPUT.DAT
+-rw-r--r-- 1 root root 1 Dec 26 01:21 /app/data/OUTPUT.DAT
+
+root@89ebd35e8c9b:/app/src# cd /app/src
+root@89ebd35e8c9b:/app/src# nl -ba program.cbl | sed -n '1,30p'
+     1         IDENTIFICATION DIVISION.
+     2         PROGRAM-ID. MORTGAGE.
+     3
+     4         ENVIRONMENT DIVISION.
+     5         CONFIGURATION SECTION.
+     6         SPECIAL-NAMES.
+     7             DECIMAL-POINT IS DOT.
+     8         INPUT-OUTPUT SECTION.
+     9         FILE-CONTROL.
+    10             SELECT INFILE ASSIGN TO "INPUT.DAT"
+    11                 ORGANIZATION IS LINE SEQUENTIAL.
+    12             SELECT OUTFILE ASSIGN TO "/app/data/OUTPUT.DAT"
+    13                 ORGANIZATION IS LINE SEQUENTIAL.
+    14
+    15         DATA DIVISION.
+    16         FILE SECTION.
+    17         FD  INFILE.
+    18         01  IN-REC                   PIC X(200).
+    19         FD  OUTFILE.
+    20         01  OUT-REC                  PIC X(200).
+    21
+    22         WORKING-STORAGE SECTION.
+    23         01  WS-EOF                   PIC X VALUE "N".
+    24
+    25         01  WS-ID                    PIC X(10).
+    26         01  WS-NAME                  PIC X(30).
+    27         01  WS-LOAN-TXT              PIC X(20).
+    28         01  WS-PROP-TXT              PIC X(20).
+    29         01  WS-DOWN-TXT              PIC X(20).
+    30         01  WS-TERM-TXT              PIC X(10).
+root@89ebd35e8c9b:/app/src# grep -n "SPECIAL-NAMES\.|DECIMAL-POINT" -n program.cbl || true
+root@89ebd35e8c9b:/app/src# sed -i '/^[[:space:]]*SPECIAL-NAMES\./d; /^[[:space:]]*DECIMAL-POINT IS DOT\./d' program.cbl
+root@89ebd35e8c9b:/app/src# nl -ba program.cbl | sed -n '1,20p'
+     1         IDENTIFICATION DIVISION.
+     2         PROGRAM-ID. MORTGAGE.
+     3
+     4         ENVIRONMENT DIVISION.
+     5         CONFIGURATION SECTION.
+     6         INPUT-OUTPUT SECTION.
+     7         FILE-CONTROL.
+     8             SELECT INFILE ASSIGN TO "INPUT.DAT"
+     9                 ORGANIZATION IS LINE SEQUENTIAL.
+    10             SELECT OUTFILE ASSIGN TO "/app/data/OUTPUT.DAT"
+    11                 ORGANIZATION IS LINE SEQUENTIAL.
+    12
+    13         DATA DIVISION.
+    14         FILE SECTION.
+    15         FD  INFILE.
+    16         01  IN-REC                   PIC X(200).
+    17         FD  OUTFILE.
+    18         01  OUT-REC                  PIC X(200).
+    19
+    20         WORKING-STORAGE SECTION.
+root@89ebd35e8c9b:/app/src# cobc -x -Wall -Wextra -std=default program.cbl -o program
+program.cbl: in paragraph 'CONVERT-FIELDS':
+program.cbl:109: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:110: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:111: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:113: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:114: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:121: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:123: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:125: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl: in paragraph 'DECIDE-AND-WRITE':
+program.cbl:138: warning: WRITE statement not terminated by END-WRITE [-Wterminator]
+program.cbl:146: warning: WRITE statement not terminated by END-WRITE [-Wterminator]
+program.cbl: in paragraph 'CALC-MONTHLY-PAY':
+program.cbl:152: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:160: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:166: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:167: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:169: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl: in paragraph 'WRITE-SCHEDULE':
+program.cbl:178: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:183: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:187: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:189: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:191: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:195: warning: some digits may be truncated [-Wpossible-truncate]
+program.cbl:48: note: 'WS-MON' defined here as PIC 9(4) [-Wpossible-truncate]
+program.cbl:62: note: 'WS-MON-ED' defined here as PIC 9(3) [-Wpossible-truncate]
+program.cbl:196: warning: some digits may be truncated [-Wpossible-truncate]
+program.cbl:46: note: 'WS-PAYMENT' defined here as PIC 9(11)V99 [-Wpossible-truncate]
+program.cbl:63: note: 'WS-PAY-ED' defined here as PIC 9(8).99 [-Wpossible-truncate]
+program.cbl:197: warning: some digits may be truncated [-Wpossible-truncate]
+program.cbl:44: note: 'WS-INTEREST' defined here as PIC 9(11)V99 [-Wpossible-truncate]
+program.cbl:64: note: 'WS-INT-ED' defined here as PIC 9(8).99 [-Wpossible-truncate]
+program.cbl:198: warning: some digits may be truncated [-Wpossible-truncate]
+program.cbl:45: note: 'WS-PRINCIPAL' defined here as PIC 9(11)V99 [-Wpossible-truncate]
+program.cbl:65: note: 'WS-PRN-ED' defined here as PIC 9(8).99 [-Wpossible-truncate]
+program.cbl:199: warning: some digits may be truncated [-Wpossible-truncate]
+program.cbl:43: note: 'WS-BALANCE' defined here as PIC 9(11)V99 [-Wpossible-truncate]
+program.cbl:66: note: 'WS-BAL-ED' defined here as PIC 9(10).99 [-Wpossible-truncate]
+program.cbl:214: warning: WRITE statement not terminated by END-WRITE [-Wterminator]
+root@89ebd35e8c9b:/app/src# rm -f /app/data/OUTPUT.DAT && : > /app/data/OUTPUT.DAT
+root@89ebd35e8c9b:/app/src# ./program
+root@89ebd35e8c9b:/app/src# ls -la /app/data/OUTPUT.DAT && sed -n '1,120p' /app/data/OUTPUT.DAT
+-rw-r--r-- 1 root root 716 Dec 26 01:36 /app/data/OUTPUT.DAT
+APP0000001DENY  INSUFFICIENT FUNDS FOR DOWN PAYMENT
+APP0000002APPRO
+001 00000429.18 00000022.92 00000406.26 0000004593.74
+002 00000429.18 00000021.05 00000408.13 0000004185.61
+003 00000429.18 00000019.18 00000410.00 0000003775.61
+004 00000429.18 00000017.30 00000411.88 0000003363.73
+005 00000429.18 00000015.42 00000413.76 0000002949.97
+006 00000429.18 00000013.52 00000415.66 0000002534.31
+007 00000429.18 00000011.62 00000417.56 0000002116.75
+008 00000429.18 00000009.70 00000419.48 0000001697.27
+009 00000429.18 00000007.78 00000421.40 0000001275.87
+010 00000429.18 00000005.85 00000423.33 0000000852.54
+011 00000429.18 00000003.91 00000425.27 0000000427.27
+012 00000429.23 00000001.96 00000427.27 0000000000.00
+root@89ebd35e8c9b:/app/src# cd /app/src
+root@89ebd35e8c9b:/app/src# awk 'length($0)>80{print NR ":" length($0) ":" $0}' program.cbl | head
+root@89ebd35e8c9b:/app/src# awk 'length($0)>72{print NR ":" length($0) ":" $0}' program.cbl | head
+root@89ebd35e8c9b:/app/src# cobc -x -std=default program.cbl -o program
+root@89ebd35e8c9b:/app/src# rm -f /app/data/OUTPUT.DAT && ./program
+root@89ebd35e8c9b:/app/src# sed -n '1,60p' /app/data/OUTPUT.DAT
+APP0000001DENY  INSUFFICIENT FUNDS FOR DOWN PAYMENT
+APP0000002APPRO
+001 00000429.18 00000022.92 00000406.26 0000004593.74
+002 00000429.18 00000021.05 00000408.13 0000004185.61
+003 00000429.18 00000019.18 00000410.00 0000003775.61
+004 00000429.18 00000017.30 00000411.88 0000003363.73
+005 00000429.18 00000015.42 00000413.76 0000002949.97
+006 00000429.18 00000013.52 00000415.66 0000002534.31
+007 00000429.18 00000011.62 00000417.56 0000002116.75
+008 00000429.18 00000009.70 00000419.48 0000001697.27
+009 00000429.18 00000007.78 00000421.40 0000001275.87
+010 00000429.18 00000005.85 00000423.33 0000000852.54
+011 00000429.18 00000003.91 00000425.27 0000000427.27
+012 00000429.23 00000001.96 00000427.27 0000000000.00
+root@89ebd35e8c9b:/app/src#

@@ -1,0 +1,181 @@
+New Terminal Output:
+
+/usr/local/lib/python3.13/site-packages/pygments/lexers/wgsl.py:72:    # https://www.w3.org/TR/WGSL/#reserved-words
+/usr/lib/python3.11/asynchat.py:1:# -*- Mode: Python; tab-width: 4 -*-
+root@f2dfd4d3de5d:/app/src# sed -n '1,120p' /etc/gnucobol/default.conf
+# GnuCOBOL compiler configuration
+#
+# Copyright (C) 2001-2012, 2014-2020 Free Software Foundation, Inc.
+# Written by Keisuke Nishida, Roger While, Simon Sobisch, Edward Hart,
+# Ron Norman
+#
+# This file is part of GnuCOBOL.
+#
+# The GnuCOBOL compiler is free software: you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# GnuCOBOL is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuCOBOL.  If not, see <https://www.gnu.org/licenses/>.
+
+
+# Value: any string
+name: "GnuCOBOL"
+
+# Value: enum
+standard-define                 0
+#        CB_STD_GC = 0,
+#        CB_STD_MF,
+#        CB_STD_IBM,
+#        CB_STD_MVS,
+#        CB_STD_BS2000,
+#        CB_STD_ACU,
+#        CB_STD_85,
+#        CB_STD_2002,
+#        CB_STD_2014
+
+# Value: int
+tab-width:                      8
+text-column:                    72
+# Maximum word-length for COBOL words / Programmer defined words
+# Be aware that GC checks the word length against COB_MAX_WORDLEN
+# first (currently 63)
+word-length:                    63
+
+# Maximum literal size in general
+literal-length:                 8191
+
+# Maximum numeric literal size (absolute maximum: 38)
+numeric-literal-length:         38
+
+# Maximum number of characters allowed in the character-string (max. 255)
+pic-length:                     255
+
+# Default assign type
+# Value: 'dynamic', 'external'
+assign-clause:                  dynamic
+
+# If yes, file names are resolved at run time using
+# environment variables.
+# For example, given ASSIGN TO "DATAFILE", the file name will be
+#  1. the value of environment variable 'DD_DATAFILE' or
+#  2. the value of environment variable 'dd_DATAFILE' or
+#  3. the value of environment variable 'DATAFILE' or
+#  4. the literal "DATAFILE"
+# If no, the value of the assign clause is the file name.
+#
+filename-mapping:               yes
+
+# Alternate formatting of numeric fields
+pretty-display:                 yes
+
+# Allow complex OCCURS DEPENDING ON
+complex-odo:                    no
+
+# Allow REDEFINES to other than last equal level number
+indirect-redefines:             no
+
+# Binary byte size - defines the allocated bytes according to PIC
+# Value:         signed  unsigned  bytes
+#                ------  --------  -----
+# '2-4-8'        1 -  4    same        2
+#                5 -  9    same        4
+#               10 - 18    same        8
+#
+# '1-2-4-8'      1 -  2    same        1
+#                3 -  4    same        2
+#                5 -  9    same        4
+#               10 - 18    same        8
+#
+# '1--8'         1 -  2    1 -  2      1
+#                3 -  4    3 -  4      2
+#                5 -  6    5 -  7      3
+#                7 -  9    8 -  9      4
+#               10 - 11   10 - 12      5
+#               12 - 14   13 - 14      6
+#               15 - 16   15 - 16      7
+#               17 - 18   17 - 18      8
+#
+binary-size:                    1-2-4-8
+
+# Numeric truncation according to ANSI
+binary-truncate:                yes
+
+# Binary byte order
+# Value: 'native', 'big-endian'
+binary-byteorder:               big-endian
+
+# Allow larger REDEFINES items
+larger-redefines-ok:            no
+
+# Allow certain syntax variations (eg. REDEFINES position)
+relax-syntax-checks:            no
+
+# Allow zero length reference-modification
+# (only checked with active EC-BOUND-REF-MOD)
+ref-mod-zero-length:            yes
+
+# Perform type OSVS - If yes, the exit point of any currently
+# executing perform is recognized if reached.
+root@f2dfd4d3de5d:/app/src# ls -la /etc/gnucobol | sed -n '1,80p'
+total 376
+drwxr-xr-x  2 root root  4096 Dec 26 01:24 .
+drwxr-xr-x 36 root root  4096 Dec 26 01:37 ..
+-rw-r--r--  1 root root  8928 Sep 19  2022 acu-strict.conf
+-rw-r--r--  1 root root  1139 Sep 19  2022 acu.conf
+-rw-r--r--  1 root root 21294 Sep 19  2022 acu.words
+-rw-r--r--  1 root root  8692 Sep 19  2022 bs2000-strict.conf
+-rw-r--r--  1 root root  1146 Sep 19  2022 bs2000.conf
+-rw-r--r--  1 root root 15187 Sep 19  2022 bs2000.words
+-rw-r--r--  1 root root  8526 Sep 19  2022 cobol2002.conf
+-rw-r--r--  1 root root 13065 Sep 19  2022 cobol2002.words
+-rw-r--r--  1 root root  8243 Sep 19  2022 cobol2014.conf
+-rw-r--r--  1 root root 14042 Sep 19  2022 cobol2014.words
+-rw-r--r--  1 root root  8605 Sep 19  2022 cobol85.conf
+-rw-r--r--  1 root root  9448 Sep 19  2022 cobol85.words
+-rw-r--r--  1 root root  9240 Sep 19  2022 default.conf
+-rw-r--r--  1 root root  8286 Sep 19  2022 ibm-strict.conf
+-rw-r--r--  1 root root  1137 Sep 19  2022 ibm.conf
+-rw-r--r--  1 root root 17463 Sep 19  2022 ibm.words
+-rw-r--r--  1 root root  4484 Sep 19  2022 lax.conf-inc
+-rw-r--r--  1 root root  8500 Sep 19  2022 mf-strict.conf
+-rw-r--r--  1 root root  1143 Sep 19  2022 mf.conf
+-rw-r--r--  1 root root 17814 Sep 19  2022 mf.words
+-rw-r--r--  1 root root  8418 Sep 19  2022 mvs-strict.conf
+-rw-r--r--  1 root root  1140 Sep 19  2022 mvs.conf
+-rw-r--r--  1 root root 11665 Sep 19  2022 mvs.words
+-rw-r--r--  1 root root  8844 Sep 19  2022 realia-strict.conf
+-rw-r--r--  1 root root  1085 Sep 19  2022 realia.conf
+-rw-r--r--  1 root root 13082 Sep 19  2022 realia.words
+-rw-r--r--  1 root root  9290 Sep 19  2022 rm-strict.conf
+-rw-r--r--  1 root root  1134 Sep 19  2022 rm.conf
+-rw-r--r--  1 root root 11113 Sep 19  2022 rm.words
+-rw-r--r--  1 root root 17746 Sep 19  2022 runtime.cfg
+-rw-r--r--  1 root root     1 Sep 19  2022 runtime_empty.cfg
+-rw-r--r--  1 root root 10646 Sep 19  2022 xopen.conf
+root@f2dfd4d3de5d:/app/src# ln -sf /etc/gnucobol/default.conf /etc/gnucobol/gnucobol.conf
+root@f2dfd4d3de5d:/app/src# ls -la /etc/gnucobol/gnucobol.conf
+lrwxrwxrwx 1 root root 26 Dec 26 01:44 /etc/gnucobol/gnucobol.conf -> /etc/gnucobol/default.conf
+root@f2dfd4d3de5d:/app/src# cd /app/src
+root@f2dfd4d3de5d:/app/src# rm -f gnucobol.conf
+root@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,200p'
+program.cbl:53: error: PICTURE string must contain at least one of the set A, N, X, Z, 1, 9 and *; or at least two of the set +, - and the currency symbol
+program.cbl:54: error: PICTURE string must contain at least one of the set A, N, X, Z, 1, 9 and *; or at least two of the set +, - and the currency symbol
+program.cbl:55: error: PICTURE string must contain at least one of the set A, N, X, Z, 1, 9 and *; or at least two of the set +, - and the currency symbol
+program.cbl:56: error: PICTURE string must contain at least one of the set A, N, X, Z, 1, 9 and *; or at least two of the set +, - and the currency symbol
+program.cbl:57: error: PICTURE string must contain at least one of the set A, N, X, Z, 1, 9 and *; or at least two of the set +, - and the currency symbol
+program.cbl: in paragraph 'BUILD-SCHEDULE':
+program.cbl:142: error: 'TERM-MONTH' is not defined
+program.cbl:143: error: syntax error, unexpected COMPUTE
+root@f2dfd4d3de5d:/app/src# rm -f /app/data/OUTPUT.DAT
+root@f2dfd4d3de5d:/app/src# ./program
+bash: ./program: No such file or directory
+root@f2dfd4d3de5d:/app/src# sed -n '1,120p' /app/data/OUTPUT.DAT
+sed: can't read /app/data/OUTPUT.DAT: No such file or directory
+root@f2dfd4d3de5d:/app/src#

@@ -1,0 +1,23 @@
+{
+  "analysis": "We are in the /app directory. The task is to create a COBOL source file /app/src/program.cbl that implements the mortgage processing logic described. The file must be in fixed format (no SOURCE FORMAT line) and each line ≤ 80 characters. After creating the file we should compile it with GnuCOBOL (cobc) to ensure it builds, and optionally run it to generate the output file. No other files have been created yet.",
+  "plan": "1. Change to /app/src directory. 2. Create program.cbl using a heredoc, writing the COBOL program that reads INPUT.DAT, processes each record, writes results to ../data/OUTPUT.DAT, and follows the specified calculations and output format. 3. Compile the program with cobc to verify syntax. 4. Run the program to produce the output file. 5. Mark the task as complete.",
+  "commands": [
+    {
+      "keystrokes": "cd /app/src\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat > program.cbl <<'EOF'\nIDENTIFICATION DIVISION.\nPROGRAM-ID. MORTGAGE.\nENVIRONMENT DIVISION.\nINPUT-OUTPUT SECTION.\nFILE-CONTROL.\n    SELECT INPUT-FILE ASSIGN TO \"INPUT.DAT\"\n        ORGANIZATION IS LINE SEQUENTIAL.\n    SELECT OUTPUT-FILE ASSIGN TO \"../data/OUTPUT.DAT\"\n        ORGANIZATION IS LINE SEQUENTIAL.\nDATA DIVISION.\nFILE SECTION.\nFD INPUT-FILE.\n01 INPUT-REC PIC X(200).\nFD OUTPUT-FILE.\n01 OUTPUT-REC PIC X(200).\nWORKING-STORAGE SECTION.\n01 WS-EOF PIC X VALUE \"N\".\n   88 END-OF-FILE VALUE \"Y\".\n01 WS-REC.\n   05 WS-ID           PIC X(10).\n   05 WS-NAME         PIC X(30).\n   05 WS-LOAN-AMOUNT  PIC 9(10).\n   05 WS-PROP-VALUE   PIC 9(10).\n   05 WS-DOWN-PAYMENT PIC 9(10).\n   05 WS-TERM         PIC 9(2).\n   05 WS-RATE         PIC 9(3)V9(2).\n01 MIN-DOWN          PIC 9(10)V99.\n01 MONTHLY-RATE      PIC 9(5)V9(6).\n01 MONTHLY-PAYMENT   PIC 9(10)V99.\n01 BALANCE           PIC 9(10)V99.\n01 INTEREST-PART     PIC 9(8)V99.\n01 PRINCIPAL-PART    PIC 9(8)V99.\n01 MON-NUMBER        PIC 9(3).\n01 REASON            PIC X(50).\n01 WS-SPACES         PIC X(1) VALUE SPACE.\nPROCEDURE DIVISION.\n   OPEN INPUT INPUT-FILE\n   OPEN OUTPUT OUTPUT-FILE\n   PERFORM UNTIL END-OF-FILE\n      READ INPUT-FILE INTO INPUT-REC\n         AT END SET END-OF-FILE TO TRUE\n      NOT AT END\n         PERFORM PROCESS-RECORD\n      END-READ\n   END-PERFORM\n   CLOSE INPUT-FILE\n   CLOSE OUTPUT-FILE\n   STOP RUN.\n\nPROCESS-RECORD.\n   UNSTRING INPUT-REC DELIMITED BY ';'\n      INTO WS-ID\n           WS-NAME\n           WS-LOAN-AMOUNT\n           WS-PROP-VALUE\n           WS-DOWN-PAYMENT\n           WS-TERM\n           WS-RATE\n   END-UNSTRING\n   COMPUTE MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED\n   IF WS-DOWN-PAYMENT < MIN-DOWN\n      MOVE \"INSUFFICIENT FUNDS FOR DOWN PAYMENT\" TO REASON\n      STRING WS-ID DELIMITED BY SIZE\n             \"DENY \" DELIMITED BY SIZE\n             REASON DELIMITED BY SIZE\n         INTO OUTPUT-REC\n      END-STRING\n      WRITE OUTPUT-REC\n   ELSE\n      MOVE \"APPRO\" TO REASON\n      STRING WS-ID DELIMITED BY SIZE\n             REASON DELIMITED BY SIZE\n         INTO OUTPUT-REC\n      END-STRING\n      WRITE OUTPUT-REC\n      PERFORM GENERATE-SCHEDULE\n   END-IF.\n\nGENERATE-SCHEDULE.\n   COMPUTE MONTHLY-RATE = WS-RATE / 1200 ROUNDED\n   COMPUTE MONTHLY-PAYMENT = WS-LOAN-AMOUNT * MONTHLY-RATE /\n        (1 - FUNCTION POW (1 + MONTHLY-RATE, -WS-TERM)) ROUNDED\n   MOVE WS-LOAN-AMOUNT TO BALANCE\n   PERFORM VARYING MON-NUMBER FROM 1 BY 1 UNTIL MON-NUMBER > WS-TERM\n      COMPUTE INTEREST-PART = BALANCE * MONTHLY-RATE ROUNDED\n      COMPUTE PRINCIPAL-PART = MONTHLY-PAYMENT - INTEREST-PART ROUNDED\n      SUBTRACT PRINCIPAL-PART FROM BALANCE GIVING BALANCE ROUNDED\n      STRING FUNCTION NUMVAL-C (MON-NUMBER) DELIMITED BY SIZE\n             \" \" DELIMITED BY SIZE\n             FUNCTION NUMVAL-C (MONTHLY-PAYMENT) DELIMITED BY SIZE\n             \" \" DELIMITED BY SIZE\n             FUNCTION NUMVAL-C (INTEREST-PART) DELIMITED BY SIZE\n             \" \" DELIMITED BY SIZE\n             FUNCTION NUMVAL-C (PRINCIPAL-PART) DELIMITED BY SIZE\n             \" \" DELIMITED BY SIZE\n             FUNCTION NUMVAL-C (BALANCE) DELIMITED BY SIZE\n         INTO OUTPUT-REC\n      END-STRING\n      WRITE OUTPUT-REC\n   END-PERFORM.\nEOF\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "cobc -x -o program program.cbl\n",
+      "duration": 5.0
+    },
+    {
+      "keystrokes": "./program\n",
+      "duration": 5.0
+    }
+  ],
+  "task_complete": true
+}

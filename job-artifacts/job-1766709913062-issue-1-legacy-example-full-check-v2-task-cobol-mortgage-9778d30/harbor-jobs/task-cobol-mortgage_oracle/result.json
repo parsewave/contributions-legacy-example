@@ -1,0 +1,31 @@
+{
+    "id": "41c10d05-6d16-4065-b317-db49c4d2bb92",
+    "started_at": "2025-12-26T01:22:09.197127",
+    "finished_at": "2025-12-26T01:22:49.103551",
+    "n_total_trials": 3,
+    "stats": {
+        "n_trials": 3,
+        "n_errors": 0,
+        "evals": {
+            "oracle__adhoc": {
+                "n_trials": 3,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 1.0
+                    }
+                ],
+                "reward_stats": {
+                    "reward": {
+                        "1.0": [
+                            "task-cobol-mortgage__LUcoeEc",
+                            "task-cobol-mortgage__amuhEwC",
+                            "task-cobol-mortgage__a6NyGHu"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

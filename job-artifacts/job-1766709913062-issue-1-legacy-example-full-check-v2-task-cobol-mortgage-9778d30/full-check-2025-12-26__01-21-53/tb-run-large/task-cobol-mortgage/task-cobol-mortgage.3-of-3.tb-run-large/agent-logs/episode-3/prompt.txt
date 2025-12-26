@@ -1,0 +1,198 @@
+New Terminal Output:
+
+root@f2dfd4d3de5d:/app/src# cd /app/src
+root@f2dfd4d3de5d:/app/src# cobc --help | sed -n '1,120p'
+GnuCOBOL compiler for most COBOL dialects with lots of extensions
+
+Usage: cobc [options]... file...
+
+Options:
+  -h, -help             display this help and exit
+  -V, -version          display compiler version and exit
+  -i, -info             display compiler information (build/environment)
+                        and exit
+  -v, -verbose          verbose mode, display additional information;
+                        multiple -v options increase the verbosity,
+                        the maximum is 3 as follows:
+                        (1) display compiler version and the commands
+                        invoked by the compiler,
+                        (2) pass verbose option to assembler/compiler
+                        (3) pass verbose option to linker
+  -q, -brief            reduced displays, commands invoked not shown
+  -###                  like -v but commands not executed
+  -x                    build an executable program
+  -m                    build a dynamically loadable module (default)
+  -j [<args>], -job[=<args>]    run program after build, passing <args>
+  -std=<dialect>        warnings/features for a specific dialect
+                        <dialect> can be one of:
+                        default, cobol2014, cobol2002, cobol85, xopen,
+                        ibm-strict, ibm, mvs-strict, mvs,
+                        mf-strict, mf, bs2000-strict, bs2000,
+                        acu-strict, acu, rm-strict, rm;
+                        see configuration files in directory config
+  -F, -free             use free source format
+  -fixed                use fixed source format (default)
+  -O, -O2, -O3, -Os     enable optimization
+  -O0                   disable optimization
+  -g                    enable C compiler debug and stack check
+  -d, -debug            enable all run-time error checking,
+                        equal to -fstack-check -fec=EC-ALL
+  -fec=<exception-name> enable code generation for <exception-name>,
+                        sets -fsource-location
+  -fno-ec=<exception-name>      disable code generation for <exception-name>
+  -o <file>             place the output into <file>
+  -b                    combine all input files into a single
+                        dynamically loadable module
+  -E                    preprocess only; do not compile or link
+  -C                    translation only; convert COBOL to C
+  -S                    compile only; output assembly file
+  -c                    compile and assemble, but do not link
+  -T <file>             generate and place a wide program listing into <file>
+  -t <file>             generate and place a program listing into <file>
+  --tlines=<lines>      specify lines per page in listing, default = 55
+  -P[=<dir or file>]    generate preprocessed program listing (.lst)
+  -Xref                 generate cross reference through 'cobxref'
+                        (V. Coen's 'cobxref' must be in path)
+  -I <directory>        add <directory> to copy/include search path
+  -L <directory>        add <directory> to library search path
+  -l <lib>              link the library <lib>
+  -A <options>          add <options> to the C compile phase
+  -Q <options>          add <options> to the C link phase
+  -D <define>           define <define> for COBOL compilation
+  -K <entry>            generate CALL to <entry> as static
+  -conf=<file>          user-defined dialect configuration; see -std
+  -list-reserved        display reserved words
+  -list-intrinsics      display intrinsic functions
+  -list-mnemonics       display mnemonic names
+  -list-system          display system routines
+  -save-temps[=<dir>]   save intermediate files
+                        * default: current directory
+  -ext <extension>      add file extension for resolving COPY
+
+Warning options:
+  -Wall                 enable most warnings (all except as noted below)
+  -Wextra               like -Wall but enable some extra warning flags
+  -w                    disable all warnings
+  -Wno-<warning>        disable warning enabled by default, -Wall or -Wextra
+  -Wadditional          additional warnings only raised with -Wall
+  -Wno-unfinished       do not warn if unfinished features are used
+                        * ALWAYS active
+  -Wno-pending          do not warn if pending features are mentioned
+                        * ALWAYS active
+  -Wno-ignored-error    do not warn about errors in unreachable code parts and so normally ignored
+                        * ALWAYS active
+  -Wobsolete            warn if obsolete features are used
+  -Warchaic             warn if archaic features are used
+  -Wredefinition        warn about non-referenced ambiguous data items
+  -Wtruncate            warn about field truncation from constant assignments
+  -Wpossible-truncate   warn about possible field truncation
+                        * NOT set with -Wall
+  -Woverlap             warn about over
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+ition of 'literal-length'
+        no definition of 'numeric-literal-length'
+        no definition of 'standard-define'
+        no definition of 'binary-size'
+        no definition of 'binary-byteorder'
+        no definition of 'assign-clause'
+        no definition of 'screen-section-rules'
+        no definition of 'dpc-in-data'
+        no definition of 'filename-mapping'
+        no definition of 'pretty-display'
+        no definition of 'binary-truncate'
+        no definition of 'complex-odo'
+        no definition of 'indirect-redefines'
+        no definition of 'larger-redefines-ok'
+        no definition of 'relax-syntax-checks'
+        no definition of 'ref-mod-zero-length'
+        no definition of 'relax-level-hierarchy'
+        no definition of 'select-working'
+        no definition of 'local-implies-recursive'
+        no definition of 'sticky-linkage'
+        no definition of 'move-ibm'
+        no definition of 'perform-osvs'
+        no definition of 'arithmetic-osvs'
+        no definition of 'constant-folding'
+        no definition of 'hostsign'
+        no definition of 'program-name-redefinition'
+        no definition of 'accept-update'
+        no definition of 'accept-auto'
+        no definition of 'console-is-crt'
+        no definition of 'no-echo-means-secure'
+        no definition of 'line-col-zero-default'
+        no definition of 'display-special-fig-consts'
+        no definition of 'binary-comp-1'
+        no definition of 'numeric-pointer'
+        no definition of 'move-non-numeric-lit-to-numeric-is-zero'
+        no definition of 'implicit-assign-dynamic-var'
+        no definition of 'comment-paragraphs'
+        no definition of 'memory-size-clause'
+        no definition of 'multiple-file-tape-clause'
+        no definition of 'label-records-clause'
+        no definition of 'value-of-clause'
+        no definition of 'data-records-clause'
+        no definition of 'top-level-occurs-clause'
+        no definition of 'same-as-clause'
+        no definition of 'type-to-clause'
+        no definition of 'usage-type'
+        no definition of 'synchronized-clause'
+        no definition of 'special-names-clause'
+        no definition of 'goto-statement-without-name'
+        no definition of 'stop-literal-statement'
+        no definition of 'stop-identifier-statement'
+        no definition of 'debugging-mode'
+        no definition of 'use-for-debugging'
+        no definition of 'padding-character-clause'
+        no definition of 'next-sentence-phrase'
+        no definition of 'listing-statements'
+        no definition of 'title-statement'
+        no definition of 'entry-statement'
+        no definition of 'move-noninteger-to-alphanumeric'
+        no definition of 'move-figurative-constant-to-numeric'
+        no definition of 'move-figurative-space-to-numeric'
+        no definition of 'move-figurative-quote-to-numeric'
+        no definition of 'odo-without-to'
+        no definition of 'section-segments'
+        no definition of 'alter-statement'
+        no definition of 'call-overflow'
+        no definition of 'numeric-boolean'
+        no definition of 'hexadecimal-boolean'
+        no definition of 'national-literals'
+        no definition of 'hexadecimal-national-literals'
+        no definition of 'national-character-literals'
+        no definition of 'hp-octal-literals'
+        no definition of 'acu-literals'
+        no definition of 'word-continuation'
+        no definition of 'not-exception-before-exception'
+        no definition of 'accept-display-extensions'
+        no definition of 'renames-uncommon-levels'
+        no definition of 'symbolic-constant'
+        no definition of 'constant-78'
+        no definition of 'constant-01'
+        no definition of 'perform-varying-without-by'
+        no definition of 'reference-out-of-declaratives'
+        no definition of 'program-prototypes'
+        no definition of 'call-convention-mnemonic'
+        no definition of 'call-convention-linkage'
+        no definition of 'numeric-value-for-edited-item'
+        no definition of 'incorrect-conf-sec-order'
+        no definition of 'define-constant-directive'
+        no definition of 'free-redefines-position'
+        no definition of 'records-mismatch-record-clause'
+        no definition of 'record-delimiter'
+        no definition of 'sequential-delimiters'
+        no definition of 'record-delim-with-fixed-recs'
+        no definition of 'missing-statement'
+        no definition of 'zero-length-literals'
+        no definition of 'xml-generate-extra-phrases'
+        no definition of 'continue-after'
+        no definition of 'goto-entry'
+        no definition of 'assign-variable'
+        no definition of 'assign-using-variable'
+        no definition of 'assign-ext-dyn'
+        no definition of 'assign-disk-from'
+        no definition of 'vsam-status'
+root@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,80p'
+configuration error:
+gnucobol.conf: No such file or directory
+root@f2dfd4d3de5d:/app/src#

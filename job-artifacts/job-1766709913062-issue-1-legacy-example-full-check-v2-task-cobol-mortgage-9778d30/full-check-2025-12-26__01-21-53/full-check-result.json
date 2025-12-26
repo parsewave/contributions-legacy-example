@@ -1,0 +1,607 @@
+{
+  "task_id": "task-cobol-mortgage",
+  "tasks_dir": "/workspace/parsewave/contributions-legacy-example/contributor_tasks",
+  "timestamp": "2025-12-26 02:12:41",
+  "basic_check": {
+    "result_type": "tb_positive",
+    "duration": 0.006192684173583984,
+    "return_code": 0,
+    "original_result": {
+      "errors": [],
+      "warnings": [],
+      "task_size_mb": 0.01
+    }
+  },
+  "ai_detect": {
+    "result_type": "tb_positive",
+    "duration": 0.06682682037353516,
+    "return_code": 0,
+    "original_result": {
+      "task_id": "task-cobol-mortgage",
+      "task_path": "/workspace/parsewave/contributions-legacy-example/contributor_tasks/task-cobol-mortgage",
+      "files_analyzed": [
+        "task.yaml (instruction field)"
+      ],
+      "documents": [
+        {
+          "predicted_class": "human",
+          "confidence_score": 0.8603016868772052,
+          "confidence_category": "high",
+          "average_generated_prob": 0,
+          "completely_generated_prob": 0.05548836493601356,
+          "document_classification": "HUMAN_ONLY",
+          "result_message": "Our detector is highly confident that the text is written entirely by a human.",
+          "language": "en",
+          "version": "2025-10-30-base"
+        }
+      ]
+    }
+  },
+  "similarity_check": {
+    "result_type": "tb_positive",
+    "duration": 2.2806413173675537,
+    "return_code": 0,
+    "original_result": {
+      "passed": true,
+      "duration": 2.2806413173675537,
+      "check_name": "similarity",
+      "message": "Similarity check PASSED: max_similarity=42.76% (threshold=80%)",
+      "details": {
+        "passed": true,
+        "max_similarity": 0.4275972167016328,
+        "threshold": 0.8,
+        "top_matches": [
+          {
+            "index": 36,
+            "instruction_preview": "You are given a COBOL program located at /app/src/program.cbl. This program reads input data from /app/src/INPUT.DAT and modifies one or more .DAT files located in the /app/data/ directory. The COBOL ",
+            "instruction_full": "You are given a COBOL program located at /app/src/program.cbl. This program reads input data from /app/src/INPUT.DAT and modifies one or more .DAT files located in the /app/data/ directory. The COBOL program is designed to be run from the /app/ directory and should be compiled and executed using GnuCOBOL 3.\nYour task is to re-implement the functionality of program.cbl in Python. You must create a new Python script located at /app/program.py, which performs the exact same operations as the COBOL program. \nSpecifically, the Python script must:\n  - Read inputs from /app/src/INPUT.DAT\n  - Apply the same logic to modify the .DAT files in /app/data/ as the COBOL program does\n  - The .DAT files produced by running /app/program.py must be identical (content-wise) to those produced by running /app/src/program.cbl using GnuCOBOL\n     \nSuccess Criteria:\n  - Given the same /app/src/INPUT.DAT file and the same initial states of ACCOUNTS.DAT, BOOKS.DAT, and TRANSACTIONS.DAT files in /app/data/,\n    after running /app/program.py, the /app/data/ACCOUNTS.DAT, /app/data/BOOKS.DAT, and /app/data/TRANSACTIONS.DAT files must be identical (content-wise) to those produced by running /app/src/program.cbl using GnuCOBOL",
+            "similarity": 0.4275972167016328,
+            "tfidf_similarity": 0.44684508926824773,
+            "fuzzy_similarity": 0.017916390179163903,
+            "keyword_similarity": 0.12195121951219512,
+            "ngram_similarity": 0.0297029702970297,
+            "repo": "terminal-bench",
+            "path": "tasks/cobol-modernization/task.yaml",
+            "source": "terminal-bench",
+            "ref": "main"
+          },
+          {
+            "index": 8914,
+            "instruction_preview": "I created a payroll system but it's producing incorrect results. The tax calculations and deductions seem off.\n\n  Files:\n  - /app/src/PAYROLL.cbl - Main program\n  - /app/src/TAXCALC.cbl - Tax calculat",
+            "instruction_full": "I created a payroll system but it's producing incorrect results. The tax calculations and deductions seem off.\n\n  Files:\n  - /app/src/PAYROLL.cbl - Main program\n  - /app/src/TAXCALC.cbl - Tax calculation module  \n  - /app/src/PAYCOMM.cpy - Shared data structures\n  - /app/data/EMPLOYEE.DAT - Employee records (25 employees)\n  - /app/data/TIMECARD.DAT - Weekly hours (8 employees have overtime)\n  - /app/docs/tax-reference.txt - Tax rates and calculation rules\n\n  Known issues:\n  - Federal tax brackets seem incorrect\n  - State tax sometimes shows wrong sign\n  - FICA rate appears to be missing Medicare\n  - Overtime pay doesn't look right\n  - 401k should be pre-tax but might not be\n\n  There may be other issues I haven't identified. Please debug thoroughly.\n\n  Success criteria:\n  - Compiles with strict IBM flags: cobc -std=ibm -Wall -Werror -Wno-arithmetic-osvs\n  - Runs without errors and processes all 25 employees  \n  - Correct gross and net payroll totals",
+            "similarity": 0.35606315539060324,
+            "tfidf_similarity": 0.3730132772118675,
+            "fuzzy_similarity": 0.023383266350018268,
+            "keyword_similarity": 0.06164383561643835,
+            "ngram_similarity": 0,
+            "source": "database"
+          },
+          {
+            "index": 132,
+            "instruction_preview": "You are to update a Fortran project's build process to use gfortran. The existing build system, designed for a different compiler, needs modification.\n\nContext:\nOriginal Makefile: /app/src/Makefile\nFo",
+            "instruction_full": "You are to update a Fortran project's build process to use gfortran. The existing build system, designed for a different compiler, needs modification.\n\nContext:\nOriginal Makefile: /app/src/Makefile\nFortran Library: /app/src/my_lib.f90\nMain Program: /app/src/test_main.f90\nYour Working Directory: /app/. All actions (copying, modifying, compiling, running) should be based here.\n\nYour objectives are:\n1. Modify the '/app/Makefile' so that the build process works\n2. Compile the project with the modified Makefile and execute test_program. Note that this program will generate an /app/output.txt that you must not modify or delete.",
+            "similarity": 0.3279501421661737,
+            "tfidf_similarity": 0.34374161082402815,
+            "fuzzy_similarity": 0.011447260834014717,
+            "keyword_similarity": 0.058333333333333334,
+            "ngram_similarity": 0,
+            "repo": "terminal-bench",
+            "path": "tasks/modernize-fortran-build/task.yaml",
+            "source": "terminal-bench",
+            "ref": "main"
+          },
+          {
+            "index": 4946,
+            "instruction_preview": "You have a COBOL program located on /app/src/VEHICLE_DISCOUNTS.cbl. This program reads vehicle data from VEHICLES.DAT, BODY-TYPES.DAT, ENGINE-TYPES.DAT, STOCK.DAT and writes DISCOUNTS.DAT\n(all files l",
+            "instruction_full": "You have a COBOL program located on /app/src/VEHICLE_DISCOUNTS.cbl. This program reads vehicle data from VEHICLES.DAT, BODY-TYPES.DAT, ENGINE-TYPES.DAT, STOCK.DAT and writes DISCOUNTS.DAT\n(all files located on /app/data/). You should re-implement logic from COBOL program in Java which calculates the discounts for the vehicles as it is done in reference program. \nImplemented Java program should be located on /app/src/VehicleDiscount.java in package ai.parsewave.\nDAT files format:\n  DISCOUNTS.DAT: VEHICLE-ID(5) + BASE-PRICE(7) + TOTAL-DISCOUNT-PCT(3) + FINAL-PRICE(7)\n  VEHICLES.DAT: VEHICLE-ID(5) + BODY(2) + ENGINE(2) + BASE-PRICE(7, zero-padded integer)\n  BODY-TYPES.DAT: BODY(2) + DISCOUNT-PCT(3, integer percent)\n  ENGINE-TYPES.DAT: ENGINE(2) + DISCOUNT-PCT(3, integer percent)\n  STOCK.DAT: VEHICLE-ID(5) + TOTAL-STOCK(4, integer)\nFor each vehicle, the body discount is the percentage from BODY-TYPES.DAT for matching BODY (or 0 if no match). The engine discount is the percentage from ENGINE-TYPES.DAT \n  for matching ENGINE (or 0 if no match). The stock discount is 5 if there is a STOCK record with TOTAL-STOCK \u2265 100 for that VEHICLE-ID, otherwise 0 (including when no STOCK record exists).\nTotal discount percent = body + engine + stock. Discount amount = floor(BASE-PRICE * totalPct / 100), final price = BASE-PRICE \u2212 discount amount.\nThe program writes /app/data/DISCOUNTS.DAT with one record per vehicle in the same order as in VEHICLES.DAT:\n  VEHICLE-ID(5) + BASE-PRICE(7) + TOTAL-DISCOUNT-PCT(3) + FINAL-PRICE(7), all zero-padded integers, fixed-width, newline-terminated.\nSuccess Criteria:\n- After running compiled Java program must produce DISCOUNTS.DAT identical to those produced by COBOL program with provided valid inputs.",
+            "similarity": 0.319258695526966,
+            "tfidf_similarity": 0.3337527305147973,
+            "fuzzy_similarity": 0.015779092702169626,
+            "keyword_similarity": 0.09285714285714286,
+            "ngram_similarity": 0.0020876826722338203,
+            "source": "database"
+          },
+          {
+            "index": 6078,
+            "instruction_preview": "you are given two json files in the data directory that would be evaluated. you would implement JSON validation on it and output validation result based on the correctness of the JSON format\n\nEvaluate",
+            "instruction_full": "you are given two json files in the data directory that would be evaluated. you would implement JSON validation on it and output validation result based on the correctness of the JSON format\n\nEvaluate the two JSON files at /data/data1.json and /data/data2.json. For each file, output result 1 if the json specification is valid and 0 if it is invalid to /app/results.txt\n\nExample:\nInput JSON\n```\n{\n\"id\": \"647ceaf3657eade56f8224eb\",\n\"index\": 0,\n\"something\": [],\n\"boolean\": true,\n\"nullValue\": null\n}\n```\n\nResult Output /app/results.txt\n```\n  1\n  0\n```\nOne result per line\n\nCode Structure:\n```\n  /app/src/__init__.py\n  /app/src/tokenizer.py\n  /app/src/parser.py\n  /app/src/validator.py\n  /app/src/main.py\n```\n\n**Note**: \n  - Do not use any built in JSON methods, libraries or invoke a subprocess\n  - Use append mode when writing to the txt file\n  - Do not hardcode output results\n\nEnsure all Implementation follow these specification",
+            "similarity": 0.30106409575954246,
+            "tfidf_similarity": 0.3153358510120464,
+            "fuzzy_similarity": 0.015429831006612785,
+            "keyword_similarity": 0.059322033898305086,
+            "ngram_similarity": 0,
+            "source": "database"
+          }
+        ],
+        "corpus_size": 8915
+      }
+    }
+  },
+  "oracle": {
+    "result_type": "tb_positive",
+    "duration": 56.54480028152466,
+    "return_code": 0,
+    "accuracy": 1.0,
+    "original_result": {
+      "id": "41c10d05-6d16-4065-b317-db49c4d2bb92",
+      "started_at": "2025-12-26T01:22:09.197127",
+      "finished_at": "2025-12-26T01:22:49.103551",
+      "n_total_trials": 3,
+      "stats": {
+        "n_trials": 3,
+        "n_errors": 0,
+        "evals": {
+          "oracle__adhoc": {
+            "n_trials": 3,
+            "n_errors": 0,
+            "metrics": [
+              {
+                "mean": 1.0
+              }
+            ],
+            "reward_stats": {
+              "reward": {
+                "1.0": [
+                  "task-cobol-mortgage__LUcoeEc",
+                  "task-cobol-mortgage__amuhEwC",
+                  "task-cobol-mortgage__a6NyGHu"
+                ]
+              }
+            },
+            "exception_stats": {}
+          }
+        }
+      }
+    }
+  },
+  "nop": {
+    "result_type": "tb_positive",
+    "duration": 55.943771839141846,
+    "return_code": 0,
+    "accuracy": 0.0,
+    "original_result": {
+      "id": "0ab939ee-f55e-45d2-b523-52a5a3128b93",
+      "started_at": "2025-12-26T01:22:09.200305",
+      "finished_at": "2025-12-26T01:22:48.487225",
+      "n_total_trials": 1,
+      "stats": {
+        "n_trials": 1,
+        "n_errors": 0,
+        "evals": {
+          "nop__adhoc": {
+            "n_trials": 1,
+            "n_errors": 0,
+            "metrics": [
+              {
+                "mean": 0.0
+              }
+            ],
+            "reward_stats": {
+              "reward": {
+                "0.0": [
+                  "task-cobol-mortgage__gaY5Ur5"
+                ]
+              }
+            },
+            "exception_stats": {}
+          }
+        }
+      }
+    }
+  },
+  "tb_check": {
+    "result_type": "tb_positive",
+    "duration": 80.53375458717346,
+    "return_code": 0,
+    "original_result": {
+      "behavior_in_task_description": {
+        "explanation": "The task description specifies: the file to create (/app/src/program.cbl), fixed-format constraints (no >>SOURCE FORMAT IS FIXED, lines \u2264 80), compilation with GnuCOBOL 3, input file location and record schema separated by ';', business rules (15% minimum down payment, annuity payment schedule), output file path (/app/data/OUTPUT.DAT) and exact output structure (ID, status, reason, and detailed schedule with field PICs). All behaviors that the tests check (file presence, format constraints, compilation/run, and exact output content) are described in the task description.",
+        "outcome": "pass"
+      },
+      "behavior_in_tests": {
+        "explanation": "Tests check: existence of /app/src/program.cbl; fixed-format constraints (no \">>SOURCE FORMAT IS FIXED\" and max line length \u226480); existence of /app/src/INPUT.DAT; successful compilation and execution; and exact content of OUTPUT.DAT for a given input including DENY rule and approved schedule formatting/numbers. Minor aspects from the description (e.g., explicitly \"run from /app/src\" and the instruction to use ROUNDED) are not directly asserted, but the numeric checks implicitly enforce the computations. Overall, core described behavior is covered.",
+        "outcome": "pass"
+      },
+      "informative_test_docstrings": {
+        "explanation": "Each test function includes a clear docstring describing the behavior being checked (files exist, fixed format, data files exist, program output).",
+        "outcome": "pass"
+      },
+      "anti_cheating_measures": {
+        "explanation": "The agent cannot see the tests, and tests overwrite INPUT.DAT with specific content before compiling/running the agent\u2019s program, then assert exact OUTPUT.DAT content. This makes simple cheating (e.g., relying on pre-existing data or echoing a generic result) unlikely to pass without implementing the logic. While a hard-coded output matching the specific test data could theoretically pass, the agent has no access to the test data, so cheating is non-trivial.",
+        "outcome": "pass"
+      },
+      "structured_data_schema": {
+        "explanation": "The output file schema, including field PIC definitions and ordering, is clearly specified in task.yaml. Input schema and delimiters are also specified.",
+        "outcome": "pass"
+      },
+      "pinned_dependencies": {
+        "explanation": "Python dependency pytest is pinned (8.4.2). Apt packages are not required to be pinned and gnucobol3 is installed via apt, which complies with the stated guideline.",
+        "outcome": "pass"
+      },
+      "typos": {
+        "explanation": "Minor grammatical issues in task.yaml (e.g., \"already exist\" should be \"already exists\"; use of \u00ab \u00bb around APPRO is unconventional). Filenames and paths appear consistent and correctly referenced. No critical typos in code or tests.",
+        "outcome": "pass"
+      },
+      "hardcoded_solution": {
+        "explanation": "The provided solution script writes a COBOL program that reads input, performs computations, and writes results. It does not simply echo or cat the final answer; it derives the output via calculation steps.",
+        "outcome": "pass"
+      },
+      "file_reference_mentioned": {
+        "explanation": "The required file /app/src/program.cbl is explicitly mentioned in task.yaml. Input and output paths (/app/src/INPUT.DAT and /app/data/OUTPUT.DAT) are also clearly specified.",
+        "outcome": "pass"
+      }
+    }
+  },
+  "tb_run_small": {
+    "result_type": "tb_negative",
+    "duration": 140.88611817359924,
+    "return_code": 0,
+    "accuracy": 0.0,
+    "agent": "terminus-2",
+    "model": "openrouter/openai/gpt-oss-120b:exacto",
+    "original_result": {
+      "id": "aec653c2-c0bc-4ba3-b3f1-04b2dcd7113f",
+      "results": [
+        {
+          "id": "54359083-0747-4a26-8bba-a672dd212d53",
+          "trial_name": "task-cobol-mortgage.3-of-5.tb-run-small",
+          "task_id": "task-cobol-mortgage",
+          "instruction": "Your task is to create a file /app/src/program.cbl in which there will be a new COBOL program in fixed format, \nwhich will be run from the /app/src directory and should be compiled and executed using GnuCOBOL 3.  \nDo not include \">>SOURCE FORMAT IS FIXED\". Keep each line \u2264 80 characters. The compiler will use fixed format by default.\nThe program will run from /app/src directory and must compile with GnuCOBOL 3. File /app/src/INPUT.DAT already exist.\n  Processes mortgage applications. Checks terms and generates a payment schedule. The program reads the existing file at /app/src/INPUT.DAT.\n  ID - X(10) NAME - X(30) LOAN-AMOUNT - 9(10) PROPERTY-VALUE - 9(10) DOWN-PAYMENT - 9(10) TERM - 9(2) RATE - 9(3)V9(2) separated by the symbol ';'.\n  Calculates the minimum down payment (15% of the property value). If the client's down payment is less, the application is rejected.\n  For approved applications, the monthly payment is calculated using the annuity nominal formula and a full payment schedule is generated.\n  The results are written to the file at /app/data/OUTPUT.DAT: ID - X(10) STATUS - X(5) (REASON - X(50) in case of refusal)\n    For rejected applications: ID and reason for rejection.\n    For approved applications: ID and  \u00abAPPRO\\n\u00bb and detailed payment schedule:\n    MON-NUMBER - 9(3) PAYMENT-AMOUNT, INTEREST-PART, PRINCIPAL-PART - 9(8).99 REMAINING-BALANCE - 9(10).99.(without header).\n    - CALCULATIONS: \n        MIN_DOWN = PROP_VALUE * 0.15\n        MONTHLY_RATE = INTEREST_RATE / 1200\n        MONTHLY_PAYMENT = LOAN_AMOUNT * monthly_rate / (1 - (1 + monthly_rate)**(-term_months))\n        Use ROUNDED for all financial computations.\n  Success Criteria:\n    A correctly constructed payment schedule in the file output. Example output file:\n     \u00abTEST000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT\n      TEST000002APPRO\n      001 00000400.00 00000022.92 00000377.08 0000004622.92 etc.\u00bb",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_required_files_exist": "passed",
+            "test_fixed_format_constraints": "passed",
+            "test_data_files_exist": "passed",
+            "test_program_output": "failed"
+          },
+          "recording_path": "tb-run-small/task-cobol-mortgage/task-cobol-mortgage.3-of-5.tb-run-small/sessions/agent.cast",
+          "total_input_tokens": 7721,
+          "total_output_tokens": 2703,
+          "n_commands": 4,
+          "trial_started_at": "2025-12-26T01:24:16.611251+00:00",
+          "trial_ended_at": "2025-12-26T01:26:05.021450+00:00",
+          "agent_started_at": "2025-12-26T01:24:50.044204+00:00",
+          "agent_ended_at": "2025-12-26T01:25:49.591936+00:00",
+          "test_started_at": "2025-12-26T01:25:53.104279+00:00",
+          "test_ended_at": "2025-12-26T01:25:53.587757+00:00"
+        },
+        {
+          "id": "a0a58a3b-689b-4b45-b9b8-96e022fc0b5d",
+          "trial_name": "task-cobol-mortgage.1-of-5.tb-run-small",
+          "task_id": "task-cobol-mortgage",
+          "instruction": "Your task is to create a file /app/src/program.cbl in which there will be a new COBOL program in fixed format, \nwhich will be run from the /app/src directory and should be compiled and executed using GnuCOBOL 3.  \nDo not include \">>SOURCE FORMAT IS FIXED\". Keep each line \u2264 80 characters. The compiler will use fixed format by default.\nThe program will run from /app/src directory and must compile with GnuCOBOL 3. File /app/src/INPUT.DAT already exist.\n  Processes mortgage applications. Checks terms and generates a payment schedule. The program reads the existing file at /app/src/INPUT.DAT.\n  ID - X(10) NAME - X(30) LOAN-AMOUNT - 9(10) PROPERTY-VALUE - 9(10) DOWN-PAYMENT - 9(10) TERM - 9(2) RATE - 9(3)V9(2) separated by the symbol ';'.\n  Calculates the minimum down payment (15% of the property value). If the client's down payment is less, the application is rejected.\n  For approved applications, the monthly payment is calculated using the annuity nominal formula and a full payment schedule is generated.\n  The results are written to the file at /app/data/OUTPUT.DAT: ID - X(10) STATUS - X(5) (REASON - X(50) in case of refusal)\n    For rejected applications: ID and reason for rejection.\n    For approved applications: ID and  \u00abAPPRO\\n\u00bb and detailed payment schedule:\n    MON-NUMBER - 9(3) PAYMENT-AMOUNT, INTEREST-PART, PRINCIPAL-PART - 9(8).99 REMAINING-BALANCE - 9(10).99.(without header).\n    - CALCULATIONS: \n        MIN_DOWN = PROP_VALUE * 0.15\n        MONTHLY_RATE = INTEREST_RATE / 1200\n        MONTHLY_PAYMENT = LOAN_AMOUNT * monthly_rate / (1 - (1 + monthly_rate)**(-term_months))\n        Use ROUNDED for all financial computations.\n  Success Criteria:\n    A correctly constructed payment schedule in the file output. Example output file:\n     \u00abTEST000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT\n      TEST000002APPRO\n      001 00000400.00 00000022.92 00000377.08 0000004622.92 etc.\u00bb",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_required_files_exist": "passed",
+            "test_fixed_format_constraints": "passed",
+            "test_data_files_exist": "passed",
+            "test_program_output": "failed"
+          },
+          "recording_path": "tb-run-small/task-cobol-mortgage/task-cobol-mortgage.1-of-5.tb-run-small/sessions/agent.cast",
+          "total_input_tokens": 8949,
+          "total_output_tokens": 3219,
+          "n_commands": 11,
+          "trial_started_at": "2025-12-26T01:24:16.603375+00:00",
+          "trial_ended_at": "2025-12-26T01:26:14.936195+00:00",
+          "agent_started_at": "2025-12-26T01:24:51.053232+00:00",
+          "agent_ended_at": "2025-12-26T01:25:59.550811+00:00",
+          "test_started_at": "2025-12-26T01:26:03.072769+00:00",
+          "test_ended_at": "2025-12-26T01:26:03.555263+00:00"
+        },
+        {
+          "id": "c0b55e86-e088-451f-a507-d3f57940c2f3",
+          "trial_name": "task-cobol-mortgage.5-of-5.tb-run-small",
+          "task_id": "task-cobol-mortgage",
+          "instruction": "Your task is to create a file /app/src/program.cbl in which there will be a new COBOL program in fixed format, \nwhich will be run from the /app/src directory and should be compiled and executed using GnuCOBOL 3.  \nDo not include \">>SOURCE FORMAT IS FIXED\". Keep each line \u2264 80 characters. The compiler will use fixed format by default.\nThe program will run from /app/src directory and must compile with GnuCOBOL 3. File /app/src/INPUT.DAT already exist.\n  Processes mortgage applications. Checks terms and generates a payment schedule. The program reads the existing file at /app/src/INPUT.DAT.\n  ID - X(10) NAME - X(30) LOAN-AMOUNT - 9(10) PROPERTY-VALUE - 9(10) DOWN-PAYMENT - 9(10) TERM - 9(2) RATE - 9(3)V9(2) separated by the symbol ';'.\n  Calculates the minimum down payment (15% of the property value). If the client's down payment is less, the application is rejected.\n  For approved applications, the monthly payment is calculated using the annuity nominal formula and a full payment schedule is generated.\n  The results are written to the file at /app/data/OUTPUT.DAT: ID - X(10) STATUS - X(5) (REASON - X(50) in case of refusal)\n    For rejected applications: ID and reason for rejection.\n    For approved applications: ID and  \u00abAPPRO\\n\u00bb and detailed payment schedule:\n    MON-NUMBER - 9(3) PAYMENT-AMOUNT, INTEREST-PART, PRINCIPAL-PART - 9(8).99 REMAINING-BALANCE - 9(10).99.(without header).\n    - CALCULATIONS: \n        MIN_DOWN = PROP_VALUE * 0.15\n        MONTHLY_RATE = INTEREST_RATE / 1200\n        MONTHLY_PAYMENT = LOAN_AMOUNT * monthly_rate / (1 - (1 + monthly_rate)**(-term_months))\n        Use ROUNDED for all financial computations.\n  Success Criteria:\n    A correctly constructed payment schedule in the file output. Example output file:\n     \u00abTEST000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT\n      TEST000002APPRO\n      001 00000400.00 00000022.92 00000377.08 0000004622.92 etc.\u00bb",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_required_files_exist": "passed",
+            "test_data_files_exist": "passed",
+            "test_fixed_format_constraints": "failed",
+            "test_program_output": "failed"
+          },
+          "recording_path": "tb-run-small/task-cobol-mortgage/task-cobol-mortgage.5-of-5.tb-run-small/sessions/agent.cast",
+          "total_input_tokens": 5164,
+          "total_output_tokens": 2780,
+          "n_commands": 6,
+          "trial_started_at": "2025-12-26T01:24:16.619368+00:00",
+          "trial_ended_at": "2025-12-26T01:26:16.862584+00:00",
+          "agent_started_at": "2025-12-26T01:24:51.897433+00:00",
+          "agent_ended_at": "2025-12-26T01:26:01.388604+00:00",
+          "test_started_at": "2025-12-26T01:26:04.920718+00:00",
+          "test_ended_at": "2025-12-26T01:26:05.405311+00:00"
+        },
+        {
+          "id": "e095d893-e9f9-46a2-9806-790986059bd3",
+          "trial_name": "task-cobol-mortgage.4-of-5.tb-run-small",
+          "task_id": "task-cobol-mortgage",
+          "instruction": "Your task is to create a file /app/src/program.cbl in which there will be a new COBOL program in fixed format, \nwhich will be run from the /app/src directory and should be compiled and executed using GnuCOBOL 3.  \nDo not include \">>SOURCE FORMAT IS FIXED\". Keep each line \u2264 80 characters. The compiler will use fixed format by default.\nThe program will run from /app/src directory and must compile with GnuCOBOL 3. File /app/src/INPUT.DAT already exist.\n  Processes mortgage applications. Checks terms and generates a payment schedule. The program reads the existing file at /app/src/INPUT.DAT.\n  ID - X(10) NAME - X(30) LOAN-AMOUNT - 9(10) PROPERTY-VALUE - 9(10) DOWN-PAYMENT - 9(10) TERM - 9(2) RATE - 9(3)V9(2) separated by the symbol ';'.\n  Calculates the minimum down payment (15% of the property value). If the client's down payment is less, the application is rejected.\n  For approved applications, the monthly payment is calculated using the annuity nominal formula and a full payment schedule is generated.\n  The results are written to the file at /app/data/OUTPUT.DAT: ID - X(10) STATUS - X(5) (REASON - X(50) in case of refusal)\n    For rejected applications: ID and reason for rejection.\n    For approved applications: ID and  \u00abAPPRO\\n\u00bb and detailed payment schedule:\n    MON-NUMBER - 9(3) PAYMENT-AMOUNT, INTEREST-PART, PRINCIPAL-PART - 9(8).99 REMAINING-BALANCE - 9(10).99.(without header).\n    - CALCULATIONS: \n        MIN_DOWN = PROP_VALUE * 0.15\n        MONTHLY_RATE = INTEREST_RATE / 1200\n        MONTHLY_PAYMENT = LOAN_AMOUNT * monthly_rate / (1 - (1 + monthly_rate)**(-term_months))\n        Use ROUNDED for all financial computations.\n  Success Criteria:\n    A correctly constructed payment schedule in the file output. Example output file:\n     \u00abTEST000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT\n      TEST000002APPRO\n      001 00000400.00 00000022.92 00000377.08 0000004622.92 etc.\u00bb",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_required_files_exist": "passed",
+            "test_fixed_format_constraints": "passed",
+            "test_data_files_exist": "passed",
+            "test_program_output": "failed"
+          },
+          "recording_path": "tb-run-small/task-cobol-mortgage/task-cobol-mortgage.4-of-5.tb-run-small/sessions/agent.cast",
+          "total_input_tokens": 6745,
+          "total_output_tokens": 2717,
+          "n_commands": 7,
+          "trial_started_at": "2025-12-26T01:24:16.618009+00:00",
+          "trial_ended_at": "2025-12-26T01:26:22.063524+00:00",
+          "agent_started_at": "2025-12-26T01:24:50.179104+00:00",
+          "agent_ended_at": "2025-12-26T01:26:06.662910+00:00",
+          "test_started_at": "2025-12-26T01:26:10.152985+00:00",
+          "test_ended_at": "2025-12-26T01:26:10.625716+00:00"
+        },
+        {
+          "id": "12534c2f-867c-4e53-ac7e-3a389a6ccfc4",
+          "trial_name": "task-cobol-mortgage.2-of-5.tb-run-small",
+          "task_id": "task-cobol-mortgage",
+          "instruction": "Your task is to create a file /app/src/program.cbl in which there will be a new COBOL program in fixed format, \nwhich will be run from the /app/src directory and should be compiled and executed using GnuCOBOL 3.  \nDo not include \">>SOURCE FORMAT IS FIXED\". Keep each line \u2264 80 characters. The compiler will use fixed format by default.\nThe program will run from /app/src directory and must compile with GnuCOBOL 3. File /app/src/INPUT.DAT already exist.\n  Processes mortgage applications. Checks terms and generates a payment schedule. The program reads the existing file at /app/src/INPUT.DAT.\n  ID - X(10) NAME - X(30) LOAN-AMOUNT - 9(10) PROPERTY-VALUE - 9(10) DOWN-PAYMENT - 9(10) TERM - 9(2) RATE - 9(3)V9(2) separated by the symbol ';'.\n  Calculates the minimum down payment (15% of the property value). If the client's down payment is less, the application is rejected.\n  For approved applications, the monthly payment is calculated using the annuity nominal formula and a full payment schedule is generated.\n  The results are written to the file at /app/data/OUTPUT.DAT: ID - X(10) STATUS - X(5) (REASON - X(50) in case of refusal)\n    For rejected applications: ID and reason for rejection.\n    For approved applications: ID and  \u00abAPPRO\\n\u00bb and detailed payment schedule:\n    MON-NUMBER - 9(3) PAYMENT-AMOUNT, INTEREST-PART, PRINCIPAL-PART - 9(8).99 REMAINING-BALANCE - 9(10).99.(without header).\n    - CALCULATIONS: \n        MIN_DOWN = PROP_VALUE * 0.15\n        MONTHLY_RATE = INTEREST_RATE / 1200\n        MONTHLY_PAYMENT = LOAN_AMOUNT * monthly_rate / (1 - (1 + monthly_rate)**(-term_months))\n        Use ROUNDED for all financial computations.\n  Success Criteria:\n    A correctly constructed payment schedule in the file output. Example output file:\n     \u00abTEST000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT\n      TEST000002APPRO\n      001 00000400.00 00000022.92 00000377.08 0000004622.92 etc.\u00bb",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_required_files_exist": "passed",
+            "test_fixed_format_constraints": "passed",
+            "test_data_files_exist": "passed",
+            "test_program_output": "failed"
+          },
+          "recording_path": "tb-run-small/task-cobol-mortgage/task-cobol-mortgage.2-of-5.tb-run-small/sessions/agent.cast",
+          "total_input_tokens": 6724,
+          "total_output_tokens": 2715,
+          "n_commands": 8,
+          "trial_started_at": "2025-12-26T01:24:16.603971+00:00",
+          "trial_ended_at": "2025-12-26T01:26:33.443709+00:00",
+          "agent_started_at": "2025-12-26T01:24:49.347166+00:00",
+          "agent_ended_at": "2025-12-26T01:26:17.893743+00:00",
+          "test_started_at": "2025-12-26T01:26:21.434858+00:00",
+          "test_ended_at": "2025-12-26T01:26:21.915622+00:00"
+        }
+      ],
+      "pass_at_k": {
+        "2": 0.0,
+        "4": 0.0,
+        "5": 0.0
+      },
+      "n_resolved": 0,
+      "n_unresolved": 5,
+      "resolved_ids": [],
+      "unresolved_ids": [
+        "task-cobol-mortgage",
+        "task-cobol-mortgage",
+        "task-cobol-mortgage",
+        "task-cobol-mortgage",
+        "task-cobol-mortgage"
+      ],
+      "accuracy": 0.0
+    }
+  },
+  "tb_run_large": {
+    "result_type": "tb_negative",
+    "duration": 1306.3358361721039,
+    "return_code": 1,
+    "accuracy": 0.0,
+    "agent": "terminus-2",
+    "model": "openrouter/openai/gpt-5.2",
+    "skipped": false,
+    "original_result": {
+      "id": "3c492b8a-2926-413f-8d26-bbf70f5a4ff7",
+      "results": [
+        {
+          "id": "182b57f1-2aea-4c2a-adc9-75d2ec67e9cf",
+          "trial_name": "task-cobol-mortgage.1-of-3.tb-run-large",
+          "task_id": "task-cobol-mortgage",
+          "instruction": "Your task is to create a file /app/src/program.cbl in which there will be a new COBOL program in fixed format, \nwhich will be run from the /app/src directory and should be compiled and executed using GnuCOBOL 3.  \nDo not include \">>SOURCE FORMAT IS FIXED\". Keep each line \u2264 80 characters. The compiler will use fixed format by default.\nThe program will run from /app/src directory and must compile with GnuCOBOL 3. File /app/src/INPUT.DAT already exist.\n  Processes mortgage applications. Checks terms and generates a payment schedule. The program reads the existing file at /app/src/INPUT.DAT.\n  ID - X(10) NAME - X(30) LOAN-AMOUNT - 9(10) PROPERTY-VALUE - 9(10) DOWN-PAYMENT - 9(10) TERM - 9(2) RATE - 9(3)V9(2) separated by the symbol ';'.\n  Calculates the minimum down payment (15% of the property value). If the client's down payment is less, the application is rejected.\n  For approved applications, the monthly payment is calculated using the annuity nominal formula and a full payment schedule is generated.\n  The results are written to the file at /app/data/OUTPUT.DAT: ID - X(10) STATUS - X(5) (REASON - X(50) in case of refusal)\n    For rejected applications: ID and reason for rejection.\n    For approved applications: ID and  \u00abAPPRO\\n\u00bb and detailed payment schedule:\n    MON-NUMBER - 9(3) PAYMENT-AMOUNT, INTEREST-PART, PRINCIPAL-PART - 9(8).99 REMAINING-BALANCE - 9(10).99.(without header).\n    - CALCULATIONS: \n        MIN_DOWN = PROP_VALUE * 0.15\n        MONTHLY_RATE = INTEREST_RATE / 1200\n        MONTHLY_PAYMENT = LOAN_AMOUNT * monthly_rate / (1 - (1 + monthly_rate)**(-term_months))\n        Use ROUNDED for all financial computations.\n  Success Criteria:\n    A correctly constructed payment schedule in the file output. Example output file:\n     \u00abTEST000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT\n      TEST000002APPRO\n      001 00000400.00 00000022.92 00000377.08 0000004622.92 etc.\u00bb",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_required_files_exist": "passed",
+            "test_fixed_format_constraints": "passed",
+            "test_data_files_exist": "passed",
+            "test_program_output": "failed"
+          },
+          "recording_path": "tb-run-large/task-cobol-mortgage/task-cobol-mortgage.1-of-1.tb-run-large/sessions/agent.cast",
+          "total_input_tokens": 54536,
+          "total_output_tokens": 8070,
+          "n_commands": 28,
+          "trial_started_at": "2025-12-26T01:26:37.376717+00:00",
+          "trial_ended_at": "2025-12-26T01:33:12.623811+00:00",
+          "agent_started_at": "2025-12-26T01:26:43.647853+00:00",
+          "agent_ended_at": "2025-12-26T01:32:56.695551+00:00",
+          "test_started_at": "2025-12-26T01:33:00.245836+00:00",
+          "test_ended_at": "2025-12-26T01:33:01.121129+00:00"
+        },
+        {
+          "id": "46313faf-8e23-4094-828d-4bb649afbb2f",
+          "trial_name": "task-cobol-mortgage.2-of-3.tb-run-large",
+          "task_id": "task-cobol-mortgage",
+          "instruction": "Your task is to create a file /app/src/program.cbl in which there will be a new COBOL program in fixed format, \nwhich will be run from the /app/src directory and should be compiled and executed using GnuCOBOL 3.  \nDo not include \">>SOURCE FORMAT IS FIXED\". Keep each line \u2264 80 characters. The compiler will use fixed format by default.\nThe program will run from /app/src directory and must compile with GnuCOBOL 3. File /app/src/INPUT.DAT already exist.\n  Processes mortgage applications. Checks terms and generates a payment schedule. The program reads the existing file at /app/src/INPUT.DAT.\n  ID - X(10) NAME - X(30) LOAN-AMOUNT - 9(10) PROPERTY-VALUE - 9(10) DOWN-PAYMENT - 9(10) TERM - 9(2) RATE - 9(3)V9(2) separated by the symbol ';'.\n  Calculates the minimum down payment (15% of the property value). If the client's down payment is less, the application is rejected.\n  For approved applications, the monthly payment is calculated using the annuity nominal formula and a full payment schedule is generated.\n  The results are written to the file at /app/data/OUTPUT.DAT: ID - X(10) STATUS - X(5) (REASON - X(50) in case of refusal)\n    For rejected applications: ID and reason for rejection.\n    For approved applications: ID and  \u00abAPPRO\\n\u00bb and detailed payment schedule:\n    MON-NUMBER - 9(3) PAYMENT-AMOUNT, INTEREST-PART, PRINCIPAL-PART - 9(8).99 REMAINING-BALANCE - 9(10).99.(without header).\n    - CALCULATIONS: \n        MIN_DOWN = PROP_VALUE * 0.15\n        MONTHLY_RATE = INTEREST_RATE / 1200\n        MONTHLY_PAYMENT = LOAN_AMOUNT * monthly_rate / (1 - (1 + monthly_rate)**(-term_months))\n        Use ROUNDED for all financial computations.\n  Success Criteria:\n    A correctly constructed payment schedule in the file output. Example output file:\n     \u00abTEST000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT\n      TEST000002APPRO\n      001 00000400.00 00000022.92 00000377.08 0000004622.92 etc.\u00bb",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_required_files_exist": "passed",
+            "test_fixed_format_constraints": "passed",
+            "test_data_files_exist": "passed",
+            "test_program_output": "failed"
+          },
+          "recording_path": "tb-run-large/task-cobol-mortgage/task-cobol-mortgage.1-of-1.tb-run-large/sessions/agent.cast",
+          "total_input_tokens": 29530,
+          "total_output_tokens": 3987,
+          "n_commands": 26,
+          "trial_started_at": "2025-12-26T01:33:16.745318+00:00",
+          "trial_ended_at": "2025-12-26T01:37:44.918649+00:00",
+          "agent_started_at": "2025-12-26T01:33:24.318443+00:00",
+          "agent_ended_at": "2025-12-26T01:37:29.307571+00:00",
+          "test_started_at": "2025-12-26T01:37:32.824601+00:00",
+          "test_ended_at": "2025-12-26T01:37:33.442802+00:00"
+        },
+        {
+          "id": "fdb226de-70f9-47a4-9d11-0d3c39bdac31",
+          "trial_name": "task-cobol-mortgage.3-of-3.tb-run-large",
+          "task_id": "task-cobol-mortgage",
+          "instruction": "Your task is to create a file /app/src/program.cbl in which there will be a new COBOL program in fixed format, \nwhich will be run from the /app/src directory and should be compiled and executed using GnuCOBOL 3.  \nDo not include \">>SOURCE FORMAT IS FIXED\". Keep each line \u2264 80 characters. The compiler will use fixed format by default.\nThe program will run from /app/src directory and must compile with GnuCOBOL 3. File /app/src/INPUT.DAT already exist.\n  Processes mortgage applications. Checks terms and generates a payment schedule. The program reads the existing file at /app/src/INPUT.DAT.\n  ID - X(10) NAME - X(30) LOAN-AMOUNT - 9(10) PROPERTY-VALUE - 9(10) DOWN-PAYMENT - 9(10) TERM - 9(2) RATE - 9(3)V9(2) separated by the symbol ';'.\n  Calculates the minimum down payment (15% of the property value). If the client's down payment is less, the application is rejected.\n  For approved applications, the monthly payment is calculated using the annuity nominal formula and a full payment schedule is generated.\n  The results are written to the file at /app/data/OUTPUT.DAT: ID - X(10) STATUS - X(5) (REASON - X(50) in case of refusal)\n    For rejected applications: ID and reason for rejection.\n    For approved applications: ID and  \u00abAPPRO\\n\u00bb and detailed payment schedule:\n    MON-NUMBER - 9(3) PAYMENT-AMOUNT, INTEREST-PART, PRINCIPAL-PART - 9(8).99 REMAINING-BALANCE - 9(10).99.(without header).\n    - CALCULATIONS: \n        MIN_DOWN = PROP_VALUE * 0.15\n        MONTHLY_RATE = INTEREST_RATE / 1200\n        MONTHLY_PAYMENT = LOAN_AMOUNT * monthly_rate / (1 - (1 + monthly_rate)**(-term_months))\n        Use ROUNDED for all financial computations.\n  Success Criteria:\n    A correctly constructed payment schedule in the file output. Example output file:\n     \u00abTEST000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT\n      TEST000002APPRO\n      001 00000400.00 00000022.92 00000377.08 0000004622.92 etc.\u00bb",
+          "is_resolved": false,
+          "failure_mode": "agent_timeout",
+          "parser_results": {
+            "test_required_files_exist": "passed",
+            "test_fixed_format_constraints": "passed",
+            "test_data_files_exist": "passed",
+            "test_program_output": "failed"
+          },
+          "recording_path": "tb-run-large/task-cobol-mortgage/task-cobol-mortgage.1-of-1.tb-run-large/sessions/agent.cast",
+          "total_input_tokens": 0,
+          "total_output_tokens": 0,
+          "n_commands": 67,
+          "trial_started_at": "2025-12-26T01:37:48.697827+00:00",
+          "trial_ended_at": "2025-12-26T01:48:19.768573+00:00",
+          "agent_started_at": "2025-12-26T01:37:54.812532+00:00",
+          "agent_ended_at": "2025-12-26T01:48:04.146641+00:00",
+          "test_started_at": "2025-12-26T01:48:07.668983+00:00",
+          "test_ended_at": "2025-12-26T01:48:08.307576+00:00"
+        }
+      ],
+      "pass_at_k": {
+        "1": 0.0
+      },
+      "n_resolved": 0,
+      "n_unresolved": 3,
+      "resolved_ids": [],
+      "unresolved_ids": [
+        "182b57f1-2aea-4c2a-adc9-75d2ec67e9cf",
+        "46313faf-8e23-4094-828d-4bb649afbb2f",
+        "fdb226de-70f9-47a4-9d11-0d3c39bdac31"
+      ],
+      "accuracy": 0.0,
+      "stop_on_first_success": true,
+      "attempts_run": 3,
+      "stopped_early": false
+    }
+  },
+  "tb_run_large_2": {
+    "result_type": "tb_system_error",
+    "duration": 1399.6138956546783,
+    "return_code": 1,
+    "accuracy": 0.0,
+    "agent": "claude-code",
+    "model": "anthropic/claude-opus-4-5-20251101",
+    "skipped": false,
+    "original_result": {
+      "id": "7be22b82-c18b-4f2a-91ea-d115512f8c82",
+      "results": [
+        {
+          "id": "3df42af1-bc90-4436-a893-e01080c9b2d5",
+          "trial_name": "task-cobol-mortgage.1-of-3.tb-run-large-2",
+          "task_id": "task-cobol-mortgage",
+          "instruction": "Your task is to create a file /app/src/program.cbl in which there will be a new COBOL program in fixed format, \nwhich will be run from the /app/src directory and should be compiled and executed using GnuCOBOL 3.  \nDo not include \">>SOURCE FORMAT IS FIXED\". Keep each line \u2264 80 characters. The compiler will use fixed format by default.\nThe program will run from /app/src directory and must compile with GnuCOBOL 3. File /app/src/INPUT.DAT already exist.\n  Processes mortgage applications. Checks terms and generates a payment schedule. The program reads the existing file at /app/src/INPUT.DAT.\n  ID - X(10) NAME - X(30) LOAN-AMOUNT - 9(10) PROPERTY-VALUE - 9(10) DOWN-PAYMENT - 9(10) TERM - 9(2) RATE - 9(3)V9(2) separated by the symbol ';'.\n  Calculates the minimum down payment (15% of the property value). If the client's down payment is less, the application is rejected.\n  For approved applications, the monthly payment is calculated using the annuity nominal formula and a full payment schedule is generated.\n  The results are written to the file at /app/data/OUTPUT.DAT: ID - X(10) STATUS - X(5) (REASON - X(50) in case of refusal)\n    For rejected applications: ID and reason for rejection.\n    For approved applications: ID and  \u00abAPPRO\\n\u00bb and detailed payment schedule:\n    MON-NUMBER - 9(3) PAYMENT-AMOUNT, INTEREST-PART, PRINCIPAL-PART - 9(8).99 REMAINING-BALANCE - 9(10).99.(without header).\n    - CALCULATIONS: \n        MIN_DOWN = PROP_VALUE * 0.15\n        MONTHLY_RATE = INTEREST_RATE / 1200\n        MONTHLY_PAYMENT = LOAN_AMOUNT * monthly_rate / (1 - (1 + monthly_rate)**(-term_months))\n        Use ROUNDED for all financial computations.\n  Success Criteria:\n    A correctly constructed payment schedule in the file output. Example output file:\n     \u00abTEST000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT\n      TEST000002APPRO\n      001 00000400.00 00000022.92 00000377.08 0000004622.92 etc.\u00bb",
+          "is_resolved": null,
+          "failure_mode": "test_timeout",
+          "parser_results": null,
+          "recording_path": "tb-run-large-2/task-cobol-mortgage/task-cobol-mortgage.1-of-1.tb-run-large-2/sessions/agent.cast",
+          "total_input_tokens": 0,
+          "total_output_tokens": 0,
+          "n_commands": null,
+          "trial_started_at": "2025-12-26T01:48:23.496723+00:00",
+          "trial_ended_at": "2025-12-26T01:59:09.037928+00:00",
+          "agent_started_at": "2025-12-26T01:48:29.669447+00:00",
+          "agent_ended_at": "2025-12-26T01:56:05.362500+00:00",
+          "test_started_at": "2025-12-26T01:56:08.804356+00:00",
+          "test_ended_at": "2025-12-26T01:59:08.973573+00:00"
+        },
+        {
+          "id": "82e70eef-e033-45a6-b76d-1bff3558e2e2",
+          "trial_name": "task-cobol-mortgage.2-of-3.tb-run-large-2",
+          "task_id": "task-cobol-mortgage",
+          "instruction": "Your task is to create a file /app/src/program.cbl in which there will be a new COBOL program in fixed format, \nwhich will be run from the /app/src directory and should be compiled and executed using GnuCOBOL 3.  \nDo not include \">>SOURCE FORMAT IS FIXED\". Keep each line \u2264 80 characters. The compiler will use fixed format by default.\nThe program will run from /app/src directory and must compile with GnuCOBOL 3. File /app/src/INPUT.DAT already exist.\n  Processes mortgage applications. Checks terms and generates a payment schedule. The program reads the existing file at /app/src/INPUT.DAT.\n  ID - X(10) NAME - X(30) LOAN-AMOUNT - 9(10) PROPERTY-VALUE - 9(10) DOWN-PAYMENT - 9(10) TERM - 9(2) RATE - 9(3)V9(2) separated by the symbol ';'.\n  Calculates the minimum down payment (15% of the property value). If the client's down payment is less, the application is rejected.\n  For approved applications, the monthly payment is calculated using the annuity nominal formula and a full payment schedule is generated.\n  The results are written to the file at /app/data/OUTPUT.DAT: ID - X(10) STATUS - X(5) (REASON - X(50) in case of refusal)\n    For rejected applications: ID and reason for rejection.\n    For approved applications: ID and  \u00abAPPRO\\n\u00bb and detailed payment schedule:\n    MON-NUMBER - 9(3) PAYMENT-AMOUNT, INTEREST-PART, PRINCIPAL-PART - 9(8).99 REMAINING-BALANCE - 9(10).99.(without header).\n    - CALCULATIONS: \n        MIN_DOWN = PROP_VALUE * 0.15\n        MONTHLY_RATE = INTEREST_RATE / 1200\n        MONTHLY_PAYMENT = LOAN_AMOUNT * monthly_rate / (1 - (1 + monthly_rate)**(-term_months))\n        Use ROUNDED for all financial computations.\n  Success Criteria:\n    A correctly constructed payment schedule in the file output. Example output file:\n     \u00abTEST000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT\n      TEST000002APPRO\n      001 00000400.00 00000022.92 00000377.08 0000004622.92 etc.\u00bb",
+          "is_resolved": null,
+          "failure_mode": "test_timeout",
+          "parser_results": null,
+          "recording_path": "tb-run-large-2/task-cobol-mortgage/task-cobol-mortgage.1-of-1.tb-run-large-2/sessions/agent.cast",
+          "total_input_tokens": 0,
+          "total_output_tokens": 0,
+          "n_commands": null,
+          "trial_started_at": "2025-12-26T01:59:24.314927+00:00",
+          "trial_ended_at": "2025-12-26T02:07:04.628634+00:00",
+          "agent_started_at": "2025-12-26T01:59:30.577560+00:00",
+          "agent_ended_at": "2025-12-26T02:04:00.939627+00:00",
+          "test_started_at": "2025-12-26T02:04:04.395862+00:00",
+          "test_ended_at": "2025-12-26T02:07:04.566845+00:00"
+        },
+        {
+          "id": "84fb39e5-18ee-4b43-88e5-aeb572d5f6e7",
+          "trial_name": "task-cobol-mortgage.3-of-3.tb-run-large-2",
+          "task_id": "task-cobol-mortgage",
+          "instruction": "Your task is to create a file /app/src/program.cbl in which there will be a new COBOL program in fixed format, \nwhich will be run from the /app/src directory and should be compiled and executed using GnuCOBOL 3.  \nDo not include \">>SOURCE FORMAT IS FIXED\". Keep each line \u2264 80 characters. The compiler will use fixed format by default.\nThe program will run from /app/src directory and must compile with GnuCOBOL 3. File /app/src/INPUT.DAT already exist.\n  Processes mortgage applications. Checks terms and generates a payment schedule. The program reads the existing file at /app/src/INPUT.DAT.\n  ID - X(10) NAME - X(30) LOAN-AMOUNT - 9(10) PROPERTY-VALUE - 9(10) DOWN-PAYMENT - 9(10) TERM - 9(2) RATE - 9(3)V9(2) separated by the symbol ';'.\n  Calculates the minimum down payment (15% of the property value). If the client's down payment is less, the application is rejected.\n  For approved applications, the monthly payment is calculated using the annuity nominal formula and a full payment schedule is generated.\n  The results are written to the file at /app/data/OUTPUT.DAT: ID - X(10) STATUS - X(5) (REASON - X(50) in case of refusal)\n    For rejected applications: ID and reason for rejection.\n    For approved applications: ID and  \u00abAPPRO\\n\u00bb and detailed payment schedule:\n    MON-NUMBER - 9(3) PAYMENT-AMOUNT, INTEREST-PART, PRINCIPAL-PART - 9(8).99 REMAINING-BALANCE - 9(10).99.(without header).\n    - CALCULATIONS: \n        MIN_DOWN = PROP_VALUE * 0.15\n        MONTHLY_RATE = INTEREST_RATE / 1200\n        MONTHLY_PAYMENT = LOAN_AMOUNT * monthly_rate / (1 - (1 + monthly_rate)**(-term_months))\n        Use ROUNDED for all financial computations.\n  Success Criteria:\n    A correctly constructed payment schedule in the file output. Example output file:\n     \u00abTEST000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT\n      TEST000002APPRO\n      001 00000400.00 00000022.92 00000377.08 0000004622.92 etc.\u00bb",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_required_files_exist": "passed",
+            "test_fixed_format_constraints": "passed",
+            "test_data_files_exist": "passed",
+            "test_program_output": "failed"
+          },
+          "recording_path": "tb-run-large-2/task-cobol-mortgage/task-cobol-mortgage.1-of-1.tb-run-large-2/sessions/agent.cast",
+          "total_input_tokens": 0,
+          "total_output_tokens": 0,
+          "n_commands": 28,
+          "trial_started_at": "2025-12-26T02:07:20.226487+00:00",
+          "trial_ended_at": "2025-12-26T02:11:39.370218+00:00",
+          "agent_started_at": "2025-12-26T02:07:26.406979+00:00",
+          "agent_ended_at": "2025-12-26T02:11:23.503191+00:00",
+          "test_started_at": "2025-12-26T02:11:27.065490+00:00",
+          "test_ended_at": "2025-12-26T02:11:27.749887+00:00"
+        }
+      ],
+      "pass_at_k": {
+        "1": 0.0
+      },
+      "n_resolved": 0,
+      "n_unresolved": 3,
+      "resolved_ids": [],
+      "unresolved_ids": [
+        "3df42af1-bc90-4436-a893-e01080c9b2d5",
+        "82e70eef-e033-45a6-b76d-1bff3558e2e2",
+        "84fb39e5-18ee-4b43-88e5-aeb572d5f6e7"
+      ],
+      "accuracy": 0.0,
+      "stop_on_first_success": true,
+      "attempts_run": 3,
+      "stopped_early": false
+    }
+  },
+  "tb_debug_small": {
+    "result_type": "tb_positive",
+    "duration": 38.70112633705139,
+    "return_code": 0,
+    "skipped": false,
+    "original_result": {
+      "outcome": "PASS",
+      "explanation": "The task instructions are explicit and sufficient: create /app/src/program.cbl in fixed format (no >>SOURCE FORMAT IS FIXED), keep lines \u2264 80 chars, compile with GnuCOBOL 3, read semicolon-delimited INPUT.DAT with specified fields, apply given formulas using ROUNDED, and write OUTPUT.DAT with the specified formats and schedule. The test simply compiles and runs the COBOL program and does not impose hidden names or undocumented formats. All failures are due to agent implementation issues: invalid fixed-format indicators (column 7), misuse of ROUNDED syntax, attempts to use unsupported POWER/POW functions, and exceeding 80-character line length\u2014each a standard COBOL coding error, not a specification gap. Therefore, failures are due to agent limitations, not insufficient instructions."
+    }
+  },
+  "tb_debug_large": {
+    "result_type": "tb_positive",
+    "duration": 44.72080707550049,
+    "return_code": 0,
+    "skipped": false,
+    "original_result": {
+      "outcome": "PASS",
+      "explanation": "The task instructions clearly specify absolute file locations: read from /app/src/INPUT.DAT and write to /app/data/OUTPUT.DAT, and that the program will be run from /app/src. The failures show the program attempted to use relative or environment-mapped filenames (e.g., INFILE mapped to INPUT.DAT and OUT-FILE to ../data/OUTPUT.DAT), which, when executed from the pytest working directory, caused file-not-found or invalid path errors (status 35 and status 30). The tests created the files at the absolute paths as specified. Therefore, the agent failed to implement the required absolute paths, not due to insufficient instructions. The instructions are sufficient; the failures stem from the agent\u2019s implementation choices."
+    }
+  },
+  "tb_debug_large_2": {
+    "result_type": "tb_positive",
+    "duration": 61.33651304244995,
+    "return_code": 0,
+    "skipped": false,
+    "original_result": {
+      "outcome": "PASS",
+      "explanation": "The task instructions clearly specify the required file paths (/app/src/INPUT.DAT, /app/data/OUTPUT.DAT), fixed-format COBOL constraints, compilation with GnuCOBOL 3, the calculation formulas with ROUNDED, the output structure including STATUS and the schedule formatting, and even explicitly require the string APPRO. The tests mirror these requirements. The failures were due to the program hanging (timeouts) and ultimately producing an empty OUTPUT.DAT despite successful compilation and execution, indicating the agent did not implement reading/writing as instructed or used the wrong path, not that the instructions were insufficient. While there is a minor potential ambiguity about TERM units and the exact denial reason text, the observed failures are not attributable to these and the instructions are otherwise sufficient for passing the tests."
+    }
+  },
+  "overall_success": false
+}

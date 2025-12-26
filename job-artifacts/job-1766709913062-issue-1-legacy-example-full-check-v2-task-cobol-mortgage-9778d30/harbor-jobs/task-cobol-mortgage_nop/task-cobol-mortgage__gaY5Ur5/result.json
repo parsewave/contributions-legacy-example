@@ -1,0 +1,85 @@
+{
+    "id": "b6aee6d9-8a7a-4dfa-8e97-6afaf9f9de51",
+    "task_name": "task-cobol-mortgage",
+    "trial_name": "task-cobol-mortgage__gaY5Ur5",
+    "trial_uri": "file:///workspace/pw-harness/jobs/task-cobol-mortgage_nop/task-cobol-mortgage__gaY5Ur5",
+    "task_id": {
+        "path": "/workspace/pw-harness/harbor_tasks/task-cobol-mortgage"
+    },
+    "source": null,
+    "task_checksum": "8e1fa43df0265892f0f18397b6a867211ad50a3733c5d08dee460380a5912a1e",
+    "config": {
+        "task": {
+            "path": "/workspace/pw-harness/harbor_tasks/task-cobol-mortgage",
+            "git_url": null,
+            "git_commit_id": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "task-cobol-mortgage__gaY5Ur5",
+        "trials_dir": "jobs/task-cobol-mortgage_nop",
+        "timeout_multiplier": 1.0,
+        "agent": {
+            "name": "nop",
+            "import_path": null,
+            "model_name": null,
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {}
+        },
+        "environment": {
+            "type": "docker",
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "use_subscription": false,
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "job_id": "0ab939ee-f55e-45d2-b523-52a5a3128b93"
+    },
+    "agent_info": {
+        "name": "nop",
+        "version": "1.0.0",
+        "model_info": null
+    },
+    "agent_result": {
+        "n_input_tokens": null,
+        "n_cache_tokens": null,
+        "n_output_tokens": null,
+        "cost_usd": null,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2025-12-26T01:22:09.202956",
+    "finished_at": "2025-12-26T01:22:48.483648",
+    "environment_setup": {
+        "started_at": "2025-12-26T01:22:09.204003",
+        "finished_at": "2025-12-26T01:22:36.834595"
+    },
+    "agent_setup": {
+        "started_at": "2025-12-26T01:22:36.834628",
+        "finished_at": "2025-12-26T01:22:36.834678"
+    },
+    "agent_execution": {
+        "started_at": "2025-12-26T01:22:36.834699",
+        "finished_at": "2025-12-26T01:22:36.834737"
+    },
+    "verifier": {
+        "started_at": "2025-12-26T01:22:36.834831",
+        "finished_at": "2025-12-26T01:22:37.439841"
+    }
+}

@@ -1,0 +1,164 @@
+New Terminal Output:
+
+root@f2dfd4d3de5d:/app/src# cd /app/src
+root@f2dfd4d3de5d:/app/src# cobc -info 2>&1 | sed -n '1,200p'
+cobc (GnuCOBOL) 3.1.2.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch, Edward Hart
+Built     Sep 19 2022 04:27:09
+Packaged  Dec 23 2020 12:04:58 UTC
+C version "12.2.0"
+
+build information
+build environment        : x86_64-pc-linux-gnu
+CC                       : gcc
+C version                : "12.2.0"
+CPPFLAGS                 : -Wdate-time -D_FORTIFY_SOURCE=2
+CFLAGS                   : -g -O2 -finline-functions -D_FORTIFY_SOURCE=2
+                           -ggdb3 -fasynchronous-unwind-tables -pipe
+                           -fsigned-char -Wall -Wwrite-strings
+                           -Wmissing-prototypes -Wno-format-y2k
+LD                       : /usr/bin/ld -m elf_x86_64
+LDFLAGS                  : -Wl,-z,relro -Wl,-z,relro,-z,now,-O1
+
+GnuCOBOL information
+COB_CC                   : gcc
+COB_CFLAGS               : -finline-functions -D_FORTIFY_SOURCE=2 -ggdb3
+                           -pipe -Wdate-time -D_FORTIFY_SOURCE=2
+                           -Wno-unused -fsigned-char -Wno-pointer-sign
+COB_DEBUG_FLAGS          : -ggdb3 -fasynchronous-unwind-tables
+COB_LDFLAGS              : -Wl,-z,relro
+COB_LIBS                 : -L/usr/lib/x86_64-linux-gnu -lcob -lm
+COB_CONFIG_DIR           : /etc/gnucobol
+COB_COPY_DIR             : /usr/share/gnucobol/copy
+COB_MSG_FORMAT           : GCC
+COB_OBJECT_EXT           : o
+COB_MODULE_EXT           : so
+COB_EXE_EXT              :
+64bit-mode               : yes
+BINARY-C-LONG            : 8 bytes
+endianness               : little-endian
+native EBCDIC            : no
+extended screen I/O      : ncursesw
+variable file format     : 0
+sequential file handler  : built-in
+indexed file handler     : BDB
+mathematical library     : GMP
+XML library              : libxml2
+JSON library             : not found
+root@f2dfd4d3de5d:/app/src# dpkg -l | grep -i -E 'cobol|gnucobol' || true
+ii  gnucobol3                   3.1.2-5+b1                amd64        COBOL compiler
+ii  libcob4:amd64               3.1.2-5+b1                amd64        COBOL compiler - runtime library
+ii  libcob4-dev:amd64           3.1.2-5+b1                amd64        COBOL compiler - development files
+root@f2dfd4d3de5d:/app/src# dpkg -L gnucobol 2>/dev/null | sed -n '1,200p'
+root@f2dfd4d3de5d:/app/src# dpkg -L gnucobol3 2>/dev/null | sed -n '1,200p'
+/.
+/etc
+/etc/gnucobol
+/etc/gnucobol/acu-strict.conf
+/etc/gnucobol/acu.conf
+/etc/gnucobol/acu.words
+/etc/gnucobol/bs2000-strict.conf
+/etc/gnucobol/bs2000.conf
+/etc/gnucobol/bs2000.words
+/etc/gnucobol/cobol2002.conf
+/etc/gnucobol/cobol2002.words
+/etc/gnucobol/cobol2014.conf
+/etc/gnucobol/cobol2014.words
+/etc/gnucobol/cobol85.conf
+/etc/gnucobol/cobol85.words
+/etc/gnucobol/default.conf
+/etc/gnucobol/ibm-strict.conf
+/etc/gnucobol/ibm.conf
+/etc/gnucobol/ibm.words
+/etc/gnucobol/lax.conf-inc
+/etc/gnucobol/mf-strict.conf
+/etc/gnucobol/mf.conf
+/etc/gnucobol/mf.words
+/etc/gnucobol/mvs-strict.conf
+/etc/gnucobol/mvs.conf
+/etc/gnucobol/mvs.words
+/etc/gnucobol/realia-strict.conf
+/etc/gnucobol/realia.conf
+/etc/gnucobol/realia.words
+/etc/gnucobol/rm-strict.conf
+/etc/gnucobol/rm.conf
+/etc/gnucobol/rm.words
+/etc/gnucobol/runtime.cfg
+/etc/gnucobol/runtime_empty.cfg
+/etc/gnucobol/xopen.conf
+/usr
+/usr/bin
+/usr/bin/cob-config
+/usr/bin/cobc
+/usr/bin/cobcrun
+/usr/share
+/usr/share/doc
+/usr/share/doc/gnucobol3
+/usr/share/doc/gnucobol3/TODO.Debian
+/usr/share/doc/gnucobol3/changelog.Debian.amd64.gz
+/usr/share/doc/gnucobol3/changelog.Debian.gz
+/usr/share/doc/gnucobol3/changelog.gz
+/usr/share/doc/gnucobol3/copyright
+/usr/share/doc/gnucobol3/gnucobol.pdf.gz
+/usr/share/doc-base
+/usr/share/doc-base/gnucobol3.gnucobol
+/usr/share/gnucobol
+/usr/share/gnucobol/copy
+/usr/share/gnucobol/copy/screenio.cpy
+/usr/share/gnucobol/copy/sqlca.cpy
+/usr/share/gnucobol/copy/sqlda.cpy
+/usr/share/gnucobol/copy/xfhfcd.cpy
+/usr/share/gnucobol/copy/xfhfcd3.cpy
+/usr/share/info
+/usr/share/info/gnucobol.info.gz
+/usr/share/locale
+/usr/share/locale/de
+/usr/share/locale/de/LC_MESSAGES
+/usr/share/locale/de/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/en@boldquot
+/usr/share/locale/en@boldquot/LC_MESSAGES
+/usr/share/locale/en@boldquot/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/en@quot
+/usr/share/locale/en@quot/LC_MESSAGES
+/usr/share/locale/en@quot/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/es
+/usr/share/locale/es/LC_MESSAGES
+/usr/share/locale/es/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/fr
+/usr/share/locale/fr/LC_MESSAGES
+/usr/share/locale/fr/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/it
+/usr/share/locale/it/LC_MESSAGES
+/usr/share/locale/it/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/ja
+/usr/share/locale/ja/LC_MESSAGES
+/usr/share/locale/ja/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/nl
+/usr/share/locale/nl/LC_MESSAGES
+/usr/share/locale/nl/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/pt
+/usr/share/locale/pt/LC_MESSAGES
+/usr/share/locale/pt/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/sr
+/usr/share/locale/sr/LC_MESSAGES
+/usr/share/locale/sr/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/sv
+/usr/share/locale/sv/LC_MESSAGES
+/usr/share/locale/sv/LC_MESSAGES/gnucobol.mo
+/usr/share/man
+/usr/share/man/man1
+/usr/share/man/man1/cob-config.1.gz
+/usr/share/man/man1/cobc.1.gz
+/usr/share/man/man1/cobcrun.1.gz
+root@f2dfd4d3de5d:/app/src# dpkg -L gnucobol4 2>/dev/null | sed -n '1,200p'
+root@f2dfd4d3de5d:/app/src# find /usr -maxdepth 6 -type f \( -iname '*cob*.conf' -o -iname '*cob*.cfg' -o -iname '*gnucobol*' \) 2>/dev/null | head -n 200
+/usr/share/doc-base/gnucobol3.gnucobol
+root@f2dfd4d3de5d:/app/src# grep -R --line-number --no-messages -E 'reserved-words|tab-width|text-column|binary-byteorder' /usr 2>/dev/null | head -n 50
+/usr/local/lib/python3.13/site-packages/pygments/lexers/business.py:41:    # http://opencobol.add1tocobol.com/#reserved-words
+/usr/local/lib/python3.13/site-packages/pygments/lexers/_lilypond_builtins.py:3994:  "stem-tremolo::calc-tab-width",
+/usr/local/lib/python3.13/site-packages/pygments/lexers/wgsl.py:72:    # https://www.w3.org/TR/WGSL/#reserved-words
+

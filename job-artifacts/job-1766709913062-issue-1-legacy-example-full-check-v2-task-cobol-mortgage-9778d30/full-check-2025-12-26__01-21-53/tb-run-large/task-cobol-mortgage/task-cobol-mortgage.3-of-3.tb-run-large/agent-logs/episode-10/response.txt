@@ -1,0 +1,6 @@
+{
+  "analysis": "The COBOL program at /app/src/program.cbl compiles with GnuCOBOL 3.1.2 after fixing the missing gnucobol.conf by linking /etc/gnucobol/gnucobol.conf to default.conf. The executable runs from /app/src, reads /app/src/INPUT.DAT, applies the 15% minimum down payment rule, and writes /app/data/OUTPUT.DAT with DENY/APPRO and a detailed amortization schedule for approved applications. Output formatting matches the required layout (no header; 3-digit month number and zero-padded amounts). All source lines are <= 80 chars and fixed format is used without any source-format directive.",
+  "plan": "Task is complete; no further commands are needed.",
+  "commands": [],
+  "task_complete": true
+}

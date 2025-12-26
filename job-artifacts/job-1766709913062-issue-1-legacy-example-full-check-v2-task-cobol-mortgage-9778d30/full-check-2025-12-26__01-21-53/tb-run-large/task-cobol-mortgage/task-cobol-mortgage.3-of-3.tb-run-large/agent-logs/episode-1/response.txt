@@ -1,0 +1,51 @@
+{
+  "analysis": "Compilation failed before producing an executable: `cobc` reports `gnucobol.conf: No such file or directory`, so the GnuCOBOL runtime/compiler configuration file isn’t being found. Also, the `cat <<EOF` entry appears to have been corrupted (shell prompts and stray fragments are visible), so `program.cbl` is likely not clean fixed-format COBOL. INPUT.DAT appears to hold monetary amounts as implied cents (e.g., 2000000000 -> 20000000.00) and rate as implied 2 decimals (00550 -> 5.50). TERM looks like years (20), so term_months should be years*12.",
+  "plan": "1) Inspect the current `program.cbl` to confirm corruption and line lengths. 2) Diagnose GnuCOBOL config lookup: check `cobc -V`, environment variables, and search for any `gnucobol.conf` on disk. Try compiling with `COB_CONFIG_FILE=/dev/null` as a quick test. 3) Rewrite `/app/src/program.cbl` cleanly in fixed format with correct parsing (implied cents for amounts, implied 2 decimals for rate, term in years -> months) and output formatting with leading zeros (PIC 0(8).00 etc). 4) Compile and run again using a working config approach, then inspect `/app/data/OUTPUT.DAT`.",
+  "commands": [
+    {
+      "keystrokes": "cd /app/src\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "nl -ba program.cbl | sed -n '1,80p'\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "which cobc\ncobc -V || true\nenv | grep -E '^COB' || true\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "find / -maxdepth 5 -type f -name 'gnucobol.conf' 2>/dev/null | head\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "COB_CONFIG_FILE=/dev/null cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,120p'\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "cat > /app/src/program.cbl <<'EOF'\n       IDENTIFICATION DIVISION.\n       PROGRAM-ID. PROGRAM.\n\n       ENVIRONMENT DIVISION.\n       INPUT-OUTPUT SECTION.\n       FILE-CONTROL.\n           SELECT INFILE ASSIGN TO \"INPUT.DAT\"\n               ORGANIZATION IS LINE SEQUENTIAL.\n           SELECT OUTFILE ASSIGN TO \"../data/OUTPUT.DAT\"\n               ORGANIZATION IS LINE SEQUENTIAL.\n\n       DATA DIVISION.\n       FILE SECTION.\n       FD  INFILE.\n       01  IN-REC                   PIC X(256).\n\n       FD  OUTFILE.\n       01  OUT-REC                  PIC X(256).\n\n       WORKING-STORAGE SECTION.\n       01  WS-EOF                   PIC X VALUE 'N'.\n\n       01  WS-FIELDS.\n           05  WS-ID                PIC X(10).\n           05  WS-NAME              PIC X(30).\n           05  WS-LOAN-X            PIC X(20).\n           05  WS-PROP-X            PIC X(20).\n           05  WS-DOWN-X            PIC X(20).\n           05  WS-TERM-X            PIC X(10).\n           05  WS-RATE-X            PIC X(20).\n\n       01  WS-NUMS.\n           05  LOAN-AMT             PIC 9(10)V99 VALUE 0.\n           05  PROP-VALUE           PIC 9(10)V99 VALUE 0.\n           05  DOWN-PAY             PIC 9(10)V99 VALUE 0.\n           05  TERM-YEARS           PIC 9(2)     VALUE 0.\n           05  TERM-MONTHS          PIC 9(4)     VALUE 0.\n           05  RATE-ANN             PIC 9(3)V9(2) VALUE 0.\n\n       01  WS-CALC.\n           05  MIN-DOWN             PIC 9(10)V99 VALUE 0.\n           05  MONTHLY-RATE         PIC 9V9(8)   VALUE 0.\n           05  BASE                 PIC 9V9(8)   VALUE 0.\n           05  POWVAL               PIC 9V9(12)  VALUE 0.\n           05  DENOM                PIC S9V9(12) VALUE 0.\n           05  MONTHLY-PAY          PIC 9(10)V99 VALUE 0.\n           05  BALANCE              PIC 9(10)V99 VALUE 0.\n           05  INTEREST-PART        PIC 9(10)V99 VALUE 0.\n           05  PRINC-PART           PIC 9(10)V99 VALUE 0.\n           05  REMAIN               PIC 9(10)V99 VALUE 0.\n\n       01  WS-OUT-EDIT.\n           05  ED-MONTH             PIC 0(3).\n           05  ED-PAY               PIC 0(8).00.\n           05  ED-INT               PIC 0(8).00.\n           05  ED-PRN               PIC 0(8).00.\n           05  ED-REM               PIC 0(10).00.\n\n       01  WS-REASON                PIC X(50).\n       01  I                        PIC 9(4) VALUE 0.\n\n       PROCEDURE DIVISION.\n       MAIN.\n           OPEN INPUT INFILE\n           OPEN OUTPUT OUTFILE\n\n           PERFORM UNTIL WS-EOF = 'Y'\n               READ INFILE\n                   AT END\n                       MOVE 'Y' TO WS-EOF\n                   NOT AT END\n                       PERFORM PROCESS-ONE\n               END-READ\n           END-PERFORM\n\n           CLOSE INFILE\n           CLOSE OUTFILE\n           STOP RUN.\n\n       PROCESS-ONE.\n           PERFORM PARSE-INPUT\n           PERFORM CHECK-APPLICATION.\n\n       PARSE-INPUT.\n           MOVE SPACES TO WS-FIELDS\n           UNSTRING IN-REC DELIMITED BY ';'\n               INTO WS-ID WS-NAME WS-LOAN-X WS-PROP-X WS-DOWN-X\n                    WS-TERM-X WS-RATE-X\n           END-UNSTRING\n\n           COMPUTE LOAN-AMT ROUNDED =\n               FUNCTION NUMVAL(WS-LOAN-X) / 100\n           COMPUTE PROP-VALUE ROUNDED =\n               FUNCTION NUMVAL(WS-PROP-X) / 100\n           COMPUTE DOWN-PAY ROUNDED =\n               FUNCTION NUMVAL(WS-DOWN-X) / 100\n           COMPUTE TERM-YEARS = FUNCTION NUMVAL(WS-TERM-X)\n           COMPUTE TERM-MONTHS = TERM-YEARS * 12\n           COMPUTE RATE-ANN ROUNDED =\n               FUNCTION NUMVAL(WS-RATE-X) / 100.\n\n       CHECK-APPLICATION.\n           COMPUTE MIN-DOWN ROUNDED = PROP-VALUE * 0.15\n\n           IF DOWN-PAY < MIN-DOWN\n               MOVE \"INSUFFICIENT FUNDS FOR DOWN PAYMENT\" TO WS-REASON\n               PERFORM WRITE-DENY\n           ELSE\n               PERFORM WRITE-APPRO\n               PERFORM BUILD-SCHEDULE\n           END-IF.\n\n       WRITE-DENY.\n           MOVE SPACES TO OUT-REC\n           STRING WS-ID DELIMITED BY SIZE\n                  \"DENY \" DELIMITED BY SIZE\n                  WS-REASON DELIMITED BY SIZE\n                  INTO OUT-REC\n           END-STRING\n           WRITE OUT-REC.\n\n       WRITE-APPRO.\n           MOVE SPACES TO OUT-REC\n           STRING WS-ID DELIMITED BY SIZE\n                  \"APPRO\" DELIMITED BY SIZE\n                  INTO OUT-REC\n           END-STRING\n           WRITE OUT-REC.\n\n       BUILD-SCHEDULE.\n           IF TERM-MONTHS <= 0\n               EXIT PARAGRAPH\n           END-IF\n\n           COMPUTE MONTHLY-RATE ROUNDED = RATE-ANN / 1200\n           MOVE LOAN-AMT TO BALANCE\n\n           IF MONTHLY-RATE = 0\n               COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS\n           ELSE\n               COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE\n               COMPUTE POWVAL ROUNDED = FUNCTION POWER(BASE, -TERM-MONTHS)\n               COMPUTE DENOM ROUNDED = 1 - POWVAL\n               COMPUTE MONTHLY-PAY ROUNDED =\n                   (LOAN-AMT * MONTHLY-RATE) / DENOM\n           END-IF\n\n           PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS\n               COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE\n               COMPUTE PRINC-PART ROUNDED = MONTHLY-PAY - INTEREST-PART\n\n               IF I = TERM-MONTHS\n                   MOVE BALANCE TO PRINC-PART\n                   COMPUTE MONTHLY-PAY ROUNDED =\n                       INTEREST-PART + PRINC-PART\n               END-IF\n\n               COMPUTE REMAIN ROUNDED = BALANCE - PRINC-PART\n\n               MOVE I TO ED-MONTH\n               MOVE MONTHLY-PAY TO ED-PAY\n               MOVE INTEREST-PART TO ED-INT\n               MOVE PRINC-PART TO ED-PRN\n               MOVE REMAIN TO ED-REM\n\n               MOVE SPACES TO OUT-REC\n               STRING ED-MONTH DELIMITED BY SIZE\n                      \" \" DELIMITED BY SIZE\n                      ED-PAY DELIMITED BY SIZE\n                      \" \" DELIMITED BY SIZE\n                      ED-INT DELIMITED BY SIZE\n                      \" \" DELIMITED BY SIZE\n                      ED-PRN DELIMITED BY SIZE\n                      \" \" DELIMITED BY SIZE\n                      ED-REM DELIMITED BY SIZE\n                      INTO OUT-REC\n               END-STRING\n               WRITE OUT-REC\n\n               MOVE REMAIN TO BALANCE\n           END-PERFORM.\nEOF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "python3 - <<'PY'\nfrom pathlib import Path\np=Path('/app/src/program.cbl')\nmx=0\nbad=[]\nfor i,line in enumerate(p.read_text().splitlines(),1):\n    l=len(line)\n    mx=max(mx,l)\n    if l>80:\n        bad.append((i,l,line))\nprint('max_len',mx)\nprint('over_80',len(bad))\nfor i,l,_ in bad[:10]:\n    print('line',i,'len',l)\nPY\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "rm -f /app/data/OUTPUT.DAT\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "COB_CONFIG_FILE=/dev/null cobc -x -std=gnucobol program.cbl\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "./program\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "sed -n '1,80p' /app/data/OUTPUT.DAT\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

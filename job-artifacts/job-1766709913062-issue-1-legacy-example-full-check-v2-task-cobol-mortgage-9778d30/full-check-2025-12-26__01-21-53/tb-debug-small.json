@@ -1,0 +1,4 @@
+{
+    "outcome": "PASS",
+    "explanation": "The task instructions are explicit and sufficient: create /app/src/program.cbl in fixed format (no >>SOURCE FORMAT IS FIXED), keep lines ≤ 80 chars, compile with GnuCOBOL 3, read semicolon-delimited INPUT.DAT with specified fields, apply given formulas using ROUNDED, and write OUTPUT.DAT with the specified formats and schedule. The test simply compiles and runs the COBOL program and does not impose hidden names or undocumented formats. All failures are due to agent implementation issues: invalid fixed-format indicators (column 7), misuse of ROUNDED syntax, attempts to use unsupported POWER/POW functions, and exceeding 80-character line length—each a standard COBOL coding error, not a specification gap. Therefore, failures are due to agent limitations, not insufficient instructions."
+}

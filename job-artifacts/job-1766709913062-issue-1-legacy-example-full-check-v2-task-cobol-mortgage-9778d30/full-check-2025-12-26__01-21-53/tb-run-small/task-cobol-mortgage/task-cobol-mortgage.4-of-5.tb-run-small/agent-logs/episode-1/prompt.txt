@@ -1,0 +1,207 @@
+Current terminal state:
+New Terminal Output:
+root@3f3b2790b96b:/app# cd /app/src
+root@3f3b2790b96b:/app/src# cat > program.cbl <<'EOF'
+> IDENTIFICATION DIVISION.
+> PROGRAM-ID. MORTGAGE.
+> ENVIRONMENT DIVISION.
+> INPUT-OUTPUT SECTION.
+> FILE-CONTROL.
+>     SELECT INPUT-FILE ASSIGN TO "INPUT.DAT"
+>         ORGANIZATION IS LINE SEQUENTIAL.
+>     SELECT OUTPUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+>         ORGANIZATION IS LINE SEQUENTIAL.
+> DATA DIVISION.
+> FILE SECTION.
+> FD INPUT-FILE.
+> 01 INPUT-REC PIC X(200).
+> FD OUTPUT-FILE.
+> 01 OUTPUT-REC PIC X(200).
+> WORKING-STORAGE SECTION.
+> 01 WS-EOF PIC X VALUE "N".
+>    88 END-OF-FILE VALUE "Y".
+> 01 WS-REC.
+>    05 WS-ID           PIC X(10).
+>    05 WS-NAME         PIC X(30).
+>    05 WS-LOAN-AMOUNT  PIC 9(10).
+>    05 WS-PROP-VALUE   PIC 9(10).
+>    05 WS-DOWN-PAYMENT PIC 9(10).
+>    05 WS-TERM         PIC 9(2).
+>    05 WS-RATE         PIC 9(3)V9(2).
+> 01 MIN-DOWN          PIC 9(10)V99.
+> 01 MONTHLY-RATE      PIC 9(5)V9(6).
+> 01 MONTHLY-PAYMENT   PIC 9(10)V99.
+> 01 BALANCE           PIC 9(10)V99.
+> 01 INTEREST-PART     PIC 9(8)V99.
+> 01 PRINCIPAL-PART    PIC 9(8)V99.
+> 01 MON-NUMBER        PIC 9(3).
+> 01 REASON            PIC X(50).
+> 01 WS-SPACES         PIC X(1) VALUE SPACE.
+> PROCEDURE DIVISION.
+>    OPEN INPUT INPUT-FILE
+>    OPEN OUTPUT OUTPUT-FILE
+>    PERFORM UNTIL END-OF-FILE
+>       READ INPUT-FILE INTO INPUT-REC
+>          AT END SET END-OF-FILE TO TRUE
+>       NOT AT END
+>          PERFORM PROCESS-RECORD
+>       END-READ
+>    END-PERFORM
+>    CLOSE INPUT-FILE
+>    CLOSE OUTPUT-FILE
+>    STOP RUN.
+>
+> PROCESS-RECORD.
+>    UNSTRING INPUT-REC DELIMITED BY ';'
+>       INTO WS-ID
+>            WS-NAME
+>            WS-LOAN-AMOUNT
+>            WS-PROP-VALUE
+>            WS-DOWN-PAYMENT
+>            WS-TERM
+>            WS-RATE
+>    END-UNSTRING
+>    COMPUTE MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED
+>    IF WS-DOWN-PAYMENT < MIN-DOWN
+>       MOVE "INSUFFICIENT FUNDS FOR DOWN PAYMENT" TO REASON
+>       STRING WS-ID DELIMITED BY SIZE
+>              "DENY " DELIMITED BY SIZE
+>              REASON DELIMITED BY SIZE
+>          INTO OUTPUT-REC
+>       END-STRING
+>       WRITE OUTPUT-REC
+>    ELSE
+>       MOVE "APPRO" TO REASON
+>       STRING WS-ID DELIMITED BY SIZE
+>              REASON DELIMITED BY SIZE
+>          INTO OUTPUT-REC
+>       END-STRING
+>       WRITE OUTPUT-REC
+>       PERFORM GENERATE-SCHEDULE
+>    END-IF.
+>
+> GENERATE-SCHEDULE.
+>    COMPUTE MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+>    COMPUTE MONTHLY-PAYMENT = WS-LOAN-AMOUNT * MONTHLY-RATE /
+>         (1 - FUNCTION POW (1 + MONTHLY-RATE, -WS-TERM)) ROUNDED
+>    MOVE WS-LOAN-AMOUNT TO BALANCE
+>    PERFORM VARYING MON-NUMBER FROM 1 BY 1 UNTIL MON-NUMBER > WS-TERM
+>       COMPUTE INTEREST-PART = BALANCE * MONTHLY-RATE ROUNDED
+>       COMPUTE PRINCIPAL-PART = MONTHLY-PAYMENT - INTEREST-PART ROUNDED
+>       SUBTRACT PRINCIPAL-PART FROM BALANCE GIVING BALANCE ROUNDED
+>       STRING FUNCTION NUMVAL-C (MON-NUMBER) DELIMITED BY SIZE
+>              " " DELIMITED BY SIZE
+>              FUNCTION NUMVAL-C (MONTHLY-PAYMENT) DELIMITED BY SIZE
+>              " " DELIMITED BY SIZE
+>              FUNCTION NUMVAL-C (INTEREST-PART) DELIMITED BY SIZE
+>              " " DELIMITED BY SIZE
+>              FUNCTION NUMVAL-C (PRINCIPAL-PART) DELIMITED BY SIZE
+>              " " DELIMITED BY SIZE
+>              FUNCTION NUMVAL-C (BALANCE) DELIMITED BY SIZE
+>          INTO OUTPUT-REC
+>       END-STRING
+>       WRITE OUTPUT-REC
+>    END-PERFORM.
+> EOF
+root@3f3b2790b96b:/app/src# cobc -x -o program program.cbl
+program.cbl:1: error: invalid indicator 'F' at column 7
+program.cbl:2: error: invalid indicator 'M' at column 7
+program.cbl:3: error: invalid indicator 'N' at column 7
+program.cbl:4: error: invalid indicator 'O' at column 7
+program.cbl:5: error: invalid indicator 'O' at column 7
+program.cbl:6: error: invalid indicator 'L' at column 7
+program.cbl:8: error: invalid indicator 'L' at column 7
+program.cbl:10: error: invalid indicator 'I' at column 7
+program.cbl:11: error: invalid indicator 'E' at column 7
+program.cbl:12: error: invalid indicator 'U' at column 7
+program.cbl:13: error: invalid indicator 'U' at column 7
+program.cbl:14: error: invalid indicator 'P' at column 7
+program.cbl:15: error: invalid indicator 'P' at column 7
+program.cbl:16: error: invalid indicator 'G' at column 7
+program.cbl:17: error: invalid indicator 'E' at column 7
+program.cbl:18: error: invalid indicator 'E' at column 7
+program.cbl:19: error: invalid indicator 'R' at column 7
+program.cbl:20: error: invalid indicator 'W' at column 7
+program.cbl:21: error: invalid indicator 'W' at column 7
+program.cbl:22: error: invalid indicator 'W' at column 7
+program.cbl:23: error: invalid indicator 'W' at column 7
+program.cbl:24: error: invalid indicator 'W' at column 7
+program.cbl:25: error: invalid indicator 'W' at column 7
+program.cbl:26: error: invalid indicator 'W' at column 7
+program.cbl:27: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:28: error: invalid indicator 'T' at column 7
+program.cbl:29: error: invalid indicator 'T' at column 7
+program.cbl:30: error: invalid indicator 'A' at column 7
+program.cbl:31: error: invalid indicator 'E' at column 7
+program.cbl:32: error: invalid indicator 'N' at column 7
+program.cbl:33: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:34: error: invalid indicator 'S' at column 7
+program.cbl:35: error: invalid indicator 'S' at column 7
+program.cbl:36: error: invalid indicator 'U' at column 7
+program.cbl:37: error: invalid indicator 'N' at column 7
+program.cbl:38: error: invalid indicator 'N' at column 7
+program.cbl:39: error: invalid indicator 'F' at column 7
+program.cbl:40: error: invalid indicator 'R' at column 7
+program.cbl:42: error: invalid indicator 'N' at column 7
+program.cbl:44: error: invalid indicator 'E' at column 7
+program.cbl:45: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:46: error: invalid indicator 'S' at column 7
+program.cbl:47: error: invalid indicator 'S' at column 7
+program.cbl:48: error: invalid indicator 'P' at column 7
+program.cbl:50: error: invalid indicator 'S' at column 7
+program.cbl:51: error: invalid indicator 'T' at column 7
+program.cbl:52: error: invalid indicator 'I' at column 7
+program.cbl:59: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:60: error: invalid indicator 'P' at column 7
+program.cbl:61: error: invalid indicator 'W' at column 7
+program.cbl:62: error: invalid indicator 'M' at column 7
+program.cbl:63: error: invalid indicator 'S' at column 7
+program.cbl:67: error: invalid indicator 'E' at column 7
+program.cbl:68: error: invalid indicator 'W' at column 7
+program.cbl:69: error: invalid indicator 'E' at column 7
+program.cbl:70: error: invalid indicator 'M' at column 7
+program.cbl:71: error: invalid indicator 'S' at column 7
+program.cbl:74: error: invalid indicator 'E' at column 7
+program.cbl:75: error: invalid indicator 'W' at column 7
+program.cbl:76: error: invalid indicator 'P' at column 7
+program.cbl:77: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:79: error: invalid indicator 'T' at column 7
+program.cbl:80: error: invalid indicator 'P' at column 7
+program.cbl:81: error: invalid indicator 'P' at column 7
+program.cbl:83: error: invalid indicator 'E' at column 7
+program.cbl:84: error: invalid indicator 'F' at column 7
+program.cbl:85: error: invalid indicator 'C' at column 7
+program.cbl:86: error: invalid indicator 'C' at column 7
+program.cbl:87: error: invalid indicator 'S' at column 7
+program.cbl:88: error: invalid indicator 'S' at column 7
+program.cbl:98: error: invalid indicator 'E' at column 7
+program.cbl:99: error: invalid indicator 'W' at column 7
+program.cbl:100: warning: continuation of COBOL words used [-Wdialect]
+program.cbl:7: error: PROGRAM-ID header missing
+program.cbl:7: error: PROCEDURE DIVISION header missing
+program.cbl:7: error: syntax error, unexpected ORGANIZATION
+program.cbl:9: error: syntax error, unexpected ORGANIZATION
+program.cbl:9: error: syntax error, unexpected DOWN
+program.cbl:9: warning: handling of USAGE NATIONAL is unfinished; implementation is likely to be changed [-Wunfinished]
+program.cbl:9: error: invalid PICTURE character 'U'
+program.cbl:9: error: invalid PICTURE character 'M'
+program.cbl:9: error: invalid PICTURE character 'E'
+program.cbl:9: error: invalid PICTURE character 'R'
+program.cbl:9: error: . cannot follow V
+program.cbl:9: error: N cannot follow .
+program.cbl:9: error: N cannot follow 9
+program.cbl:9: error: N cannot follow V
+program.cbl:9: error: E cannot follow V
+program.cbl:9: error: E cannot follow N
+program.cbl:41: error: syntax error, unexpected END
+program.cbl:41: error: 'END-OF-FILE' is not defined
+program.cbl:53: error: 'WS-NAME' is not defined
+program.cbl:54: error: syntax error, unexpected Identifier, expecting TIMES
+program.cbl:82: error: syntax error, unexpected (
+program.cbl:43: error: 'PROCESS-RECORDPERFORM' is not defined
+root@3f3b2790b96b:/app/src# ./program
+bash: ./program: No such file or directory
+root@3f3b2790b96b:/app/src#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

@@ -1,0 +1,267 @@
+New Terminal Output:
+
+root@8932fc9aa05e:/app/src# sed -n '1,60p' /app/src/program.cbl 2>/dev/null || true
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PROGRAM.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+               ORGANIZATION IS LINE SEQUENTIAL.
+           SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  IN-FILE.
+       01  IN-REC                      PIC X(256).
+
+       FD  OUT-FILE.
+       01  OUT-REC                     PIC X(256).
+
+       WORKING-STORAGE SECTION.
+       01  WS-EOF                      PIC X VALUE 'N'.
+
+       01  WS-FIELDS.
+           05  WS-ID                   PIC X(10).
+           05  WS-NAME                 PIC X(30).
+           05  WS-LOAN-A               PIC X(32).
+           05  WS-PROP-A               PIC X(32).
+           05  WS-DOWN-A               PIC X(32).
+           05  WS-TERM-A               PIC X(32).
+           05  WS-RATE-A               PIC X(32).
+
+       01  WS-NUMS.
+           05  WS-LOAN                 PIC 9(12)V99 COMP-3.
+           05  WS-PROP                 PIC 9(12)V99 COMP-3.
+           05  WS-DOWN                 PIC 9(12)V99 COMP-3.
+           05  WS-TERM                 PIC 9(4) COMP-3.
+           05  WS-RATE                 PIC 9(5)V99 COMP-3.
+
+       01  WS-CALC.
+           05  WS-MIN-DOWN             PIC 9(12)V99 COMP-3.
+           05  WS-BAL                  PIC 9(12)V99 COMP-3.
+           05  WS-MR                   COMP-2.
+           05  WS-ONE-PLUS-MR          COMP-2.
+           05  WS-POW                  COMP-2.
+           05  WS-DENOM                COMP-2.
+           05  WS-PAY-DBL              COMP-2.
+           05  WS-PAY                  PIC 9(12)V99 COMP-3.
+           05  WS-INT                  PIC 9(12)V99 COMP-3.
+           05  WS-PRIN                 PIC 9(12)V99 COMP-3.
+           05  WS-NEWBAL               PIC 9(12)V99 COMP-3.
+
+       01  WS-OUT-FMTS.
+           05  F-MON                   PIC 9(3).
+           05  F-PAY                   PIC 9(8).99.
+           05  F-INT                   PIC 9(8).99.
+           05  F-PRIN                  PIC 9(8).99.
+           05  F-REM                   PIC 9(10).99.
+
+       01  WS-STATUS                   PIC X(5).
+       01  WS-REASON                   PIC X(50).
+root@8932fc9aa05e:/app/src# env | grep -E '^(COB|COBC)' || true
+root@8932fc9aa05e:/app/src# find / -name 'gnucobol.conf' 2>/dev/null | head -n 20
+root@8932fc9aa05e:/app/src# cobc -V 2>&1 | sed -n '1,40p'
+cobc (GnuCOBOL) 3.1.2.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch, Edward Hart
+Built     Sep 19 2022 04:27:09
+Packaged  Dec 23 2020 12:04:58 UTC
+C version "12.2.0"
+root@8932fc9aa05e:/app/src# python3 - <<'PY'
+> content = """       IDENTIFICATION DIVISION.
+>        PROGRAM-ID. PROGRAM.
+>
+>        ENVIRONMENT DIVISION.
+>        INPUT-OUTPUT SECTION.
+>        FILE-CONTROL.
+>            SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+ />                ORGANIZATION IS LINE SEQUENTIAL.
+>            SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+ COMPUTE WS->                ORGANIZATION IS LINE SEQUENTIAL.
+>
+>        DATA DIVISION.
+>        FILE SECTION.
+ON>        FD  IN-FILE.
+US, >        01  IN-REC                 PIC X(256).
+>
+>        FD  OUT-FILE.
+>        01  OUT-REC                PIC X(256).
+1>
+.>        WORKING-STORAGE SECTION.
+>        01  WS-EOF                 PIC X VALUE 'N'.
+>
+>        01  WS-FIELDS.
+ PERFO>            05  WS-ID              PIC X(10).
+>            05  WS-NAME            PIC X(30).
+>            05  WS-LOAN-A          PIC X(32).
+    >            05  WS-PROP-A          PIC X(32).
+WS-I>            05  WS-DOWN-A          PIC X(32).
+>            05  WS-TERM-A          PIC X(32).
+     >            05  WS-RATE-A          PIC X(32).
+>
++>        01  WS-NUMS.
+>            05  WS-LOAN            PIC 9(12)V99 COMP-3.
+>            05  WS-PROP            PIC 9(12)V99 COMP-3.
+      >            05  WS-DOWN            PIC 9(12)V99 COMP-3.
+>            05  WS-TERM-YRS        PIC 9(4) COMP-3.
+>            05  WS-TERM-MOS        PIC 9(5) COMP-3.
+>            05  WS-RATE-PCT        PIC 9(3)V99 COMP-3.
+     >
+>        01  WS-CALC.
+>            05  WS-MIN-DOWN        PIC 9(12)V99 COMP-3.
+>            05  WS-BAL             PIC 9(12)V99 COMP-3.
+      >            05  WS-MR              COMP-2.
+>            05  WS-ONE-PLUS        COMP-2.
+>            05  WS-POW             COMP-2.
+>            05  WS-DEN             COMP-2.
+S>            05  WS-PAY-DBL         COMP-2.
+>            05  WS-PAY             PIC 9(12)V99 COMP-3.
+>            05  WS-INT    
+[... output limited to 10000 bytes; 69 interior bytes omitted ...]
+                 AT END
+>                        MOVE 'Y' TO WS-EOF
+>                    NOT AT END
+>                        PERFORM PROCESS-REC
+>                END-READ
+>            END-PERFORM.
+>
+>            CLOSE IN-FILE OUT-FILE.
+>            STOP RUN.
+>
+>        PROCESS-REC.
+>            MOVE SPACES TO WS-FIELDS
+>            UNSTRING IN-REC DELIMITED BY ';'
+>                INTO WS-ID WS-NAME WS-LOAN-A WS-PROP-A
+>                     WS-DOWN-A WS-TERM-A WS-RATE-A
+>            END-UNSTRING
+>
+>            PERFORM CONVERT-INPUT
+>
+>            COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP * 0.15
+>
+>            IF WS-DOWN < WS-MIN-DOWN
+>                MOVE WS-ID TO O-ID
+>                MOVE 'DENY ' TO O-STATUS
+>                MOVE 'INSUFFICIENT FUNDS FOR DOWN PAYMENT' TO O-REASON
+>                MOVE SPACES TO OUT-REC
+>                STRING O-ID DELIMITED BY SIZE
+>                       O-STATUS DELIMITED BY SIZE
+>                       O-REASON DELIMITED BY SIZE
+>                  INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>            ELSE
+>                MOVE SPACES TO OUT-REC
+>                STRING WS-ID DELIMITED BY SIZE
+>                       'APPRO' DELIMITED BY SIZE
+>                  INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>
+>                PERFORM BUILD-SCHEDULE
+>            END-IF.
+>
+>        CONVERT-INPUT.
+>            COMPUTE WS-LOAN = FUNCTION NUMVAL(WS-LOAN-A)
+>            COMPUTE WS-PROP = FUNCTION NUMVAL(WS-PROP-A)
+>            COMPUTE WS-DOWN = FUNCTION NUMVAL(WS-DOWN-A)
+>            COMPUTE WS-TERM-YRS = FUNCTION NUMVAL(WS-TERM-A)
+>            COMPUTE WS-TERM-MOS = WS-TERM-YRS * 12
+>            COMPUTE WS-RATE-PCT = FUNCTION NUMVAL(WS-RATE-A) / 100.
+>
+>        BUILD-SCHEDULE.
+>            IF WS-TERM-MOS <= 0
+>                EXIT PARAGRAPH
+>            END-IF
+>
+>            MOVE WS-LOAN TO WS-BAL
+>
+>            COMPUTE WS-MR = (WS-RATE-PCT / 1.0) / 1200.0
+>            COMPUTE WS-ONE-PLUS = 1.0 + WS-MR
+>
+>            IF WS-MR = 0.0
+>                COMPUTE WS-PAY ROUNDED = WS-LOAN / WS-TERM-MOS
+>            ELSE
+>                COMPUTE WS-POW = FUNCTION POWER(WS-ONE-PLUS, WS-TERM-MOS)
+>                COMPUTE WS-DEN = 1.0 - (1.0 / WS-POW)
+>                COMPUTE WS-PAY-DBL = (WS-LOAN / 1.0) * WS-MR / WS-DEN
+>                COMPUTE WS-PAY ROUNDED = WS-PAY-DBL
+>            END-IF
+>
+>            PERFORM VARYING L-MON FROM 1 BY 1
+>                UNTIL L-MON > WS-TERM-MOS
+>
+>                COMPUTE WS-INT ROUNDED = WS-BAL * WS-MR
+>                COMPUTE WS-PRIN ROUNDED = WS-PAY - WS-INT
+>
+>                IF L-MON = WS-TERM-MOS
+>                    MOVE WS-BAL TO WS-PRIN
+>                    COMPUTE WS-PAY ROUNDED = WS-INT + WS-PRIN
+>                END-IF
+>
+>                COMPUTE WS-NEWBAL ROUNDED = WS-BAL - WS-PRIN
+>                IF WS-NEWBAL < 0
+>                    MOVE 0 TO WS-NEWBAL
+>                END-IF
+>
+>                MOVE WS-PAY TO L-PAY
+>                MOVE WS-INT TO L-INT
+>                MOVE WS-PRIN TO L-PRIN
+>                MOVE WS-NEWBAL TO L-REM
+>
+>                MOVE SPACES TO OUT-REC
+>                STRING L-MON DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       L-PAY DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       L-INT DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       L-PRIN DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       L-REM DELIMITED BY SIZE
+>                  INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>
+>                MOVE WS-NEWBAL TO WS-BAL
+>            END-PERFORM.
+> """
+> open('/app/src/program.cbl','w',encoding='utf-8').write(content)
+> PY
+root@8932fc9aa05e:/app/src# python3 - <<'PY'
+> # quick check: no line > 80 chars
+> p = '/app/src/program.cbl'
+> mx = 0
+> bad = []
+> with open(p,'r',encoding='utf-8') as f:
+>     for i,l in enumerate(f,1):
+>         n = len(l.rstrip('\n'))
+>         mx = max(mx,n)
+>         if n > 80:
+>             bad.append((i,n,l.rstrip('\n')))
+> print('max_len', mx)
+> for i,n,l in bad[:10]:
+>     print(i,n,l)
+> PY
+max_len 72
+root@8932fc9aa05e:/app/src# cd /app/src
+root@8932fc9aa05e:/app/src# unset COB_CONFIG_FILE COB_CONFIG_DIR COB_COPY_DIR COB_LIBARIES COB_LIBRARY_PATH 2>/dev/null || true
+root@8932fc9aa05e:/app/src# CONF=$(find / -name 'gnucobol.conf' 2>/dev/null | head -n 1); echo "CONF=$CONF"; if [ -n "$CONF" ]; then export COB_CONFIG_FILE="$CO
+NF"; fi; echo "COB_CONFIG_FILE=$COB_CONFIG_FILE"
+CONF=
+COB_CONFIG_FILE=
+root@8932fc9aa05e:/app/src# cobc -x program.cbl
+program.cbl: in paragraph 'BUILD-SCHEDULE':
+program.cbl:136: error: FUNCTION 'POWER' unknown
+root@8932fc9aa05e:/app/src# ./program
+bash: ./program: No such file or directory
+root@8932fc9aa05e:/app/src# wc -l /app/data/OUTPUT.DAT && sed -n '1,120p' /app/data/OUTPUT.DAT
+1 /app/data/OUTPUT.DAT
+
+root@8932fc9aa05e:/app/src#

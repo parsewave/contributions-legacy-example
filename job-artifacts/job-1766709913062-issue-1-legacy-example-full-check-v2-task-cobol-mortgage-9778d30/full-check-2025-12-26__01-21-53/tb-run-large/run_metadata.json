@@ -1,0 +1,30 @@
+{
+    "run_id": "tb-run-large-1",
+    "uuid": "2d286e18-08ea-4446-ba7d-965006095970",
+    "dataset_path": "/workspace/parsewave/contributions-legacy-example/contributor_tasks",
+    "dataset_name": null,
+    "dataset_version": null,
+    "output_path": "/workspace/parsewave/runs/full-check/full-check-2025-12-26__01-21-53",
+    "agent_name": "terminus-2",
+    "no_rebuild": false,
+    "cleanup": true,
+    "log_level": 20,
+    "task_ids": [
+        "task-cobol-mortgage"
+    ],
+    "exclude_task_ids": null,
+    "n_tasks": null,
+    "n_concurrent_trials": 1,
+    "n_attempts": 1,
+    "dataset_size": 1,
+    "accuracy": 0.0,
+    "model_name": "openrouter/openai/gpt-5.2",
+    "start_time": "2025-12-26T01:26:37.367872+00:00",
+    "end_time": "2025-12-26T01:33:12.628867+00:00",
+    "commit_hash": "b6adae5cea4735d1ec9d77ca08b9404f0af661c0",
+    "username": "root",
+    "s3_bucket": null,
+    "agent_kwargs": null,
+    "pass_at_k": {},
+    "resumed_at": null
+}

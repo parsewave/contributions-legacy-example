@@ -1,0 +1,88 @@
+root@f6f405979c86:/app# bash /tests/run-tests.sh; tmux wait -S done
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.13.1, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /tests
+collected 4 items
+
+../tests/test_outputs.py::test_required_files_exist PASSED                                                                                               [ 25%]
+../tests/test_outputs.py::test_fixed_format_constraints PASSED                                                                                           [ 50%]
+../tests/test_outputs.py::test_data_files_exist PASSED                                                                                                   [ 75%]
+../tests/test_outputs.py::test_program_output FAILED                                                                                                     [100%]
+
+=========================================================================== FAILURES ===========================================================================
+_____________________________________________________________________ test_program_output ______________________________________________________________________
+
+    def test_program_output():
+        """Test that the program produces the expected output and file contents"""
+        initial_OUTPUT = ""
+
+        data_dir = Path("/app/data")
+
+        (data_dir / "OUTPUT.DAT").write_text(initial_OUTPUT)
+
+        Path("/app/src/INPUT.DAT").write_text(
+    """APP0000001;Williams David Robert         ;2000000000;3500000000;0500000000;20;00550
+    APP0000002;John Smith Clark              ;0000005000;0000004000;0000003500;01;00550""")
+
+        # Compile the COBOL program
+        compile_result = subprocess.run([
+            'cobc',
+            '-x',
+            '-o',
+            '/app/src/programCOMP',
+            '/app/src/program.cbl'
+        ], capture_output=True, text=True)
+
+        assert compile_result.returncode == 0, f"Compilation failed: {compile_result.stderr}"
+
+        # Run the compiled program
+        result = subprocess.run(
+            ['/app/src/programCOMP'],
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0, f"Program failed: {result.stderr}"
+
+        expected_OUTPUT = (
+    """APP0000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT
+    APP0000002APPRO
+    001 00000429.18 00000022.92 00000406.26 0000004593.74
+    002 00000429.18 00000021.05 00000408.13 0000004185.61
+    003 00000429.18 00000019.18 00000410.00 0000003775.61
+    004 00000429.18 00000017.30 00000411.88 0000003363.73
+    005 00000429.18 00000015.42 00000413.76 0000002949.97
+    006 00000429.18 00000013.52 00000415.66 0000002534.31
+    007 00000429.18 00000011.61 00000417.57 0000002116.74
+    008 00000429.18 00000009.70 00000419.48 0000001697.26
+    009 00000429.18 00000007.78 00000421.40 0000001275.86
+    010 00000429.18 00000005.85 00000423.33 0000000852.53
+    011 00000429.18 00000003.91 00000425.27 0000000427.26
+    012 00000429.22 00000001.96 00000427.26 0000000000.00\n"""
+        )
+
+>       assert (data_dir / "OUTPUT.DAT").read_text() == expected_OUTPUT, (
+            "OUTPUT.DAT content mismatch"
+        )
+E       AssertionError: OUTPUT.DAT content mismatch
+E       assert '' == 'APP0000001DE...00000000.00\n'
+E
+E         - APP0000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT
+E         - APP0000002APPRO
+E         - 001 00000429.18 00000022.92 00000406.26 0000004593.74
+E         - 002 00000429.18 00000021.05 00000408.13 0000004185.61
+E         - 003 00000429.18 00000019.18 00000410.00 0000003775.61
+E         - 004 00000429.18 00000017.30 00000411.88 0000003363.73...
+E
+E         ...Full output truncated (8 lines hidden), use '-vv' to show
+
+/tests/test_outputs.py:80: AssertionError
+============================================================================ PASSES ============================================================================
+=================================================================== short test summary info ====================================================================
+PASSED ../tests/test_outputs.py::test_required_files_exist
+PASSED ../tests/test_outputs.py::test_fixed_format_constraints
+PASSED ../tests/test_outputs.py::test_data_files_exist
+FAILED ../tests/test_outputs.py::test_program_output - AssertionError: OUTPUT.DAT content mismatch
+================================================================= 1 failed, 3 passed in 0.25s ==================================================================
+root@f6f405979c86:/app#

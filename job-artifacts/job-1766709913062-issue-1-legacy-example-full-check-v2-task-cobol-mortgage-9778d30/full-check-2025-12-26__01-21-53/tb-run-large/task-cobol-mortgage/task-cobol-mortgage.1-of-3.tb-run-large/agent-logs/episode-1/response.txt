@@ -1,0 +1,55 @@
+{
+  "analysis": "INPUT.DAT has 2 semicolon-delimited lines. Rate is stored as 5 digits like 00550 (meaning 5.50%). Term looks like years (20, 01). The attempt to create program.cbl was corrupted (garbled text inserted), and compilation failed because cobc cannot find gnucobol.conf (likely due to a bad COB_CONFIG_FILE/COB_CONFIG_DIR setting or missing config). OUTPUT.DAT is still basically empty.",
+  "plan": "1) Inspect the current program.cbl (confirm corruption) and check any COB* environment variables. 2) Locate gnucobol.conf on the filesystem; if found, set COB_CONFIG_FILE to it (or unset conflicting vars). 3) Rewrite /app/src/program.cbl cleanly (fixed format, <=80 chars/line) using UNSTRING + NUMVAL conversion, down payment validation, annuity payment formula, and schedule generation with ROUNDED computations. 4) Compile and run from /app/src and verify /app/data/OUTPUT.DAT content.",
+  "commands": [
+    {
+      "keystrokes": "sed -n '1,60p' /app/src/program.cbl 2>/dev/null || true\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "env | grep -E '^(COB|COBC)' || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "find / -name 'gnucobol.conf' 2>/dev/null | head -n 20\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "cobc -V 2>&1 | sed -n '1,40p'\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "python3 - <<'PY'\ncontent = \"\"\"       IDENTIFICATION DIVISION.\n       PROGRAM-ID. PROGRAM.\n\n       ENVIRONMENT DIVISION.\n       INPUT-OUTPUT SECTION.\n       FILE-CONTROL.\n           SELECT IN-FILE ASSIGN TO \"INPUT.DAT\"\n               ORGANIZATION IS LINE SEQUENTIAL.\n           SELECT OUT-FILE ASSIGN TO \"../data/OUTPUT.DAT\"\n               ORGANIZATION IS LINE SEQUENTIAL.\n\n       DATA DIVISION.\n       FILE SECTION.\n       FD  IN-FILE.\n       01  IN-REC                 PIC X(256).\n\n       FD  OUT-FILE.\n       01  OUT-REC                PIC X(256).\n\n       WORKING-STORAGE SECTION.\n       01  WS-EOF                 PIC X VALUE 'N'.\n\n       01  WS-FIELDS.\n           05  WS-ID              PIC X(10).\n           05  WS-NAME            PIC X(30).\n           05  WS-LOAN-A          PIC X(32).\n           05  WS-PROP-A          PIC X(32).\n           05  WS-DOWN-A          PIC X(32).\n           05  WS-TERM-A          PIC X(32).\n           05  WS-RATE-A          PIC X(32).\n\n       01  WS-NUMS.\n           05  WS-LOAN            PIC 9(12)V99 COMP-3.\n           05  WS-PROP            PIC 9(12)V99 COMP-3.\n           05  WS-DOWN            PIC 9(12)V99 COMP-3.\n           05  WS-TERM-YRS        PIC 9(4) COMP-3.\n           05  WS-TERM-MOS        PIC 9(5) COMP-3.\n           05  WS-RATE-PCT        PIC 9(3)V99 COMP-3.\n\n       01  WS-CALC.\n           05  WS-MIN-DOWN        PIC 9(12)V99 COMP-3.\n           05  WS-BAL             PIC 9(12)V99 COMP-3.\n           05  WS-MR              COMP-2.\n           05  WS-ONE-PLUS        COMP-2.\n           05  WS-POW             COMP-2.\n           05  WS-DEN             COMP-2.\n           05  WS-PAY-DBL         COMP-2.\n           05  WS-PAY             PIC 9(12)V99 COMP-3.\n           05  WS-INT             PIC 9(12)V99 COMP-3.\n           05  WS-PRIN            PIC 9(12)V99 COMP-3.\n           05  WS-NEWBAL          PIC 9(12)V99 COMP-3.\n\n       01  WS-OUT.\n           05  O-ID               PIC X(10).\n           05  O-STATUS           PIC X(5).\n           05  O-REASON           PIC X(50).\n\n       01  WS-LINE.\n           05  L-MON              PIC 9(3).\n           05  L-PAY              PIC 9(8).99.\n           05  L-INT              PIC 9(8).99.\n           05  L-PRIN             PIC 9(8).99.\n           05  L-REM              PIC 9(10).99.\n\n       PROCEDURE DIVISION.\n       MAIN.\n           OPEN INPUT IN-FILE\n                OUTPUT OUT-FILE.\n\n           PERFORM UNTIL WS-EOF = 'Y'\n               READ IN-FILE\n                   AT END\n                       MOVE 'Y' TO WS-EOF\n                   NOT AT END\n                       PERFORM PROCESS-REC\n               END-READ\n           END-PERFORM.\n\n           CLOSE IN-FILE OUT-FILE.\n           STOP RUN.\n\n       PROCESS-REC.\n           MOVE SPACES TO WS-FIELDS\n           UNSTRING IN-REC DELIMITED BY ';'\n               INTO WS-ID WS-NAME WS-LOAN-A WS-PROP-A\n                    WS-DOWN-A WS-TERM-A WS-RATE-A\n           END-UNSTRING\n\n           PERFORM CONVERT-INPUT\n\n           COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP * 0.15\n\n           IF WS-DOWN < WS-MIN-DOWN\n               MOVE WS-ID TO O-ID\n               MOVE 'DENY ' TO O-STATUS\n               MOVE 'INSUFFICIENT FUNDS FOR DOWN PAYMENT' TO O-REASON\n               MOVE SPACES TO OUT-REC\n               STRING O-ID DELIMITED BY SIZE\n                      O-STATUS DELIMITED BY SIZE\n                      O-REASON DELIMITED BY SIZE\n                 INTO OUT-REC\n               END-STRING\n               WRITE OUT-REC\n           ELSE\n               MOVE SPACES TO OUT-REC\n               STRING WS-ID DELIMITED BY SIZE\n                      'APPRO' DELIMITED BY SIZE\n                 INTO OUT-REC\n               END-STRING\n               WRITE OUT-REC\n\n               PERFORM BUILD-SCHEDULE\n           END-IF.\n\n       CONVERT-INPUT.\n           COMPUTE WS-LOAN = FUNCTION NUMVAL(WS-LOAN-A)\n           COMPUTE WS-PROP = FUNCTION NUMVAL(WS-PROP-A)\n           COMPUTE WS-DOWN = FUNCTION NUMVAL(WS-DOWN-A)\n           COMPUTE WS-TERM-YRS = FUNCTION NUMVAL(WS-TERM-A)\n           COMPUTE WS-TERM-MOS = WS-TERM-YRS * 12\n           COMPUTE WS-RATE-PCT = FUNCTION NUMVAL(WS-RATE-A) / 100.\n\n       BUILD-SCHEDULE.\n           IF WS-TERM-MOS <= 0\n               EXIT PARAGRAPH\n           END-IF\n\n           MOVE WS-LOAN TO WS-BAL\n\n           COMPUTE WS-MR = (WS-RATE-PCT / 1.0) / 1200.0\n           COMPUTE WS-ONE-PLUS = 1.0 + WS-MR\n\n           IF WS-MR = 0.0\n               COMPUTE WS-PAY ROUNDED = WS-LOAN / WS-TERM-MOS\n           ELSE\n               COMPUTE WS-POW = FUNCTION POWER(WS-ONE-PLUS, WS-TERM-MOS)\n               COMPUTE WS-DEN = 1.0 - (1.0 / WS-POW)\n               COMPUTE WS-PAY-DBL = (WS-LOAN / 1.0) * WS-MR / WS-DEN\n               COMPUTE WS-PAY ROUNDED = WS-PAY-DBL\n           END-IF\n\n           PERFORM VARYING L-MON FROM 1 BY 1\n               UNTIL L-MON > WS-TERM-MOS\n\n               COMPUTE WS-INT ROUNDED = WS-BAL * WS-MR\n               COMPUTE WS-PRIN ROUNDED = WS-PAY - WS-INT\n\n               IF L-MON = WS-TERM-MOS\n                   MOVE WS-BAL TO WS-PRIN\n                   COMPUTE WS-PAY ROUNDED = WS-INT + WS-PRIN\n               END-IF\n\n               COMPUTE WS-NEWBAL ROUNDED = WS-BAL - WS-PRIN\n               IF WS-NEWBAL < 0\n                   MOVE 0 TO WS-NEWBAL\n               END-IF\n\n               MOVE WS-PAY TO L-PAY\n               MOVE WS-INT TO L-INT\n               MOVE WS-PRIN TO L-PRIN\n               MOVE WS-NEWBAL TO L-REM\n\n               MOVE SPACES TO OUT-REC\n               STRING L-MON DELIMITED BY SIZE\n                      ' ' DELIMITED BY SIZE\n                      L-PAY DELIMITED BY SIZE\n                      ' ' DELIMITED BY SIZE\n                      L-INT DELIMITED BY SIZE\n                      ' ' DELIMITED BY SIZE\n                      L-PRIN DELIMITED BY SIZE\n                      ' ' DELIMITED BY SIZE\n                      L-REM DELIMITED BY SIZE\n                 INTO OUT-REC\n               END-STRING\n               WRITE OUT-REC\n\n               MOVE WS-NEWBAL TO WS-BAL\n           END-PERFORM.\n\"\"\"\nopen('/app/src/program.cbl','w',encoding='utf-8').write(content)\nPY\n",
+      "duration": 0.3
+    },
+    {
+      "keystrokes": "python3 - <<'PY'\n# quick check: no line > 80 chars\np = '/app/src/program.cbl'\nmx = 0\nbad = []\nwith open(p,'r',encoding='utf-8') as f:\n    for i,l in enumerate(f,1):\n        n = len(l.rstrip('\\n'))\n        mx = max(mx,n)\n        if n > 80:\n            bad.append((i,n,l.rstrip('\\n')))\nprint('max_len', mx)\nfor i,n,l in bad[:10]:\n    print(i,n,l)\nPY\n",
+      "duration": 0.3
+    },
+    {
+      "keystrokes": "cd /app/src\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "unset COB_CONFIG_FILE COB_CONFIG_DIR COB_COPY_DIR COB_LIBARIES COB_LIBRARY_PATH 2>/dev/null || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "CONF=$(find / -name 'gnucobol.conf' 2>/dev/null | head -n 1); echo \"CONF=$CONF\"; if [ -n \"$CONF\" ]; then export COB_CONFIG_FILE=\"$CONF\"; fi; echo \"COB_CONFIG_FILE=$COB_CONFIG_FILE\"\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "cobc -x program.cbl\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "./program\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "wc -l /app/data/OUTPUT.DAT && sed -n '1,120p' /app/data/OUTPUT.DAT\n",
+      "duration": 0.2
+    }
+  ],
+  "task_complete": false
+}

@@ -1,0 +1,4 @@
+{
+    "outcome": "PASS",
+    "explanation": "The task instructions clearly specify the required file paths (/app/src/INPUT.DAT, /app/data/OUTPUT.DAT), fixed-format COBOL constraints, compilation with GnuCOBOL 3, the calculation formulas with ROUNDED, the output structure including STATUS and the schedule formatting, and even explicitly require the string APPRO. The tests mirror these requirements. The failures were due to the program hanging (timeouts) and ultimately producing an empty OUTPUT.DAT despite successful compilation and execution, indicating the agent did not implement reading/writing as instructed or used the wrong path, not that the instructions were insufficient. While there is a minor potential ambiguity about TERM units and the exact denial reason text, the observed failures are not attributable to these and the instructions are otherwise sufficient for passing the tests."
+}

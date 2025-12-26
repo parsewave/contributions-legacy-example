@@ -1,0 +1,14 @@
+{
+  "analysis": "We are at the root of the container in /app. The task requires creating a COBOL source file /app/src/program.cbl that processes mortgage applications from INPUT.DAT, writes results to /app/data/OUTPUT.DAT, and then compile and run it using GnuCOBOL 3. We haven't yet inspected the directory contents, so we need to list /app/src and /app/data to see existing files and ensure the directories exist. This will guide us in creating the source file correctly.",
+  "plan": "1. List the contents of /app/src to verify INPUT.DAT exists and check for any existing files. 2. List /app/data to verify OUTPUT.DAT does not already exist (or to see if we need to create the directory). 3. Create the COBOL source file /app/src/program.cbl with the required logic, keeping each line ≤ 80 characters and using fixed format (no SOURCE FORMAT directive). 4. Compile the program with GnuCOBOL (cobc -x program.cbl -o program). 5. Execute the compiled program from /app/src. 6. Verify that /app/data/OUTPUT.DAT has been created and contains expected data.",
+  "commands": [
+    {
+      "keystrokes": "ls -l /app/src\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "ls -l /app/data\n",
+      "duration": 0.1
+    }
+  ]
+}

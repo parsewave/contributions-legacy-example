@@ -1,0 +1,35 @@
+{
+  "analysis": "`cobc` is installed, but fails immediately because it cannot find `gnucobol.conf`. The error shows only the filename (no path), which strongly suggests it’s searching in its default locations and/or the current directory. We should try providing a `gnucobol.conf` in `/app/src` (where compilation is run). If it then complains about missing settings, we can add minimal required directives or locate the expected path via `strace`/package files.",
+  "plan": "1) Create a minimal `gnucobol.conf` in `/app/src` (and optionally `/app`) to satisfy the missing-file error. 2) Re-run compilation. 3) If compilation still fails, use `strace` to see where it looks for the config, then place the file there. 4) Once compilation works, run the program and inspect `/app/data/OUTPUT.DAT`.",
+  "commands": [
+    {
+      "keystrokes": "cd /app/src\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat > gnucobol.conf <<'EOF'\n# Minimal config file for GnuCOBOL in this sandbox.\n# (Defaults are used; this file only needs to exist.)\nEOF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,200p'\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "ls -la\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "rm -f /app/data/OUTPUT.DAT\n./program 2>&1 | sed -n '1,120p'\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "sed -n '1,120p' /app/data/OUTPUT.DAT\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "strace -f -e openat cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,120p'\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+}

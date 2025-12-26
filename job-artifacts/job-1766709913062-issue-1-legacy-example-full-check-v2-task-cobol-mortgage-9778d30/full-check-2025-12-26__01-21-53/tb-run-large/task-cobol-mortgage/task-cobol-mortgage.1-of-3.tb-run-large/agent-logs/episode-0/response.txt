@@ -1,0 +1,39 @@
+{
+  "analysis": "We are at /app with no work done yet. The task requires creating a fixed-format COBOL program at /app/src/program.cbl that reads /app/src/INPUT.DAT (semicolon-delimited records), validates minimum down payment (15% of property value), writes rejection lines or approval + full amortization schedule to /app/data/OUTPUT.DAT, and compiles/runs under GnuCOBOL 3. We need to inspect the input file format and then implement program.cbl accordingly.",
+  "plan": "1) Inspect /app/src and preview INPUT.DAT to confirm actual field representations (especially RATE and TERM). 2) Create /app/src/program.cbl in COBOL fixed format using LINE SEQUENTIAL I/O, UNSTRING for parsing, NUMVAL for numeric conversion, and decimal-edited PICs for output with leading zeros and decimal point. 3) Compile with cobc -x in /app/src and run it, then inspect /app/data/OUTPUT.DAT for correctness.",
+  "commands": [
+    {
+      "keystrokes": "ls -la /app /app/src /app/data\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "sed -n '1,5p' /app/src/INPUT.DAT\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "sed -n '1,120p' /app/src/INPUT.DAT | cat -A\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "cat > /app/src/program.cbl <<'COB'\n       IDENTIFICATION DIVISION.\n       PROGRAM-ID. PROGRAM.\n\n       ENVIRONMENT DIVISION.\n       INPUT-OUTPUT SECTION.\n       FILE-CONTROL.\n           SELECT IN-FILE ASSIGN TO \"INPUT.DAT\"\n               ORGANIZATION IS LINE SEQUENTIAL.\n           SELECT OUT-FILE ASSIGN TO \"../data/OUTPUT.DAT\"\n               ORGANIZATION IS LINE SEQUENTIAL.\n\n       DATA DIVISION.\n       FILE SECTION.\n       FD  IN-FILE.\n       01  IN-REC                      PIC X(256).\n\n       FD  OUT-FILE.\n       01  OUT-REC                     PIC X(256).\n\n       WORKING-STORAGE SECTION.\n       01  WS-EOF                      PIC X VALUE 'N'.\n\n       01  WS-FIELDS.\n           05  WS-ID                   PIC X(10).\n           05  WS-NAME                 PIC X(30).\n           05  WS-LOAN-A               PIC X(32).\n           05  WS-PROP-A               PIC X(32).\n           05  WS-DOWN-A               PIC X(32).\n           05  WS-TERM-A               PIC X(32).\n           05  WS-RATE-A               PIC X(32).\n\n       01  WS-NUMS.\n           05  WS-LOAN                 PIC 9(12)V99 COMP-3.\n           05  WS-PROP                 PIC 9(12)V99 COMP-3.\n           05  WS-DOWN                 PIC 9(12)V99 COMP-3.\n           05  WS-TERM                 PIC 9(4) COMP-3.\n           05  WS-RATE                 PIC 9(5)V99 COMP-3.\n\n       01  WS-CALC.\n           05  WS-MIN-DOWN             PIC 9(12)V99 COMP-3.\n           05  WS-BAL                  PIC 9(12)V99 COMP-3.\n           05  WS-MR                   COMP-2.\n           05  WS-ONE-PLUS-MR          COMP-2.\n           05  WS-POW                  COMP-2.\n           05  WS-DENOM                COMP-2.\n           05  WS-PAY-DBL              COMP-2.\n           05  WS-PAY                  PIC 9(12)V99 COMP-3.\n           05  WS-INT                  PIC 9(12)V99 COMP-3.\n           05  WS-PRIN                 PIC 9(12)V99 COMP-3.\n           05  WS-NEWBAL               PIC 9(12)V99 COMP-3.\n\n       01  WS-OUT-FMTS.\n           05  F-MON                   PIC 9(3).\n           05  F-PAY                   PIC 9(8).99.\n           05  F-INT                   PIC 9(8).99.\n           05  F-PRIN                  PIC 9(8).99.\n           05  F-REM                   PIC 9(10).99.\n\n       01  WS-STATUS                   PIC X(5).\n       01  WS-REASON                   PIC X(50).\n\n       PROCEDURE DIVISION.\n       MAIN.\n           OPEN INPUT IN-FILE\n                OUTPUT OUT-FILE.\n\n           PERFORM UNTIL WS-EOF = 'Y'\n               READ IN-FILE\n                   AT END\n                       MOVE 'Y' TO WS-EOF\n                   NOT AT END\n                       PERFORM PROCESS-REC\n               END-READ\n           END-PERFORM.\n\n           CLOSE IN-FILE OUT-FILE.\n           STOP RUN.\n\n       PROCESS-REC.\n           MOVE SPACES TO WS-FIELDS\n           UNSTRING IN-REC DELIMITED BY ';'\n               INTO WS-ID WS-NAME WS-LOAN-A WS-PROP-A\n                    WS-DOWN-A WS-TERM-A WS-RATE-A\n           END-UNSTRING\n\n           PERFORM CONVERT-NUMBERS\n\n           COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP * 0.15\n\n           IF WS-DOWN < WS-MIN-DOWN\n               MOVE 'DENY ' TO WS-STATUS\n               MOVE 'INSUFFICIENT FUNDS FOR DOWN PAYMENT' TO WS-REASON\n               STRING WS-ID DELIMITED BY SIZE\n                      WS-STATUS DELIMITED BY SIZE\n                      ' ' DELIMITED BY SIZE\n                      WS-REASON DELIMITED BY SIZE\n                   INTO OUT-REC\n               END-STRING\n               WRITE OUT-REC\n           ELSE\n               MOVE 'APPRO' TO WS-STATUS\n               MOVE SPACES TO OUT-REC\n               STRING WS-ID DELIMITED BY SIZE\n                      WS-STATUS DELIMITED BY SIZE\n                   INTO OUT-REC\n               END-STRING\n               WRITE OUT-REC\n\n               PERFORM BUILD-SCHEDULE\n           END-IF.\n\n       CONVERT-NUMBERS.\n           COMPUTE WS-LOAN = FUNCTION NUMVAL(WS-LOAN-A) * 100\n           COMPUTE WS-PROP = FUNCTION NUMVAL(WS-PROP-A) * 100\n           COMPUTE WS-DOWN = FUNCTION NUMVAL(WS-DOWN-A) * 100\n           COMPUTE WS-TERM = FUNCTION NUMVAL(WS-TERM-A)\n           COMPUTE WS-RATE = FUNCTION NUMVAL(WS-RATE-A) * 100.\n\n       BUILD-SCHEDULE.\n           MOVE WS-LOAN TO WS-BAL\n\n           COMPUTE WS-MR = (WS-RATE / 100.0) / 1200.0\n           COMPUTE WS-ONE-PLUS-MR = 1.0 + WS-MR\n\n           IF WS-TERM <= 0\n               EXIT PARAGRAPH\n           END-IF\n\n           IF WS-MR = 0.0\n               COMPUTE WS-PAY ROUNDED = WS-LOAN / WS-TERM\n           ELSE\n               COMPUTE WS-POW = FUNCTION POWER(WS-ONE-PLUS-MR, WS-TERM)\n               COMPUTE WS-DENOM = 1.0 - (1.0 / WS-POW)\n               COMPUTE WS-PAY-DBL = (WS-LOAN / 100.0) * WS-MR / WS-DENOM\n               COMPUTE WS-PAY ROUNDED = WS-PAY-DBL * 100.0\n           END-IF\n\n           PERFORM VARYING F-MON FROM 1 BY 1 UNTIL F-MON > WS-TERM\n               COMPUTE WS-INT ROUNDED = WS-BAL * WS-MR\n\n               COMPUTE WS-PRIN ROUNDED = WS-PAY - WS-INT\n\n               IF F-MON = WS-TERM\n                   MOVE WS-BAL TO WS-PRIN\n                   COMPUTE WS-PAY ROUNDED = WS-INT + WS-PRIN\n               END-IF\n\n               COMPUTE WS-NEWBAL ROUNDED = WS-BAL - WS-PRIN\n               IF WS-NEWBAL < 0\n                   MOVE 0 TO WS-NEWBAL\n               END-IF\n\n               COMPUTE F-PAY = WS-PAY / 100\n               COMPUTE F-INT = WS-INT / 100\n               COMPUTE F-PRIN = WS-PRIN / 100\n               COMPUTE F-REM = WS-NEWBAL / 100\n\n               MOVE SPACES TO OUT-REC\n               STRING F-MON DELIMITED BY SIZE\n                      ' ' DELIMITED BY SIZE\n                      F-PAY DELIMITED BY SIZE\n                      ' ' DELIMITED BY SIZE\n                      F-INT DELIMITED BY SIZE\n                      ' ' DELIMITED BY SIZE\n                      F-PRIN DELIMITED BY SIZE\n                      ' ' DELIMITED BY SIZE\n                      F-REM DELIMITED BY SIZE\n                   INTO OUT-REC\n               END-STRING\n               WRITE OUT-REC\n\n               MOVE WS-NEWBAL TO WS-BAL\n           END-PERFORM.\nCOB\n",
+      "duration": 0.3
+    },
+    {
+      "keystrokes": "cd /app/src\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cobc -x -std=gnucobol program.cbl\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "./program\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "wc -l /app/data/OUTPUT.DAT && sed -n '1,40p' /app/data/OUTPUT.DAT\n",
+      "duration": 0.2
+    }
+  ],
+  "task_complete": false
+}

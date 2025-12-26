@@ -1,0 +1,171 @@
+Current terminal state:
+New Terminal Output:
+root@fd18caf110c5:/app# cat > /app/src/program.cbl <<'EOF'
+> IDENTIFICATION DIVISION.
+> PROGRAM-ID. PROGRAM.
+> ENVIRONMENT DIVISION.
+> INPUT-OUTPUT SECTION.
+> FILE-CONTROL.
+>     SELECT INFILE ASSIGN TO '/app/src/INPUT.DAT'
+>         ORGANIZATION IS LINE SEQUENTIAL.
+>     SELECT OUTFILE ASSIGN TO '/app/data/OUTPUT.DAT'
+>         ORGANIZATION IS LINE SEQUENTIAL.
+> DATA DIVISION.
+> FILE SECTION.
+> FD INFILE.
+> 01 IN-REC PIC X(200).
+> FD OUTFILE.
+> 01 OUT-REC PIC X(200).
+> WORKING-STORAGE SECTION.
+> 01 WS-EOF        PIC X VALUE 'N'.
+> 01 WS-DELIM      PIC X VALUE ';'.
+> 01 WS-ID         PIC X(10).
+> 01 WS-NAME       PIC X(30).
+> 01 WS-LOAN-AMT   PIC 9(10)V99.
+> 01 WS-PROP-VALUE PIC 9(10)V99.
+> 01 WS-DOWN-PAY   PIC 9(10)V99.
+> 01 WS-TERM       PIC 9(2) COMP.
+> 01 WS-RATE       PIC 9(3)V99.
+> 01 WS-MIN-DOWN   PIC 9(10)V99.
+> 01 WS-MONTHLY-RATE PIC S9(4)V9(6).
+> 01 WS-MONTHLY-PMT PIC 9(8)V99.
+> 01 WS-INTEREST   PIC 9(8)V99.
+> 01 WS-PRINCIPAL  PIC 9(8)V99.
+> 01 WS-REMAIN-BAL PIC 9(10)V99.
+> 01 WS-MON-NUM    PIC 9(3).
+> 01 WS-REASON     PIC X(50) VALUE
+>    'INSUFFICIENT FUNDS FOR DOWN PAYMENT'.
+> PROCEDURE DIVISION.
+> MAIN-LOGIC.
+>     OPEN INPUT INFILE
+>     OPEN OUTPUT OUTFILE
+>     PERFORM UNTIL WS-EOF = 'Y'
+>         READ INFILE AT END
+>             MOVE 'Y' TO WS-EOF
+>         NOT AT END
+>             PERFORM SPLIT-RECORD
+>             PERFORM PROCESS-APP
+>         END-READ
+>     END-PERFORM
+>     CLOSE INFILE
+>     CLOSE OUTFILE
+>     STOP RUN.
+> SPLIT-RECORD.
+>     UNSTRING IN-REC DELIMITED BY WS-DELIM
+>         INTO WS-ID, WS-NAME, WS-LOAN-AMT,
+>              WS-PROP-VALUE, WS-DOWN-PAY,
+>              WS-TERM, WS-RATE.
+> PROCESS-APP.
+>     COMPUTE WS-MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED
+>     IF WS-DOWN-PAY < WS-MIN-DOWN
+>         MOVE WS-ID TO OUT-REC(1:10)
+>         STRING 'DENY ' WS-REASON DELIMITED BY SIZE
+>             INTO OUT-REC(11:)
+>         WRITE OUTFILE FROM OUT-REC
+>     ELSE
+>         MOVE WS-ID TO OUT-REC(1:10)
+>         STRING 'APPRO' DELIMITED BY SIZE
+>             INTO OUT-REC(11:)
+>         WRITE OUTFILE FROM OUT-REC
+>         PERFORM CALCULATE-PAYMENT
+>     END-IF.
+> CALCULATE-PAYMENT.
+>     COMPUTE WS-MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+>     COMPUTE WS-MONTHLY-PMT =
+>         WS-LOAN-AMT * WS-MONTHLY-RATE /
+>         (1 - (1 + WS-MONTHLY-RATE) ** (-WS-TERM))
+>         ROUNDED
+>     MOVE WS-LOAN-AMT TO WS-REMAIN-BAL
+>     PERFORM VARYING WS-MON-NUM FROM 1 BY 1
+>         UNTIL WS-MON-NUM > WS-TERM
+>         COMPUTE WS-INTEREST = WS-REMAIN-BAL * WS-MONTHLY-RATE ROUNDED
+>         COMPUTE WS-PRINCIPAL = WS-MONTHLY-PMT - WS-INTEREST ROUNDED
+>         SUBTRACT WS-PRINCIPAL FROM WS-REMAIN-BAL
+>         MOVE WS-MON-NUM TO OUT-REC(1:3)
+>         STRING
+>           FUNCTION NUMVAL-C (WS-MONTHLY-PMT) DELIMITED BY SIZE
+>           ' ' FUNCTION NUMVAL-C (WS-INTEREST) DELIMITED BY SIZE
+>           ' ' FUNCTION NUMVAL-C (WS-PRINCIPAL) DELIMITED BY SIZE
+>           ' ' FUNCTION NUMVAL-C (WS-REMAIN-BAL) DELIMITED BY SIZE
+>           INTO OUT-REC(4:)
+>         WRITE OUTFILE FROM OUT-REC
+>     END-PERFORM.
+> EOF
+root@fd18caf110c5:/app# cobc -x -o /app/src/program /app/src/program.cbl
+/app/src/program.cbl:1: error: invalid indicator 'F' at column 7
+/app/src/program.cbl:2: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:3: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:4: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:5: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:6: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:8: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:10: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:11: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:12: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:13: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:14: error: invalid indicator 'F' at column 7
+/app/src/program.cbl:15: warning: continuation of COBOL words used [-Wdialect]
+/app/src/program.cbl:16: error: invalid indicator 'G' at column 7
+/app/src/program.cbl:17: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:19: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:20: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:21: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:22: error: invalid indicator 'P' at column 7
+/app/src/program.cbl:24: error: invalid indicator 'T' at column 7
+/app/src/program.cbl:25: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:26: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:27: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:28: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:29: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:30: error: invalid indicator 'P' at column 7
+/app/src/program.cbl:31: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:32: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:33: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:34: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:35: error: invalid indicator 'U' at column 7
+/app/src/program.cbl:36: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:37: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:38: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:39: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:47: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:48: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:49: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:50: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:51: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:55: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:56: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:62: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:69: error: invalid indicator 'A' at column 7
+/app/src/program.cbl:70: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:71: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:75: error: invalid indicator 'V' at column 7
+/app/src/program.cbl:76: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:7: error: PROGRAM-ID header missing
+/app/src/program.cbl:7: error: PROCEDURE DIVISION header missing
+/app/src/program.cbl:7: error: syntax error, unexpected ORGANIZATION
+/app/src/program.cbl:9: error: syntax error, unexpected ORGANIZATION
+/app/src/program.cbl:9: error: unknown statement 'REC'
+/app/src/program.cbl:40: error: 'INFILE' is not defined
+/app/src/program.cbl:40: error: 'INFILE' is not a file name
+/app/src/program.cbl:41: error: 'WS-EOF' is not defined
+/app/src/program.cbl:52: error: syntax error, unexpected INTO
+/app/src/program.cbl:57: error: unknown statement 'WS-DOWN-PAY'
+/app/src/program.cbl:58: error: 'WS-ID' is not defined
+/app/src/program.cbl:58: error: 'OUT-REC' is not defined
+/app/src/program.cbl:59: error: 'WS-REASON' is not defined
+/app/src/program.cbl:61: error: 'OUTFILE' is not defined
+/app/src/program.cbl:72: error: 'WS-LOAN-AMT' is not defined
+/app/src/program.cbl:72: error: syntax error, unexpected *, expecting TIMES
+/app/src/program.cbl:78: error: 'WS-INTEREST' is not defined
+/app/src/program.cbl:78: error: 'WS-REMAIN-BAL' is not defined
+/app/src/program.cbl:78: error: 'WS-MONTHLY-RATE' is not defined
+/app/src/program.cbl:78: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:79: error: 'WS-PRINCIPAL' is not defined
+/app/src/program.cbl:79: error: 'WS-MONTHLY-PMT' is not defined
+/app/src/program.cbl:79: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:81: error: 'WS-MON-NUM' is not defined
+/app/src/program.cbl:90: error: syntax error, unexpected end of file
+root@fd18caf110c5:/app#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

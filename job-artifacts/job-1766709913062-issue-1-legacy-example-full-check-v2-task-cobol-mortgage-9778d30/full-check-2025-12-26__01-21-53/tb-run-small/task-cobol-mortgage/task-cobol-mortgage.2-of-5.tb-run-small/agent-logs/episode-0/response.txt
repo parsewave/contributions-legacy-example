@@ -1,0 +1,23 @@
+{
+  "analysis": "We need to create a COBOL fixed‑format source file at /app/src/program.cbl that reads mortgage applications from /app/src/INPUT.DAT, validates down‑payment, computes an annuity payment schedule for approved loans, and writes results to /app/data/OUTPUT.DAT. After creating the source, we must compile it with GnuCOBOL (cobc) and run the resulting program. No further steps are required beyond confirming the program runs.",
+  "plan": "1. Write the COBOL program to /app/src/program.cbl using a heredoc, ensuring each line is ≤80 characters and no \"SOURCE FORMAT IS FIXED\" line is included. 2. Compile the program with cobc in executable mode. 3. Execute the compiled program. 4. (Optional) Display a few lines of the output file to verify it was created.",
+  "commands": [
+    {
+      "keystrokes": "cat > /app/src/program.cbl <<'EOF'\nIDENTIFICATION DIVISION.\nPROGRAM-ID. PROGRAM.\nENVIRONMENT DIVISION.\nINPUT-OUTPUT SECTION.\nFILE-CONTROL.\n    SELECT IN-FILE ASSIGN TO \"/app/src/INPUT.DAT\"\n        ORGANIZATION IS LINE SEQUENTIAL.\n    SELECT OUT-FILE ASSIGN TO \"/app/data/OUTPUT.DAT\"\n        ORGANIZATION IS LINE SEQUENTIAL.\nDATA DIVISION.\nFILE SECTION.\nFD IN-FILE.\n01 IN-REC.\n   05 IN-LINE PIC X(200).\nFD OUT-FILE.\n01 OUT-REC PIC X(200).\nWORKING-STORAGE SECTION.\n01 WS-EOF PIC X VALUE \"N\".\n   88 EOF VALUE \"Y\".\n   88 NOT-EOF VALUE \"N\".\n01 WS-FIELDS.\n   05 WS-ID PIC X(10).\n   05 WS-NAME PIC X(30).\n   05 WS-LOAN-AMOUNT PIC 9(10)V99.\n   05 WS-PROP-VALUE PIC 9(10)V99.\n   05 WS-DOWN-PAYMENT PIC 9(10)V99.\n   05 WS-TERM PIC 9(2).\n   05 WS-RATE PIC 9(3)V99.\n01 WS-MIN-DOWN PIC 9(10)V99.\n01 WS-MONTHLY-RATE PIC 9(5)V9999.\n01 WS-MONTHLY-PAYMENT PIC 9(10)V99.\n01 WS-REMAIN-BAL PIC 9(12)V99.\n01 WS-INTEREST PIC 9(10)V99.\n01 WS-PRINCIPAL PIC 9(10)V99.\n01 WS-MONTH-NUM PIC 9(3) VALUE ZEROS.\n01 WS-REASON PIC X(50).\nPROCEDURE DIVISION.\nMAIN-PARA.\n    OPEN INPUT IN-FILE\n    OPEN OUTPUT OUT-FILE\n    PERFORM UNTIL EOF\n        READ IN-FILE INTO IN-LINE\n            AT END SET EOF TO TRUE\n        NOT AT END\n            PERFORM PROCESS-RECORD\n        END-READ\n    END-PERFORM\n    CLOSE IN-FILE OUT-FILE\n    STOP RUN.\nPROCESS-RECORD.\n    UNSTRING IN-LINE DELIMITED BY ';'\n        INTO WS-ID\n             WS-NAME\n             WS-LOAN-AMOUNT\n             WS-PROP-VALUE\n             WS-DOWN-PAYMENT\n             WS-TERM\n             WS-RATE\n    END-UNSTRING\n    COMPUTE WS-MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED\n    IF WS-DOWN-PAYMENT < WS-MIN-DOWN\n        MOVE \"INSUFFICIENT FUNDS FOR DOWN PAYMENT\" TO WS-REASON\n        STRING WS-ID DELIMITED BY SIZE\n               \"DENY \" DELIMITED BY SIZE\n               WS-REASON DELIMITED BY SIZE\n               INTO OUT-REC\n        END-STRING\n        WRITE OUT-REC\n    ELSE\n        STRING WS-ID DELIMITED BY SIZE\n               \"APPRO\" DELIMITED BY SIZE\n               INTO OUT-REC\n        END-STRING\n        WRITE OUT-REC\n        PERFORM CALCULATE-PAYMENT-SCHEDULE\n    END-IF.\nCALCULATE-PAYMENT-SCHEDULE.\n    COMPUTE WS-MONTHLY-RATE = WS-RATE / 1200 ROUNDED\n    COMPUTE WS-MONTHLY-PAYMENT = WS-LOAN-AMOUNT * WS-MONTHLY-RATE /\n          (1 - (1 + WS-MONTHLY-RATE) ** (- WS-TERM)) ROUNDED\n    MOVE WS-LOAN-AMOUNT TO WS-REMAIN-BAL\n    PERFORM VARYING WS-MONTH-NUM FROM 1 BY 1\n        UNTIL WS-MONTH-NUM > WS-TERM\n        COMPUTE WS-INTEREST = WS-REMAIN-BAL * WS-MONTHLY-RATE ROUNDED\n        COMPUTE WS-PRINCIPAL = WS-MONTHLY-PAYMENT - WS-INTEREST ROUNDED\n        SUBTRACT WS-PRINCIPAL FROM WS-REMAIN-BAL\n        STRING WS-MONTH-NUM DELIMITED BY SIZE\n               \" \" DELIMITED BY SIZE\n               WS-MONTHLY-PAYMENT DELIMITED BY SIZE\n               \" \" DELIMITED BY SIZE\n               WS-INTEREST DELIMITED BY SIZE\n               \" \" DELIMITED BY SIZE\n               WS-PRINCIPAL DELIMITED BY SIZE\n               \" \" DELIMITED BY SIZE\n               WS-REMAIN-BAL DELIMITED BY SIZE\n               INTO OUT-REC\n        END-STRING\n        WRITE OUT-REC\n    END-PERFORM.\nEOF\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "cobc -x -o /app/src/program /app/src/program.cbl\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "/app/src/program\n",
+      "duration": 3.0
+    },
+    {
+      "keystrokes": "head -n 20 /app/data/OUTPUT.DAT\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": true
+}

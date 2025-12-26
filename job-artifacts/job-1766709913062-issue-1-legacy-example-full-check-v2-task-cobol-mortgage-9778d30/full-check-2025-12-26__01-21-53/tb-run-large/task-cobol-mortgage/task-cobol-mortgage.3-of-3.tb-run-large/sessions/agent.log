@@ -1,0 +1,1900 @@
+[?2004hroot@f2dfd4d3de5d:/app# asciinema rec --stdin /logs/agent.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@f2dfd4d3de5d:/app# clear
+[?2004l[H[J[3J[?2004hroot@f2dfd4d3de5d:/app# ls -la /app/src /app/data
+[?2004l/app/data:
+total 12
+drwxr-xr-x 2 root root 4096 Dec 26 01:21 .
+drwxr-xr-x 4 root root 4096 Dec 26 01:24 ..
+-rw-r--r-- 1 root root    1 Dec 26 01:21 OUTPUT.DAT
+
+/app/src:
+total 12
+drwxr-xr-x 2 root root 4096 Dec 26 01:21 .
+drwxr-xr-x 4 root root 4096 Dec 26 01:24 ..
+-rw-r--r-- 1 root root  167 Dec 26 01:21 INPUT.DAT
+[?2004hroot@f2dfd4d3de5d:/app# sed -n '1,5p' /app/src/INPUT.DAT
+[?2004lAPP0000001;Williams David Robert         ;2000000000;3500000000;0500000000;20;00550
+APP0000002;John Smith Clark              ;0000005000;0000004000;0000003500;01;00550[?2004hroot@f2dfd4d3de5d:/app# cat > /app/src/program.cbl <<'EOF'
+[?2004l[?2004h>        IDENTIFICATION DIVISION.
+[?2004l[?2004h>        PROGRAM-ID. PROGRAM.
+[?2004l       EXIT PARAGRAPH
+           END-IF
+
+           COMPUTE MONTHLY-RATE ROUNDED = RATE-ANN / [?2004h> 
+[?2004l1[?2004h>        ENVIRONMENT DIVISION.
+[?2004l[?2004h>        INPUT-OUTPUT SECTION.
+[?2004l[?2004h>        FILE-CONTROL.
+[?2004l[?2004h>            SELECT INFILE ASSIGN TO "INPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>            SELECT OUTFILE ASSIGN TO "../data/OUTPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> 
+[?2004l[?2004h>        DATA DIVISION.
+[?2004l[?2004h>        FILE SECTION.
+[?2004l[?2004h>        FD  INFILE.
+[?2004l [?2004h>        01  IN-REC               PIC X(256).
+[?2004l[?2004h> 
+[?2004l[?2004h>        FD  OUTFILE.
+[?2004l[?2004h>        01  OUT-REC              PIC X(256).
+[?2004l-IF[?2004h> 
+[?2004l
+[?2004h>        WORKING-STORAGE SECTION.
+[?2004l[?2004h>        01  WS-EOF               PIC X VALUE 'N'.
+[?2004l[?2004h> 
+[?2004lM[?2004h>        01  WS-FIELDS.
+[?2004lU[?2004h>            05  WS-ID            PIC X(10).
+[?2004l[?2004h>            05  WS-NAME          PIC X(30).
+[?2004l[?2004h>            05  WS-LOAN-X        PIC X(20).
+[?2004lRM[?2004h>            05  WS-PROP-X        PIC X(20).
+[?2004l[?2004h>            05  WS-DOWN-X        PIC X(20).
+[?2004lH[?2004h>            05  WS-TERM-X        PIC X(10).
+[?2004lT[?2004h>            05  WS-RATE-X        PIC X(20).
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-NUMS.
+[?2004l CO[?2004h>            05  LOAN-AMT         PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  PROP-VALUE       PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  DOWN-PAY         PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  TERM-MONTHS      PIC 9(4)     VALUE 0.
+[?2004l  [?2004h>            05  RATE-ANN         PIC 9(3)V9(2) VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-CALC.
+[?2004l[?2004h>            05  MIN-DOWN         PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  MONTHLY-RATE     PIC 9V9(8)   VALUE 0.
+[?2004l[?2004h>            05  BASE             PIC 9V9(8)   VALUE 0.
+[?2004l[?2004h>            05  POWVAL           PIC 9V9(12)  VALUE 0.
+[?2004l[?2004h>            05  DENOM            PIC S9V9(12) VALUE 0.
+[?2004l   [?2004h>            05  MONTHLY-PAY      PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  BALANCE          PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  INTEREST-PART    PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  PRINC-PART       PIC 9(10)V99 VALUE 0.
+[?2004l O[?2004h>            05  REMAIN           PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-OUT-EDIT.
+[?2004l[?2004h>            05  ED-MONTH         PIC 9(3).
+[?2004l[?2004h>            05  ED-PAY           PIC 9(8).99.
+[?2004l[?2004h>            05  ED-INT           PIC 9(8).99.
+[?2004l[?2004h>            05  ED-PRN           PIC 9(8).99.
+[?2004l[?2004h>            05  ED-REM           PIC 9(10).99.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-REASON            PIC X(50).
+[?2004l[?2004h>        01  I                    PIC 9(4) VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCEDURE DIVISION.
+[?2004l[?2004h>        MAIN.
+[?2004l[?2004h>            OPEN INPUT INFILE
+[?2004l[?2004h>            OPEN OUTPUT OUTFILE
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM UNTIL WS-EOF = 'Y'
+[?2004l[?2004h>                READ INFILE
+[?2004l[?2004h>                    AT END
+[?2004l[?2004h>                        MOVE 'Y' TO WS-EOF
+[?2004l[?2004h>                    NOT AT END
+[?2004l[?2004h>                        PERFORM PROCESS-ONE
+[?2004l[?2004h>                END-READ
+[?2004l[?2004h>            END-PERFORM
+[?2004l[?2004h> 
+[?2004l[?2004h>            CLOSE INFILE
+[?2004l[?2004h>            CLOSE OUTFILE
+[?2004l[?2004h>            STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCESS-ONE.
+[?2004l[?2004h>            PERFORM PARSE-INPUT
+[?2004l[?2004h>            PERFORM CHECK-APPLICATION.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PARSE-INPUT.
+[?2004l[?2004h>            MOVE SPACES TO WS-FIELDS
+[?2004l[?2004h>            UNSTRING IN-REC DELIMITED BY ';'
+[?2004l[?2004h>                INTO WS-ID WS-NAME WS-LOAN-X WS-PROP-X WS-DOWN-X
+[?2004l[?2004h>                     WS-TERM-X WS-RATE-X
+[?2004l[?2004h>            END-UNSTRING
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE LOAN-AMT ROUNDED = FUNCTION NUMVAL(WS-LOAN-X)
+[?2004l[?2004h>            COMPUTE PROP-VALUE ROUNDED = FUNCTION NUMVAL(WS-PROP-X)
+[?2004l[?2004h>            COMPUTE DOWN-PAY ROUNDED = FUNCTION NUMVAL(WS-DOWN-X)
+[?2004l[?2004h>            COMPUTE TERM-MONTHS = FUNCTION NUMVAL(WS-TERM-X)
+[?2004l[?2004h>            COMPUTE RATE-ANN ROUNDED = FUNCTION NUMVAL(WS-RATE-X).
+[?2004l[?2004h> 
+[?2004l[?2004h>        CHECK-APPLICATION.
+[?2004l[?2004h>            COMPUTE MIN-DOWN ROUNDED = PROP-VALUE * 0.15
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF DOWN-PAY < MIN-DOWN
+[?2004l[?2004h>                MOVE "INSUFFICIENT FUNDS FOR DOWN PAYMENT" TO WS-REASON
+[?2004l[?2004h>                PERFORM WRITE-DENY
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                PERFORM WRITE-APPRO
+[?2004l[?2004h>                PERFORM BUILD-SCHEDULE
+[?2004l[?2004h>            END-IF.
+[?2004l[?2004h> 
+[?2004l[?2004h>        WRITE-DENY.
+[?2004l[?2004h>            MOVE SPACES TO OUT-REC
+[?2004l[?2004h>            STRING WS-ID DELIMITED BY SIZE
+[?2004l[?2004h>                   "DENY " DELIMITED BY SIZE
+[?2004l[?2004h>                   WS-REASON DELIMITED BY SIZE
+[?2004l[?2004h>                   INTO OUT-REC
+[?2004l[?2004h>            END-STRING
+[?2004l[?2004h>            WRITE OUT-REC.
+[?2004l[?2004h> 
+[?2004l[?2004h>        WRITE-APPRO.
+[?2004l[?2004h>            MOVE SPACES TO OUT-REC
+[?2004l[?2004h>            STRING WS-ID DELIMITED BY SIZE
+[?2004l[?2004h>                   "APPRO" DELIMITED BY SIZE
+[?2004l[?2004h>                   INTO OUT-REC
+[?2004l[?2004h>            END-STRING
+[?2004l[?2004h>            WRITE OUT-REC.
+[?2004l[?2004h> 
+[?2004l[?2004h>        BUILD-SCHEDULE.
+[?2004l[?2004h>            IF TERM-MONTHS <= 0
+[?2004l[?2004h>                EXIT PARAGRAPH
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE MONTHLY-RATE ROUNDED = RATE-ANN / 1200
+[?2004l[?2004h>            MOVE LOAN-AMT TO BALANCE
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF MONTHLY-RATE = 0
+[?2004l[?2004h>                COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE
+[?2004l[?2004h>                COMPUTE POWVAL ROUNDED = FUNCTION POWER(BASE, -TERM-MONTHS)
+[?2004l[?2004h>                COMPUTE DENOM ROUNDED = 1 - POWVAL
+[?2004l[?2004h>                COMPUTE MONTHLY-PAY ROUNDED =
+[?2004l[?2004h>                    (LOAN-AMT * MONTHLY-RATE) / DENOM
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS
+[?2004l[?2004h>                COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE
+[?2004l[?2004h>                COMPUTE PRINC-PART ROUNDED = MONTHLY-PAY - INTEREST-PART
+[?2004l[?2004h> 
+[?2004l[?2004h>                IF I = TERM-MONTHS
+[?2004l[?2004h>                    MOVE BALANCE TO PRINC-PART
+[?2004l[?2004h>                    COMPUTE MONTHLY-PAY ROUNDED =
+[?2004l[?2004h>                        INTEREST-PART + PRINC-PART
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>                COMPUTE REMAIN ROUNDED = BALANCE - PRINC-PART
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE I TO ED-MONTH
+[?2004l[?2004h>                MOVE MONTHLY-PAY TO ED-PAY
+[?2004l[?2004h>                MOVE INTEREST-PART TO ED-INT
+[?2004l[?2004h>                MOVE PRINC-PART TO ED-PRN
+[?2004l[?2004h>                MOVE REMAIN TO ED-REM
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE SPACES TO OUT-REC
+[?2004l[?2004h>                STRING ED-MONTH DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-PAY DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-INT DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-PRN DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-REM DELIMITED BY SIZE
+[?2004l[?2004h>                       INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE REMAIN TO BALANCE
+[?2004l[?2004h>            END-PERFORM.
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@f2dfd4d3de5d:/app# cd /app/src
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol program.cbl
+[?2004lconfiguration error:
+gnucobol.conf: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# ./program
+[?2004lbash: ./program: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# ls -la /app/data/OUTPUT.DAT
+[?2004l-rw-r--r-- 1 root root 1 Dec 26 01:21 /app/data/OUTPUT.DAT
+[?2004hroot@f2dfd4d3de5d:/app/src# sed -n '1,40p' /app/data/OUTPUT.DAT
+[?2004l
+[?2004hroot@f2dfd4d3de5d:/app/src# cd /app/src
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# nl -ba program.cbl | sed -n '1,80p'
+[?2004l     1	       IDENTIFICATION DIVISION.
+     2	       PROGRAM-ID. PROGRAM.
+     3	
+     4	       ENVIRONMENT DIVISION.
+     5	       INPUT-OUTPUT SECTION.
+     6	       FILE-CONTROL.
+     7	           SELECT INFILE ASSIGN TO "INPUT.DAT"
+     8	               ORGANIZATION IS LINE SEQUENTIAL.
+     9	           SELECT OUTFILE ASSIGN TO "../data/OUTPUT.DAT"
+    10	               ORGANIZATION IS LINE SEQUENTIAL.
+    11	
+    12	       DATA DIVISION.
+    13	       FILE SECTION.
+    14	       FD  INFILE.
+    15	       01  IN-REC               PIC X(256).
+    16	
+    17	       FD  OUTFILE.
+    18	       01  OUT-REC              PIC X(256).
+    19	
+    20	       WORKING-STORAGE SECTION.
+    21	       01  WS-EOF               PIC X VALUE 'N'.
+    22	
+    23	       01  WS-FIELDS.
+    24	           05  WS-ID            PIC X(10).
+    25	           05  WS-NAME          PIC X(30).
+    26	           05  WS-LOAN-X        PIC X(20).
+    27	           05  WS-PROP-X        PIC X(20).
+    28	           05  WS-DOWN-X        PIC X(20).
+    29	           05  WS-TERM-X        PIC X(10).
+    30	           05  WS-RATE-X        PIC X(20).
+    31	
+    32	       01  WS-NUMS.
+    33	           05  LOAN-AMT         PIC 9(10)V99 VALUE 0.
+    34	           05  PROP-VALUE       PIC 9(10)V99 VALUE 0.
+    35	           05  DOWN-PAY         PIC 9(10)V99 VALUE 0.
+    36	           05  TERM-MONTHS      PIC 9(4)     VALUE 0.
+    37	           05  RATE-ANN         PIC 9(3)V9(2) VALUE 0.
+    38	
+    39	       01  WS-CALC.
+    40	           05  MIN-DOWN         PIC 9(10)V99 VALUE 0.
+    41	           05  MONTHLY-RATE     PIC 9V9(8)   VALUE 0.
+    42	           05  BASE             PIC 9V9(8)   VALUE 0.
+    43	           05  POWVAL           PIC 9V9(12)  VALUE 0.
+    44	           05  DENOM            PIC S9V9(12) VALUE 0.
+    45	           05  MONTHLY-PAY      PIC 9(10)V99 VALUE 0.
+    46	           05  BALANCE          PIC 9(10)V99 VALUE 0.
+    47	           05  INTEREST-PART    PIC 9(10)V99 VALUE 0.
+    48	           05  PRINC-PART       PIC 9(10)V99 VALUE 0.
+    49	           05  REMAIN           PIC 9(10)V99 VALUE 0.
+    50	
+    51	       01  WS-OUT-EDIT.
+    52	           05  ED-MONTH         PIC 9(3).
+    53	           05  ED-PAY           PIC 9(8).99.
+    54	           05  ED-INT           PIC 9(8).99.
+    55	           05  ED-PRN           PIC 9(8).99.
+    56	           05  ED-REM           PIC 9(10).99.
+    57	
+    58	       01  WS-REASON            PIC X(50).
+    59	       01  I                    PIC 9(4) VALUE 0.
+    60	
+    61	       PROCEDURE DIVISION.
+    62	       MAIN.
+    63	           OPEN INPUT INFILE
+    64	           OPEN OUTPUT OUTFILE
+    65	
+    66	           PERFORM UNTIL WS-EOF = 'Y'
+    67	               READ INFILE
+    68	                   AT END
+    69	                       MOVE 'Y' TO WS-EOF
+    70	                   NOT AT END
+    71	                       PERFORM PROCESS-ONE
+    72	               END-READ
+    73	           END-PERFORM
+    74	
+    75	           CLOSE INFILE
+    76	           CLOSE OUTFILE
+    77	           STOP RUN.
+    78	
+    79	       PROCESS-ONE.
+    80	           PERFORM PARSE-INPUT
+[?2004hroot@f2dfd4d3de5d:/app/src# which cobc
+[?2004l/usr/bin/cobc
+[?2004hroot@f2dfd4d3de5d:/app/src# cobc -V || true
+[?2004lcobc (GnuCOBOL) 3.1.2.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch, Edward Hart
+Built     Sep 19 2022 04:27:09
+Packaged  Dec 23 2020 12:04:58 UTC
+C version "12.2.0"
+[?2004hroot@f2dfd4d3de5d:/app/src# env | grep -E '^COB' || true
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# find / -maxdepth 5 -type f -name 'gnucobol.conf' 2>/dev/null | head
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# COB_CONFIG_FILE=/dev/null cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,120p'
+[?2004lconfiguration error:
+gnucobol.conf: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# cat > /app/src/program.cbl <<'EOF'
+[?2004l[?2004h>        IDENTIFICATION DIVISION.
+[?2004l[?2004h>        PROGRAM-ID. PROGRAM.
+[?2004l [?2004h> 
+[?2004l[?2004h>        ENVIRONMENT DIVISION.
+[?2004l[?2004h>        INPUT-OUTPUT SECTION.
+[?2004l[?2004h>        FILE-CONTROL.
+[?2004l[?2004h>            SELECT INFILE ASSIGN TO "INPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004lD-[?2004h>            SELECT OUTFILE ASSIGN TO "../data/OUTPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> 
+[?2004lU[?2004h>        DATA DIVISION.
+[?2004l[?2004h>        FILE SECTION.
+[?2004l[?2004h>        FD  INFILE.
+[?2004l[?2004h>        01  IN-REC                   PIC X(256).
+[?2004l[?2004h> 
+[?2004l[?2004h>        FD  OUTFILE.
+[?2004l[?2004h>        01  OUT-REC                  PIC X(256).
+[?2004l[?2004h> 
+[?2004l[?2004h>        WORKING-STORAGE SECTION.
+[?2004lOM[?2004h>        01  WS-EOF                   PIC X VALUE 'N'.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-FIELDS.
+[?2004lED =[?2004h>            05  WS-ID                PIC X(10).
+[?2004l [?2004h>            05  WS-NAME              PIC X(30).
+[?2004l[?2004h>            05  WS-LOAN-X            PIC X(20).
+[?2004l[?2004h>            05  WS-PROP-X            PIC X(20).
+[?2004l[?2004h>            05  WS-DOWN-X            PIC X(20).
+[?2004l[?2004h>            05  WS-TERM-X            PIC X(10).
+[?2004l[?2004h>            05  WS-RATE-X            PIC X(20).
+[?2004lNTHL[?2004h> 
+[?2004l[?2004h>        01  WS-NUMS.
+[?2004l[?2004h>            05  LOAN-AMT             PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  PROP-VALUE           PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  DOWN-PAY             PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  TERM-YEARS           PIC 9(2)     VALUE 0.
+[?2004l[?2004h>            05  TERM-MONTHS          PIC 9(4)     VALUE 0.
+[?2004l[?2004h>            05  RATE-ANN             PIC 9(3)V9(2) VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-CALC.
+[?2004l[?2004h>            05  MIN-DOWN             PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  MONTHLY-RATE         PIC 9V9(8)   VALUE 0.
+[?2004l
+  [?2004h>            05  BASE                 PIC 9V9(8)   VALUE 0.
+[?2004lSP[?2004h>            05  POWVAL               PIC 9V9(12)  VALUE 0.
+[?2004l[?2004h>            05  DENOM                PIC S9V9(12) VALUE 0.
+[?2004l[?2004h>            05  MONTHLY-PAY          PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  BALANCE              PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  INTEREST-PART        PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  PRINC-PART           PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  REMAIN               PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h> 
+[?2004l-[?2004h>        01  WS-OUT-EDIT.
+[?2004l[?2004h>            05  ED-MONTH             PIC 0(3).
+[?2004l[?2004h>            05  ED-PAY               PIC 0(8).00.
+[?2004l[?2004h>            05  ED-INT               PIC 0(8).00.
+[?2004l[?2004h>            05  ED-PRN               PIC 0(8).00.
+[?2004l[?2004h>            05  ED-REM               PIC 0(10).00.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-REASON                PIC X(50).
+[?2004l[?2004h>        01  I                        PIC 9(4) VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCEDURE DIVISION.
+[?2004l[?2004h>        MAIN.
+[?2004l[?2004h>            OPEN INPUT INFILE
+[?2004l[?2004h>            OPEN OUTPUT OUTFILE
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM UNTIL WS-EOF = 'Y'
+[?2004l[?2004h>                READ INFILE
+[?2004l[?2004h>                    AT END
+[?2004l[?2004h>                        MOVE 'Y' TO WS-EOF
+[?2004l[?2004h>                    NOT AT END
+[?2004l[?2004h>                        PERFORM PROCESS-ONE
+[?2004l[?2004h>                END-READ
+[?2004l[?2004h>            END-PERFORM
+[?2004l[?2004h> 
+[?2004l[?2004h>            CLOSE INFILE
+[?2004l[?2004h>            CLOSE OUTFILE
+[?2004l[?2004h>            STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCESS-ONE.
+[?2004l[?2004h>            PERFORM PARSE-INPUT
+[?2004l[?2004h>            PERFORM CHECK-APPLICATION.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PARSE-INPUT.
+[?2004l[?2004h>            MOVE SPACES TO WS-FIELDS
+[?2004l[?2004h>            UNSTRING IN-REC DELIMITED BY ';'
+[?2004l[?2004h>                INTO WS-ID WS-NAME WS-LOAN-X WS-PROP-X WS-DOWN-X
+[?2004l[?2004h>                     WS-TERM-X WS-RATE-X
+[?2004l[?2004h>            END-UNSTRING
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE LOAN-AMT ROUNDED =
+[?2004l[?2004h>                FUNCTION NUMVAL(WS-LOAN-X) / 100
+[?2004l[?2004h>            COMPUTE PROP-VALUE ROUNDED =
+[?2004l[?2004h>                FUNCTION NUMVAL(WS-PROP-X) / 100
+[?2004l[?2004h>            COMPUTE DOWN-PAY ROUNDED =
+[?2004l[?2004h>                FUNCTION NUMVAL(WS-DOWN-X) / 100
+[?2004l[?2004h>            COMPUTE TERM-YEARS = FUNCTION NUMVAL(WS-TERM-X)
+[?2004l[?2004h>            COMPUTE TERM-MONTHS = TERM-YEARS * 12
+[?2004l[?2004h>            COMPUTE RATE-ANN ROUNDED =
+[?2004l[?2004h>                FUNCTION NUMVAL(WS-RATE-X) / 100.
+[?2004l[?2004h> 
+[?2004l[?2004h>        CHECK-APPLICATION.
+[?2004l[?2004h>            COMPUTE MIN-DOWN ROUNDED = PROP-VALUE * 0.15
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF DOWN-PAY < MIN-DOWN
+[?2004l[?2004h>                MOVE "INSUFFICIENT FUNDS FOR DOWN PAYMENT" TO WS-REASON
+[?2004l[?2004h>                PERFORM WRITE-DENY
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                PERFORM WRITE-APPRO
+[?2004l[?2004h>                PERFORM BUILD-SCHEDULE
+[?2004l[?2004h>            END-IF.
+[?2004l[?2004h> 
+[?2004l[?2004h>        WRITE-DENY.
+[?2004l[?2004h>            MOVE SPACES TO OUT-REC
+[?2004l[?2004h>            STRING WS-ID DELIMITED BY SIZE
+[?2004l[?2004h>                   "DENY " DELIMITED BY SIZE
+[?2004l[?2004h>                   WS-REASON DELIMITED BY SIZE
+[?2004l[?2004h>                   INTO OUT-REC
+[?2004l[?2004h>            END-STRING
+[?2004l[?2004h>            WRITE OUT-REC.
+[?2004l[?2004h> 
+[?2004l[?2004h>        WRITE-APPRO.
+[?2004l[?2004h>            MOVE SPACES TO OUT-REC
+[?2004l[?2004h>            STRING WS-ID DELIMITED BY SIZE
+[?2004l[?2004h>                   "APPRO" DELIMITED BY SIZE
+[?2004l[?2004h>                   INTO OUT-REC
+[?2004l[?2004h>            END-STRING
+[?2004l[?2004h>            WRITE OUT-REC.
+[?2004l[?2004h> 
+[?2004l[?2004h>        BUILD-SCHEDULE.
+[?2004l[?2004h>            IF TERM-MONTHS <= 0
+[?2004l[?2004h>                EXIT PARAGRAPH
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE MONTHLY-RATE ROUNDED = RATE-ANN / 1200
+[?2004l[?2004h>            MOVE LOAN-AMT TO BALANCE
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF MONTHLY-RATE = 0
+[?2004l[?2004h>                COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE
+[?2004l[?2004h>                COMPUTE POWVAL ROUNDED = FUNCTION POWER(BASE, -TERM-MONTHS)
+[?2004l[?2004h>                COMPUTE DENOM ROUNDED = 1 - POWVAL
+[?2004l[?2004h>                COMPUTE MONTHLY-PAY ROUNDED =
+[?2004l[?2004h>                    (LOAN-AMT * MONTHLY-RATE) / DENOM
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS
+[?2004l[?2004h>                COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE
+[?2004l[?2004h>                COMPUTE PRINC-PART ROUNDED = MONTHLY-PAY - INTEREST-PART
+[?2004l[?2004h> 
+[?2004l[?2004h>                IF I = TERM-MONTHS
+[?2004l[?2004h>                    MOVE BALANCE TO PRINC-PART
+[?2004l[?2004h>                    COMPUTE MONTHLY-PAY ROUNDED =
+[?2004l[?2004h>                        INTEREST-PART + PRINC-PART
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>                COMPUTE REMAIN ROUNDED = BALANCE - PRINC-PART
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE I TO ED-MONTH
+[?2004l[?2004h>                MOVE MONTHLY-PAY TO ED-PAY
+[?2004l[?2004h>                MOVE INTEREST-PART TO ED-INT
+[?2004l[?2004h>                MOVE PRINC-PART TO ED-PRN
+[?2004l[?2004h>                MOVE REMAIN TO ED-REM
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE SPACES TO OUT-REC
+[?2004l[?2004h>                STRING ED-MONTH DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-PAY DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-INT DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-PRN DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-REM DELIMITED BY SIZE
+[?2004l[?2004h>                       INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE REMAIN TO BALANCE
+[?2004l[?2004h>            END-PERFORM.
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# python3 - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> p=Path('/app/src/program.cbl')
+[?2004l[?2004h> mx=0
+[?2004l[?2004h> bad=[]
+[?2004l[?2004h> for i,line in enumerate(p.read_text().splitlines(),1):
+[?2004l[?2004h>     l=len(line)
+[?2004l[?2004h>     mx=max(mx,l)
+[?2004l[?2004h>     if l>80:
+[?2004l[?2004h>         bad.append((i,l,line))
+[?2004l[?2004h> print('max_len',mx)
+[?2004l[?2004h> print('over_80',len(bad))
+[?2004l[?2004h> for i,l,_ in bad[:10]:
+[?2004l[?2004h>     print('line',i,'len',l)
+[?2004l[?2004h> PY
+[?2004lmax_len 74
+over_80 0
+[?2004hroot@f2dfd4d3de5d:/app/src# rm -f /app/data/OUTPUT.DAT
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# COB_CONFIG_FILE=/dev/null cobc -x -std=gnucobol program.cbl
+[?2004lconfiguration error:
+gnucobol.conf: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# ./program
+[?2004lbash: ./program: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# sed -n '1,80p' /app/data/OUTPUT.DAT
+[?2004lsed: can't read /app/data/OUTPUT.DAT: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# cd /app/src
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# cobc --help | sed -n '1,120p'
+[?2004lGnuCOBOL compiler for most COBOL dialects with lots of extensions
+
+Usage: cobc [options]... file...
+
+Options:
+  -h, -help             display this help and exit
+  -V, -version          display compiler version and exit
+  -i, -info             display compiler information (build/environment)
+                        and exit
+  -v, -verbose          verbose mode, display additional information;
+                        multiple -v options increase the verbosity,
+                        the maximum is 3 as follows:
+                        (1) display compiler version and the commands
+                        invoked by the compiler,
+                        (2) pass verbose option to assembler/compiler
+                        (3) pass verbose option to linker
+  -q, -brief            reduced displays, commands invoked not shown
+  -###                  like -v but commands not executed
+  -x                    build an executable program
+  -m                    build a dynamically loadable module (default)
+  -j [<args>], -job[=<args>]	run program after build, passing <args>
+  -std=<dialect>        warnings/features for a specific dialect
+                        <dialect> can be one of:
+                        default, cobol2014, cobol2002, cobol85, xopen,
+                        ibm-strict, ibm, mvs-strict, mvs,
+                        mf-strict, mf, bs2000-strict, bs2000,
+                        acu-strict, acu, rm-strict, rm;
+                        see configuration files in directory config
+  -F, -free             use free source format
+  -fixed                use fixed source format (default)
+  -O, -O2, -O3, -Os     enable optimization
+  -O0                   disable optimization
+  -g                    enable C compiler debug and stack check
+  -d, -debug            enable all run-time error checking,
+                        equal to -fstack-check -fec=EC-ALL
+  -fec=<exception-name>	enable code generation for <exception-name>,
+                        sets -fsource-location
+  -fno-ec=<exception-name>	disable code generation for <exception-name>
+  -o <file>             place the output into <file>
+  -b                    combine all input files into a single
+                        dynamically loadable module
+  -E                    preprocess only; do not compile or link
+  -C                    translation only; convert COBOL to C
+  -S                    compile only; output assembly file
+  -c                    compile and assemble, but do not link
+  -T <file>             generate and place a wide program listing into <file>
+  -t <file>             generate and place a program listing into <file>
+  --tlines=<lines>      specify lines per page in listing, default = 55
+  -P[=<dir or file>]    generate preprocessed program listing (.lst)
+  -Xref                 generate cross reference through 'cobxref'
+                        (V. Coen's 'cobxref' must be in path)
+  -I <directory>        add <directory> to copy/include search path
+  -L <directory>        add <directory> to library search path
+  -l <lib>              link the library <lib>
+  -A <options>          add <options> to the C compile phase
+  -Q <options>          add <options> to the C link phase
+  -D <define>           define <define> for COBOL compilation
+  -K <entry>            generate CALL to <entry> as static
+  -conf=<file>          user-defined dialect configuration; see -std
+  -list-reserved        display reserved words
+  -list-intrinsics      display intrinsic functions
+  -list-mnemonics       display mnemonic names
+  -list-system          display system routines
+  -save-temps[=<dir>]   save intermediate files
+                        * default: current directory
+  -ext <extension>      add file extension for resolving COPY
+
+Warning options:
+  -Wall                 enable most warnings (all except as noted below)
+  -Wextra               like -Wall but enable some extra warning flags
+  -w                    disable all warnings
+  -Wno-<warning>        disable warning enabled by default, -Wall or -Wextra
+  -Wadditional          additional warnings only raised with -Wall
+  -Wno-unfinished       do not warn if unfinished features are used
+                        * ALWAYS active
+  -Wno-pending          do not warn if pending features are mentioned
+                        * ALWAYS active
+  -Wno-ignored-error    do not warn about errors in unreachable code parts and so normally ignored
+                        * ALWAYS active
+  -Wobsolete            warn if obsolete features are used
+  -Warchaic             warn if archaic features are used
+  -Wredefinition        warn about non-referenced ambiguous data items
+  -Wtruncate            warn about field truncation from constant assignments
+  -Wpossible-truncate   warn about possible field truncation
+                        * NOT set with -Wall
+  -Woverlap             warn about overlapping MOVE of items
+  -Wpossible-overlap    warn about MOVE of items that may overlap depending on variables
+                        * NOT set with -Wall
+  -Wparentheses         warn about lack of parentheses around AND within OR
+  -Wstrict-typing       warn strictly about type mismatch
+  -Wimplicit-define     warn about implicitly defined data items
+                        * NOT set with -Wall
+  -Wno-corresponding    do not warn about CORRESPONDING with no matching items
+                        * ALWAYS active
+  -Winitial-value       warn if initial VALUE clause is ignored
+  -Wprototypes          warn about missing FUNCTION prototypes/definitions
+  -Warithmetic-osvs     warn if arithmetic expression precision has changed
+  -Wcall-params         warn about non 01/77 items for CALL parameters
+                        * NOT set with -Wall
+  -Wconstant-expression  warn about expressions that always resolve to true/false
+  -Wcolumn-overflow     warn about text after program-text area, FIXED format
+                        * NOT set with -Wall
+  -Wterminator          warn about lack of scope terminator END-XXX
+                        * NOT set with -Wall
+  -Wlinkage             warn about dangling LINKAGE items
+                        * NOT set with -Wall
+  -Wunreachable         warn about likely unreachable statements
+                        * NOT set with -Wall
+  -Wno-dialect          do not warn about dialect specific issues
+                        * ALWAYS active
+  -Wdangling-text       warn source text after program-area
+                        * NOT set with -Wall
+  -Wno-others           do not warn about different issues
+                        * ALWAYS active
+  -Werror               treat all warnings as errors
+  -Wno-error            don't treat warnings as errors
+  -Werror=<warning>     treat specified <warning> as error
+  -Wno-error=<warning>  don't treat specified <warning> as error
+
+Compiler options:
+[?2004hroot@f2dfd4d3de5d:/app/src# find / -maxdepth 6 -type f \( -name '*cob*.conf' -o -name '*.conf' \) 2>/dev/null | head -n 50
+[?2004l/etc/xattr.conf
+/etc/ld.so.conf.d/x86_64-linux-gnu.conf
+/etc/ld.so.conf.d/libc.conf
+/etc/ld.so.conf
+/etc/deluser.conf
+/etc/host.conf
+/etc/adduser.conf
+/etc/selinux/semanage.conf
+/etc/pam.conf
+/etc/nsswitch.conf
+/etc/libaudit.conf
+/etc/ca-certificates.conf
+/etc/debconf.conf
+/etc/gnucobol/acu-strict.conf
+/etc/gnucobol/realia.conf
+/etc/gnucobol/bs2000.conf
+/etc/gnucobol/mf-strict.conf
+/etc/gnucobol/cobol85.conf
+/etc/gnucobol/mvs.conf
+/etc/gnucobol/cobol2014.conf
+/etc/gnucobol/mvs-strict.conf
+/etc/gnucobol/ibm.conf
+/etc/gnucobol/mf.conf
+/etc/gnucobol/realia-strict.conf
+/etc/gnucobol/rm-strict.conf
+/etc/gnucobol/xopen.conf
+/etc/gnucobol/acu.conf
+/etc/gnucobol/bs2000-strict.conf
+/etc/gnucobol/default.conf
+/etc/gnucobol/ibm-strict.conf
+/etc/gnucobol/rm.conf
+/etc/gnucobol/cobol2002.conf
+/etc/resolv.conf
+/etc/fonts/conf.avail/58-dejavu-lgc-sans.conf
+/etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-serif.conf
+/etc/fonts/conf.avail/58-dejavu-lgc-serif.conf
+/etc/fonts/conf.avail/20-unhint-small-dejavu-sans-mono.conf
+/etc/fonts/conf.avail/20-unhint-small-dejavu-serif.conf
+/etc/fonts/conf.avail/57-dejavu-serif.conf
+/etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-sans-mono.conf
+/etc/fonts/conf.avail/20-unhint-small-dejavu-sans.conf
+/etc/fonts/conf.avail/57-dejavu-sans.conf
+/etc/fonts/conf.avail/57-dejavu-sans-mono.conf
+/etc/fonts/conf.avail/58-dejavu-lgc-sans-mono.conf
+/etc/fonts/conf.avail/20-unhint-small-dejavu-lgc-sans.conf
+/etc/fonts/fonts.conf
+/etc/mke2fs.conf
+/etc/e2scrub.conf
+/etc/security/pam_env.conf
+/etc/security/limits.conf
+[?2004hroot@f2dfd4d3de5d:/app/src# strace -f -e openat cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,120p'
+[?2004lbash: strace: command not found
+[?2004hroot@f2dfd4d3de5d:/app/src# mkdir -p /app/src/conf
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# cat > /app/src/conf/gnucobol.conf <<'EOF'
+[?2004l[?2004h> # Minimal GnuCOBOL config for this sandbox.
+[?2004l[?2004h> # If cobc requires more settings, we will extend this after seeing errors.
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol -conf=/app/src/conf/gnucobol.conf program.cbl 2>&1 | sed -n '1,200p'
+[?2004lconfiguration error:
+gnucobol.conf: No such file or directory
+/app/src/conf/gnucobol.conf: missing definitions:
+	no definition of 'name'
+	no definition of 'reserved-words'
+	no definition of 'tab-width'
+	no definition of 'text-column'
+	no definition of 'pic-length'
+	no definition of 'word-length'
+	no definition of 'literal-length'
+	no definition of 'numeric-literal-length'
+	no definition of 'standard-define'
+	no definition of 'binary-size'
+	no definition of 'binary-byteorder'
+	no definition of 'assign-clause'
+	no definition of 'screen-section-rules'
+	no definition of 'dpc-in-data'
+	no definition of 'filename-mapping'
+	no definition of 'pretty-display'
+	no definition of 'binary-truncate'
+	no definition of 'complex-odo'
+	no definition of 'indirect-redefines'
+	no definition of 'larger-redefines-ok'
+	no definition of 'relax-syntax-checks'
+	no definition of 'ref-mod-zero-length'
+	no definition of 'relax-level-hierarchy'
+	no definition of 'select-working'
+	no definition of 'local-implies-recursive'
+	no definition of 'sticky-linkage'
+	no definition of 'move-ibm'
+	no definition of 'perform-osvs'
+	no definition of 'arithmetic-osvs'
+	no definition of 'constant-folding'
+	no definition of 'hostsign'
+	no definition of 'program-name-redefinition'
+	no definition of 'accept-update'
+	no definition of 'accept-auto'
+	no definition of 'console-is-crt'
+	no definition of 'no-echo-means-secure'
+	no definition of 'line-col-zero-default'
+	no definition of 'display-special-fig-consts'
+	no definition of 'binary-comp-1'
+	no definition of 'numeric-pointer'
+	no definition of 'move-non-numeric-lit-to-numeric-is-zero'
+	no definition of 'implicit-assign-dynamic-var'
+	no definition of 'comment-paragraphs'
+	no definition of 'memory-size-clause'
+	no definition of 'multiple-file-tape-clause'
+	no definition of 'label-records-clause'
+	no definition of 'value-of-clause'
+	no definition of 'data-records-clause'
+	no definition of 'top-level-occurs-clause'
+	no definition of 'same-as-clause'
+	no definition of 'type-to-clause'
+	no definition of 'usage-type'
+	no definition of 'synchronized-clause'
+	no definition of 'special-names-clause'
+	no definition of 'goto-statement-without-name'
+	no definition of 'stop-literal-statement'
+	no definition of 'stop-identifier-statement'
+	no definition of 'debugging-mode'
+	no definition of 'use-for-debugging'
+	no definition of 'padding-character-clause'
+	no definition of 'next-sentence-phrase'
+	no definition of 'listing-statements'
+	no definition of 'title-statement'
+	no definition of 'entry-statement'
+	no definition of 'move-noninteger-to-alphanumeric'
+	no definition of 'move-figurative-constant-to-numeric'
+	no definition of 'move-figurative-space-to-numeric'
+	no definition of 'move-figurative-quote-to-numeric'
+	no definition of 'odo-without-to'
+	no definition of 'section-segments'
+	no definition of 'alter-statement'
+	no definition of 'call-overflow'
+	no definition of 'numeric-boolean'
+	no definition of 'hexadecimal-boolean'
+	no definition of 'national-literals'
+	no definition of 'hexadecimal-national-literals'
+	no definition of 'national-character-literals'
+	no definition of 'hp-octal-literals'
+	no definition of 'acu-literals'
+	no definition of 'word-continuation'
+	no definition of 'not-exception-before-exception'
+	no definition of 'accept-display-extensions'
+	no definition of 'renames-uncommon-levels'
+	no definition of 'symbolic-constant'
+	no definition of 'constant-78'
+	no definition of 'constant-01'
+	no definition of 'perform-varying-without-by'
+	no definition of 'reference-out-of-declaratives'
+	no definition of 'program-prototypes'
+	no definition of 'call-convention-mnemonic'
+	no definition of 'call-convention-linkage'
+	no definition of 'numeric-value-for-edited-item'
+	no definition of 'incorrect-conf-sec-order'
+	no definition of 'define-constant-directive'
+	no definition of 'free-redefines-position'
+	no definition of 'records-mismatch-record-clause'
+	no definition of 'record-delimiter'
+	no definition of 'sequential-delimiters'
+	no definition of 'record-delim-with-fixed-recs'
+	no definition of 'missing-statement'
+	no definition of 'zero-length-literals'
+	no definition of 'xml-generate-extra-phrases'
+	no definition of 'continue-after'
+	no definition of 'goto-entry'
+	no definition of 'assign-variable'
+	no definition of 'assign-using-variable'
+	no definition of 'assign-ext-dyn'
+	no definition of 'assign-disk-from'
+	no definition of 'vsam-status'
+[?2004hroot@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,80p'
+[?2004lconfiguration error:
+gnucobol.conf: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# cd /app/src
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# cat > gnucobol.conf <<'EOF'
+[?2004l[?2004h> # Minimal config file for GnuCOBOL in this sandbox.
+[?2004l[?2004h> # (Defaults are used; this file only needs to exist.)
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,200p'
+[?2004lconfiguration error:
+gnucobol.conf: missing definitions:
+	no definition of 'name'
+	no definition of 'reserved-words'
+	no definition of 'tab-width'
+	no definition of 'text-column'
+	no definition of 'pic-length'
+	no definition of 'word-length'
+	no definition of 'literal-length'
+	no definition of 'numeric-literal-length'
+	no definition of 'standard-define'
+	no definition of 'binary-size'
+	no definition of 'binary-byteorder'
+	no definition of 'assign-clause'
+	no definition of 'screen-section-rules'
+	no definition of 'dpc-in-data'
+	no definition of 'filename-mapping'
+	no definition of 'pretty-display'
+	no definition of 'binary-truncate'
+	no definition of 'complex-odo'
+	no definition of 'indirect-redefines'
+	no definition of 'larger-redefines-ok'
+	no definition of 'relax-syntax-checks'
+	no definition of 'ref-mod-zero-length'
+	no definition of 'relax-level-hierarchy'
+	no definition of 'select-working'
+	no definition of 'local-implies-recursive'
+	no definition of 'sticky-linkage'
+	no definition of 'move-ibm'
+	no definition of 'perform-osvs'
+	no definition of 'arithmetic-osvs'
+	no definition of 'constant-folding'
+	no definition of 'hostsign'
+	no definition of 'program-name-redefinition'
+	no definition of 'accept-update'
+	no definition of 'accept-auto'
+	no definition of 'console-is-crt'
+	no definition of 'no-echo-means-secure'
+	no definition of 'line-col-zero-default'
+	no definition of 'display-special-fig-consts'
+	no definition of 'binary-comp-1'
+	no definition of 'numeric-pointer'
+	no definition of 'move-non-numeric-lit-to-numeric-is-zero'
+	no definition of 'implicit-assign-dynamic-var'
+	no definition of 'comment-paragraphs'
+	no definition of 'memory-size-clause'
+	no definition of 'multiple-file-tape-clause'
+	no definition of 'label-records-clause'
+	no definition of 'value-of-clause'
+	no definition of 'data-records-clause'
+	no definition of 'top-level-occurs-clause'
+	no definition of 'same-as-clause'
+	no definition of 'type-to-clause'
+	no definition of 'usage-type'
+	no definition of 'synchronized-clause'
+	no definition of 'special-names-clause'
+	no definition of 'goto-statement-without-name'
+	no definition of 'stop-literal-statement'
+	no definition of 'stop-identifier-statement'
+	no definition of 'debugging-mode'
+	no definition of 'use-for-debugging'
+	no definition of 'padding-character-clause'
+	no definition of 'next-sentence-phrase'
+	no definition of 'listing-statements'
+	no definition of 'title-statement'
+	no definition of 'entry-statement'
+	no definition of 'move-noninteger-to-alphanumeric'
+	no definition of 'move-figurative-constant-to-numeric'
+	no definition of 'move-figurative-space-to-numeric'
+	no definition of 'move-figurative-quote-to-numeric'
+	no definition of 'odo-without-to'
+	no definition of 'section-segments'
+	no definition of 'alter-statement'
+	no definition of 'call-overflow'
+	no definition of 'numeric-boolean'
+	no definition of 'hexadecimal-boolean'
+	no definition of 'national-literals'
+	no definition of 'hexadecimal-national-literals'
+	no definition of 'national-character-literals'
+	no definition of 'hp-octal-literals'
+	no definition of 'acu-literals'
+	no definition of 'word-continuation'
+	no definition of 'not-exception-before-exception'
+	no definition of 'accept-display-extensions'
+	no definition of 'renames-uncommon-levels'
+	no definition of 'symbolic-constant'
+	no definition of 'constant-78'
+	no definition of 'constant-01'
+	no definition of 'perform-varying-without-by'
+	no definition of 'reference-out-of-declaratives'
+	no definition of 'program-prototypes'
+	no definition of 'call-convention-mnemonic'
+	no definition of 'call-convention-linkage'
+	no definition of 'numeric-value-for-edited-item'
+	no definition of 'incorrect-conf-sec-order'
+	no definition of 'define-constant-directive'
+	no definition of 'free-redefines-position'
+	no definition of 'records-mismatch-record-clause'
+	no definition of 'record-delimiter'
+	no definition of 'sequential-delimiters'
+	no definition of 'record-delim-with-fixed-recs'
+	no definition of 'missing-statement'
+	no definition of 'zero-length-literals'
+	no definition of 'xml-generate-extra-phrases'
+	no definition of 'continue-after'
+	no definition of 'goto-entry'
+	no definition of 'assign-variable'
+	no definition of 'assign-using-variable'
+	no definition of 'assign-ext-dyn'
+	no definition of 'assign-disk-from'
+	no definition of 'vsam-status'
+[?2004hroot@f2dfd4d3de5d:/app/src# ls -la
+[?2004ltotal 28
+drwxr-xr-x 3 root root 4096 Dec 26 01:43 .
+drwxr-xr-x 4 root root 4096 Dec 26 01:24 ..
+-rw-r--r-- 1 root root  167 Dec 26 01:21 INPUT.DAT
+drwxr-xr-x 2 root root 4096 Dec 26 01:42 conf
+-rw-r--r-- 1 root root  106 Dec 26 01:43 gnucobol.conf
+-rw-r--r-- 1 root root 6200 Dec 26 01:41 program.cbl
+[?2004hroot@f2dfd4d3de5d:/app/src# rm -f /app/data/OUTPUT.DAT
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# ./program 2>&1 | sed -n '1,120p'
+[?2004lbash: ./program: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# sed -n '1,120p' /app/data/OUTPUT.DAT
+[?2004lsed: can't read /app/data/OUTPUT.DAT: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# strace -f -e openat cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,120p'
+[?2004lbash: strace: command not found
+[?2004hroot@f2dfd4d3de5d:/app/src# cd /app/src
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# cobc -info 2>&1 | sed -n '1,200p'
+[?2004lcobc (GnuCOBOL) 3.1.2.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch, Edward Hart
+Built     Sep 19 2022 04:27:09
+Packaged  Dec 23 2020 12:04:58 UTC
+C version "12.2.0"
+
+build information
+build environment        : x86_64-pc-linux-gnu
+CC                       : gcc
+C version                : "12.2.0"
+CPPFLAGS                 : -Wdate-time -D_FORTIFY_SOURCE=2
+CFLAGS                   : -g -O2 -finline-functions -D_FORTIFY_SOURCE=2
+                           -ggdb3 -fasynchronous-unwind-tables -pipe
+                           -fsigned-char -Wall -Wwrite-strings
+                           -Wmissing-prototypes -Wno-format-y2k
+LD                       : /usr/bin/ld -m elf_x86_64
+LDFLAGS                  : -Wl,-z,relro -Wl,-z,relro,-z,now,-O1
+
+GnuCOBOL information
+COB_CC                   : gcc
+COB_CFLAGS               : -finline-functions -D_FORTIFY_SOURCE=2 -ggdb3
+                           -pipe -Wdate-time -D_FORTIFY_SOURCE=2
+                           -Wno-unused -fsigned-char -Wno-pointer-sign
+COB_DEBUG_FLAGS          : -ggdb3 -fasynchronous-unwind-tables
+COB_LDFLAGS              : -Wl,-z,relro
+COB_LIBS                 : -L/usr/lib/x86_64-linux-gnu -lcob -lm
+COB_CONFIG_DIR           : /etc/gnucobol
+COB_COPY_DIR             : /usr/share/gnucobol/copy
+COB_MSG_FORMAT           : GCC
+COB_OBJECT_EXT           : o
+COB_MODULE_EXT           : so
+COB_EXE_EXT              : 
+64bit-mode               : yes
+BINARY-C-LONG            : 8 bytes
+endianness               : little-endian
+native EBCDIC            : no
+extended screen I/O      : ncursesw
+variable file format     : 0
+sequential file handler  : built-in
+indexed file handler     : BDB
+mathematical library     : GMP
+XML library              : libxml2
+JSON library             : not found
+[?2004hroot@f2dfd4d3de5d:/app/src# dpkg -l | grep -i -E 'cobol|gnucobol' || true
+[?2004lii  gnucobol3                   3.1.2-5+b1                amd64        COBOL compiler
+ii  libcob4:amd64               3.1.2-5+b1                amd64        COBOL compiler - runtime library
+ii  libcob4-dev:amd64           3.1.2-5+b1                amd64        COBOL compiler - development files
+[?2004hroot@f2dfd4d3de5d:/app/src# dpkg -L gnucobol 2>/dev/null | sed -n '1,200p'
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# dpkg -L gnucobol3 2>/dev/null | sed -n '1,200p'
+[?2004l/.
+/etc
+/etc/gnucobol
+/etc/gnucobol/acu-strict.conf
+/etc/gnucobol/acu.conf
+/etc/gnucobol/acu.words
+/etc/gnucobol/bs2000-strict.conf
+/etc/gnucobol/bs2000.conf
+/etc/gnucobol/bs2000.words
+/etc/gnucobol/cobol2002.conf
+/etc/gnucobol/cobol2002.words
+/etc/gnucobol/cobol2014.conf
+/etc/gnucobol/cobol2014.words
+/etc/gnucobol/cobol85.conf
+/etc/gnucobol/cobol85.words
+/etc/gnucobol/default.conf
+/etc/gnucobol/ibm-strict.conf
+/etc/gnucobol/ibm.conf
+/etc/gnucobol/ibm.words
+/etc/gnucobol/lax.conf-inc
+/etc/gnucobol/mf-strict.conf
+/etc/gnucobol/mf.conf
+/etc/gnucobol/mf.words
+/etc/gnucobol/mvs-strict.conf
+/etc/gnucobol/mvs.conf
+/etc/gnucobol/mvs.words
+/etc/gnucobol/realia-strict.conf
+/etc/gnucobol/realia.conf
+/etc/gnucobol/realia.words
+/etc/gnucobol/rm-strict.conf
+/etc/gnucobol/rm.conf
+/etc/gnucobol/rm.words
+/etc/gnucobol/runtime.cfg
+/etc/gnucobol/runtime_empty.cfg
+/etc/gnucobol/xopen.conf
+/usr
+/usr/bin
+/usr/bin/cob-config
+/usr/bin/cobc
+/usr/bin/cobcrun
+/usr/share
+/usr/share/doc
+/usr/share/doc/gnucobol3
+/usr/share/doc/gnucobol3/TODO.Debian
+/usr/share/doc/gnucobol3/changelog.Debian.amd64.gz
+/usr/share/doc/gnucobol3/changelog.Debian.gz
+/usr/share/doc/gnucobol3/changelog.gz
+/usr/share/doc/gnucobol3/copyright
+/usr/share/doc/gnucobol3/gnucobol.pdf.gz
+/usr/share/doc-base
+/usr/share/doc-base/gnucobol3.gnucobol
+/usr/share/gnucobol
+/usr/share/gnucobol/copy
+/usr/share/gnucobol/copy/screenio.cpy
+/usr/share/gnucobol/copy/sqlca.cpy
+/usr/share/gnucobol/copy/sqlda.cpy
+/usr/share/gnucobol/copy/xfhfcd.cpy
+/usr/share/gnucobol/copy/xfhfcd3.cpy
+/usr/share/info
+/usr/share/info/gnucobol.info.gz
+/usr/share/locale
+/usr/share/locale/de
+/usr/share/locale/de/LC_MESSAGES
+/usr/share/locale/de/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/en@boldquot
+/usr/share/locale/en@boldquot/LC_MESSAGES
+/usr/share/locale/en@boldquot/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/en@quot
+/usr/share/locale/en@quot/LC_MESSAGES
+/usr/share/locale/en@quot/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/es
+/usr/share/locale/es/LC_MESSAGES
+/usr/share/locale/es/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/fr
+/usr/share/locale/fr/LC_MESSAGES
+/usr/share/locale/fr/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/it
+/usr/share/locale/it/LC_MESSAGES
+/usr/share/locale/it/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/ja
+/usr/share/locale/ja/LC_MESSAGES
+/usr/share/locale/ja/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/nl
+/usr/share/locale/nl/LC_MESSAGES
+/usr/share/locale/nl/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/pt
+/usr/share/locale/pt/LC_MESSAGES
+/usr/share/locale/pt/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/sr
+/usr/share/locale/sr/LC_MESSAGES
+/usr/share/locale/sr/LC_MESSAGES/gnucobol.mo
+/usr/share/locale/sv
+/usr/share/locale/sv/LC_MESSAGES
+/usr/share/locale/sv/LC_MESSAGES/gnucobol.mo
+/usr/share/man
+/usr/share/man/man1
+/usr/share/man/man1/cob-config.1.gz
+/usr/share/man/man1/cobc.1.gz
+/usr/share/man/man1/cobcrun.1.gz
+[?2004hroot@f2dfd4d3de5d:/app/src# dpkg -L gnucobol4 2>/dev/null | sed -n '1,200p'
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# find /usr -maxdepth 6 -type f \( -iname '*cob*.conf' -o -iname '*cob*.cfg' -o -iname '*gnucobol*' \) 2>/dev/null | head -n 200
+[?2004l/usr/share/doc-base/gnucobol3.gnucobol
+[?2004hroot@f2dfd4d3de5d:/app/src# grep -R --line-number --no-messages -E 'reserved-words|tab-width|text-column|binary-byteorder' /usr 2>/dev/null | head -n 50
+[?2004l/usr/local/lib/python3.13/site-packages/pygments/lexers/business.py:41:    # http://opencobol.add1tocobol.com/#reserved-words
+/usr/local/lib/python3.13/site-packages/pygments/lexers/_lilypond_builtins.py:3994:  "stem-tremolo::calc-tab-width",
+/usr/local/lib/python3.13/site-packages/pygments/lexers/wgsl.py:72:    # https://www.w3.org/TR/WGSL/#reserved-words
+/usr/lib/python3.11/asynchat.py:1:# -*- Mode: Python; tab-width: 4 -*-
+[?2004hroot@f2dfd4d3de5d:/app/src# sed -n '1,120p' /etc/gnucobol/default.conf
+[?2004l# GnuCOBOL compiler configuration
+#
+# Copyright (C) 2001-2012, 2014-2020 Free Software Foundation, Inc.
+# Written by Keisuke Nishida, Roger While, Simon Sobisch, Edward Hart,
+# Ron Norman
+#
+# This file is part of GnuCOBOL.
+#
+# The GnuCOBOL compiler is free software: you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# GnuCOBOL is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuCOBOL.  If not, see <https://www.gnu.org/licenses/>.
+
+
+# Value: any string
+name: "GnuCOBOL"
+
+# Value: enum
+standard-define			0
+#        CB_STD_GC = 0,
+#        CB_STD_MF,
+#        CB_STD_IBM,
+#        CB_STD_MVS,
+#        CB_STD_BS2000,
+#        CB_STD_ACU,
+#        CB_STD_85,
+#        CB_STD_2002,
+#        CB_STD_2014
+
+# Value: int
+tab-width:			8
+text-column:			72
+# Maximum word-length for COBOL words / Programmer defined words
+# Be aware that GC checks the word length against COB_MAX_WORDLEN
+# first (currently 63)
+word-length:			63
+
+# Maximum literal size in general
+literal-length:			8191
+
+# Maximum numeric literal size (absolute maximum: 38)
+numeric-literal-length:		38
+
+# Maximum number of characters allowed in the character-string (max. 255)
+pic-length:			255
+
+# Default assign type
+# Value: 'dynamic', 'external'
+assign-clause:			dynamic
+
+# If yes, file names are resolved at run time using
+# environment variables.
+# For example, given ASSIGN TO "DATAFILE", the file name will be
+#  1. the value of environment variable 'DD_DATAFILE' or
+#  2. the value of environment variable 'dd_DATAFILE' or
+#  3. the value of environment variable 'DATAFILE' or
+#  4. the literal "DATAFILE"
+# If no, the value of the assign clause is the file name.
+#
+filename-mapping:		yes
+
+# Alternate formatting of numeric fields
+pretty-display:			yes
+
+# Allow complex OCCURS DEPENDING ON
+complex-odo:			no
+
+# Allow REDEFINES to other than last equal level number
+indirect-redefines:		no
+
+# Binary byte size - defines the allocated bytes according to PIC
+# Value:         signed  unsigned  bytes
+#                ------  --------  -----
+# '2-4-8'        1 -  4    same        2
+#                5 -  9    same        4
+#               10 - 18    same        8
+#
+# '1-2-4-8'      1 -  2    same        1
+#                3 -  4    same        2
+#                5 -  9    same        4
+#               10 - 18    same        8
+#
+# '1--8'         1 -  2    1 -  2      1
+#                3 -  4    3 -  4      2
+#                5 -  6    5 -  7      3
+#                7 -  9    8 -  9      4
+#               10 - 11   10 - 12      5
+#               12 - 14   13 - 14      6
+#               15 - 16   15 - 16      7
+#               17 - 18   17 - 18      8
+#
+binary-size:			1-2-4-8
+
+# Numeric truncation according to ANSI
+binary-truncate:		yes
+
+# Binary byte order
+# Value: 'native', 'big-endian'
+binary-byteorder:		big-endian
+
+# Allow larger REDEFINES items
+larger-redefines-ok:		no
+
+# Allow certain syntax variations (eg. REDEFINES position)
+relax-syntax-checks:		no
+
+# Allow zero length reference-modification
+# (only checked with active EC-BOUND-REF-MOD)
+ref-mod-zero-length:		yes
+
+# Perform type OSVS - If yes, the exit point of any currently
+# executing perform is recognized if reached.
+[?2004hroot@f2dfd4d3de5d:/app/src# ls -la /etc/gnucobol | sed -n '1,80p'
+[?2004ltotal 376
+drwxr-xr-x  2 root root  4096 Dec 26 01:24 .
+drwxr-xr-x 36 root root  4096 Dec 26 01:37 ..
+-rw-r--r--  1 root root  8928 Sep 19  2022 acu-strict.conf
+-rw-r--r--  1 root root  1139 Sep 19  2022 acu.conf
+-rw-r--r--  1 root root 21294 Sep 19  2022 acu.words
+-rw-r--r--  1 root root  8692 Sep 19  2022 bs2000-strict.conf
+-rw-r--r--  1 root root  1146 Sep 19  2022 bs2000.conf
+-rw-r--r--  1 root root 15187 Sep 19  2022 bs2000.words
+-rw-r--r--  1 root root  8526 Sep 19  2022 cobol2002.conf
+-rw-r--r--  1 root root 13065 Sep 19  2022 cobol2002.words
+-rw-r--r--  1 root root  8243 Sep 19  2022 cobol2014.conf
+-rw-r--r--  1 root root 14042 Sep 19  2022 cobol2014.words
+-rw-r--r--  1 root root  8605 Sep 19  2022 cobol85.conf
+-rw-r--r--  1 root root  9448 Sep 19  2022 cobol85.words
+-rw-r--r--  1 root root  9240 Sep 19  2022 default.conf
+-rw-r--r--  1 root root  8286 Sep 19  2022 ibm-strict.conf
+-rw-r--r--  1 root root  1137 Sep 19  2022 ibm.conf
+-rw-r--r--  1 root root 17463 Sep 19  2022 ibm.words
+-rw-r--r--  1 root root  4484 Sep 19  2022 lax.conf-inc
+-rw-r--r--  1 root root  8500 Sep 19  2022 mf-strict.conf
+-rw-r--r--  1 root root  1143 Sep 19  2022 mf.conf
+-rw-r--r--  1 root root 17814 Sep 19  2022 mf.words
+-rw-r--r--  1 root root  8418 Sep 19  2022 mvs-strict.conf
+-rw-r--r--  1 root root  1140 Sep 19  2022 mvs.conf
+-rw-r--r--  1 root root 11665 Sep 19  2022 mvs.words
+-rw-r--r--  1 root root  8844 Sep 19  2022 realia-strict.conf
+-rw-r--r--  1 root root  1085 Sep 19  2022 realia.conf
+-rw-r--r--  1 root root 13082 Sep 19  2022 realia.words
+-rw-r--r--  1 root root  9290 Sep 19  2022 rm-strict.conf
+-rw-r--r--  1 root root  1134 Sep 19  2022 rm.conf
+-rw-r--r--  1 root root 11113 Sep 19  2022 rm.words
+-rw-r--r--  1 root root 17746 Sep 19  2022 runtime.cfg
+-rw-r--r--  1 root root     1 Sep 19  2022 runtime_empty.cfg
+-rw-r--r--  1 root root 10646 Sep 19  2022 xopen.conf
+[?2004hroot@f2dfd4d3de5d:/app/src# ln -sf /etc/gnucobol/default.conf /etc/gnucobol/gnucobol.conf
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# ls -la /etc/gnucobol/gnucobol.conf
+[?2004llrwxrwxrwx 1 root root 26 Dec 26 01:44 /etc/gnucobol/gnucobol.conf -> /etc/gnucobol/default.conf
+[?2004hroot@f2dfd4d3de5d:/app/src# cd /app/src
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# rm -f gnucobol.conf
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,200p'
+[?2004lprogram.cbl:53: error: PICTURE string must contain at least one of the set A, N, X, Z, 1, 9 and *; or at least two of the set +, - and the currency symbol
+program.cbl:54: error: PICTURE string must contain at least one of the set A, N, X, Z, 1, 9 and *; or at least two of the set +, - and the currency symbol
+program.cbl:55: error: PICTURE string must contain at least one of the set A, N, X, Z, 1, 9 and *; or at least two of the set +, - and the currency symbol
+program.cbl:56: error: PICTURE string must contain at least one of the set A, N, X, Z, 1, 9 and *; or at least two of the set +, - and the currency symbol
+program.cbl:57: error: PICTURE string must contain at least one of the set A, N, X, Z, 1, 9 and *; or at least two of the set +, - and the currency symbol
+program.cbl: in paragraph 'BUILD-SCHEDULE':
+program.cbl:142: error: 'TERM-MONTH' is not defined
+program.cbl:143: error: syntax error, unexpected COMPUTE
+[?2004hroot@f2dfd4d3de5d:/app/src# rm -f /app/data/OUTPUT.DAT
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# ./program
+[?2004lbash: ./program: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# sed -n '1,120p' /app/data/OUTPUT.DAT
+[?2004lsed: can't read /app/data/OUTPUT.DAT: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# cd /app/src
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# cat > /app/src/program.cbl <<'EOF'
+[?2004l  ED-PAY               PIC 9(8).99.
+           05  ED-INT               PIC 9(8).99.
+           05  ED-PRN               PIC 9(8).99.
+           05  ED-REM               PIC 9(10).99.
+
+       01  WS-REASON                PIC X(50).
+       01  I                        PIC 9(4) VALUE 0.
+
+       PROCEDURE DIVISION.
+       MAIN.
+           OPEN INPUT INFILE
+           OPEN OUTPUT OUTFILE
+
+           PERFORM UNTIL WS-EOF = 'Y'
+               READ INFILE
+                   AT END
+                       MOVE 'Y' TO WS-EOF
+                   NOT AT END
+                       PERFORM PROCESS-ONE
+               END-READ
+           END-PERFORM
+
+           CLOSE INFILE
+           CLOSE OUTFILE
+           STOP RUN.
+
+       PROCESS-ONE.
+           PERFORM PARSE-INPUT
+           PERFORM CHECK-APPLICATION.
+
+       PARSE-INPUT.
+           MOVE SPACES TO WS-FIELDS
+           UNSTRING IN-REC DELIMITED BY ';'
+               INTO WS-ID WS-NAME WS-LOAN-X WS-PROP-X WS-DOWN-X
+                    WS-TERM-X WS-RATE-X
+           END-UNSTRING
+
+           COMPUTE LOAN-AMT ROUNDED =
+               FUNCTION NUMVAL(WS-LOAN-X) / 100
+           COMPUTE PROP-VALUE ROUNDED =
+               FUNCTION NUMVAL(WS-PROP-X) / 100
+           COMPUTE DOWN-PAY ROUNDED =
+               FUNCTION NUMVAL(WS-DOWN-X) / 100
+           COMPUTE TERM-YEARS = FUNCTION NUMVAL(WS-TERM-X)
+           COMPUTE TERM-MONTHS = TERM-YEARS * 12
+           COMPUTE RATE-ANN ROUNDED =
+               FUNCTION NUMVAL(WS-RATE-X) / 100.
+
+       CHECK-APPLICATION.
+           COMPUTE MIN-DOWN ROUNDED = PROP-VALUE * 0.15
+
+           IF DOWN-PAY < MIN-DOWN
+               MOVE "INSUFFICIENT FUNDS FOR DOWN PAYMENT" TO WS-REASON
+               PERFORM WRITE-DENY
+           ELSE
+               PERFORM WRITE-APPRO
+               PERFORM BUILD-SCHEDULE
+           END-IF.
+
+       WRITE-DENY.
+           MOVE SPACES TO OUT-REC
+           STRING WS-ID DELIMITED BY SIZE
+                  "DENY " DELIMITED BY SIZE
+                  WS-REASON DELIMITED BY SIZE
+                  INTO OUT-REC
+           END-STRING
+           WRITE OUT-REC.[?2004h>        IDENTIFICATION DIVISION.
+[?2004l[?2004h>        PROGRAM-ID. PROGRAM.
+[?2004l[?2004h> 
+[?2004l [?2004h>        ENVIRONMENT DIVISION.
+[?2004l[?2004h>        INPUT-OUTPUT SECTION.
+[?2004l[?2004h>        FILE-CONTROL.
+[?2004lZ[?2004h>            SELECT INFILE ASSIGN TO "INPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>            SELECT OUTFILE ASSIGN TO "../data/OUTPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004lOMP[?2004h> 
+[?2004l[?2004h>        DATA DIVISION.
+[?2004l[?2004h>        FILE SECTION.
+[?2004l[?2004h>        FD  INFILE.
+[?2004l[?2004h>        01  IN-REC                   PIC X(256).
+[?2004l[?2004h> 
+[?2004l [?2004h>        FD  OUTFILE.
+[?2004l[?2004h>        01  OUT-REC                  PIC X(256).
+[?2004l[?2004h> 
+[?2004l [?2004h>        WORKING-STORAGE SECTION.
+[?2004lOM[?2004h>        01  WS-EOF                   PIC X VALUE 'N'.
+[?2004l[?2004h> 
+[?2004lO[?2004h>        01  WS-FIELDS.
+[?2004l[?2004h>            05  WS-ID                PIC X(10).
+[?2004l[?2004h>            05  WS-NAME              PIC X(30).
+[?2004l  [?2004h>            05  WS-LOAN-X            PIC X(20).
+[?2004l[?2004h>            05  WS-PROP-X            PIC X(20).
+[?2004l [?2004h>            05  WS-DOWN-X            PIC X(20).
+[?2004l[?2004h>            05  WS-TERM-X            PIC X(10).
+[?2004l[?2004h>            05  WS-RATE-X            PIC X(20).
+[?2004l[?2004h> 
+[?2004lY[?2004h>        01  WS-NUMS.
+[?2004l[?2004h>            05  LOAN-AMT             PIC 9(10)V99 VALUE 0.
+[?2004l
+[?2004h>            05  PROP-VALUE           PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  DOWN-PAY             PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  TERM-YEARS           PIC 9(2)     VALUE 0.
+[?2004lC[?2004h>            05  TERM-MONTHS          PIC 9(4)     VALUE 0.
+[?2004lN[?2004h>            05  RATE-ANN             PIC 9(3)V9(2) VALUE 0.
+[?2004l[?2004h> 
+[?2004lD[?2004h>        01  WS-CALC.
+[?2004l   [?2004h>            05  MIN-DOWN             PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  MONTHLY-RATE         PIC 9V9(8)   VALUE 0.
+[?2004l
+  [?2004h>            05  BASE                 PIC 9V9(8)   VALUE 0.
+[?2004l[?2004h>            05  POWVAL               PIC 9V9(12)  VALUE 0.
+[?2004lD B[?2004h>            05  DENOM                PIC S9V9(12) VALUE 0.
+[?2004l[?2004h>            05  MONTHLY-PAY          PIC 9(10)V99 VALUE 0.
+[?2004l  [?2004h>            05  BALANCE              PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  INTEREST-PART        PIC 9(10)V99 VALUE 0.
+[?2004lIZE[?2004h>            05  PRINC-PART           PIC 9(10)V99 VALUE 0.
+[?2004l[?2004h>            05  REMAIN               PIC 9(10)V99 VALUE 0.
+[?2004lD[?2004h> 
+[?2004l-[?2004h>        01  WS-OUT-EDIT.
+[?2004l[?2004h>            05  ED-MONTH             PIC 9(3).
+[?2004l[?2004h>            05  ED-PAY               PIC 9(8).99.
+[?2004l[?2004h>            05  ED-INT               PIC 9(8).99.
+[?2004l[?2004h>            05  ED-PRN               PIC 9(8).99.
+[?2004l[?2004h>            05  ED-REM               PIC 9(10).99.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-REASON                PIC X(50).
+[?2004l[?2004h>        01  I                        PIC 9(4) VALUE 0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCEDURE DIVISION.
+[?2004l[?2004h>        MAIN.
+[?2004l[?2004h>            OPEN INPUT INFILE
+[?2004l[?2004h>            OPEN OUTPUT OUTFILE
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM UNTIL WS-EOF = 'Y'
+[?2004l[?2004h>                READ INFILE
+[?2004l[?2004h>                    AT END
+[?2004l[?2004h>                        MOVE 'Y' TO WS-EOF
+[?2004l[?2004h>                    NOT AT END
+[?2004l[?2004h>                        PERFORM PROCESS-ONE
+[?2004l[?2004h>                END-READ
+[?2004l[?2004h>            END-PERFORM
+[?2004l[?2004h> 
+[?2004l[?2004h>            CLOSE INFILE
+[?2004l[?2004h>            CLOSE OUTFILE
+[?2004l[?2004h>            STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCESS-ONE.
+[?2004l[?2004h>            PERFORM PARSE-INPUT
+[?2004l[?2004h>            PERFORM CHECK-APPLICATION.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PARSE-INPUT.
+[?2004l[?2004h>            MOVE SPACES TO WS-FIELDS
+[?2004l[?2004h>            UNSTRING IN-REC DELIMITED BY ';'
+[?2004l[?2004h>                INTO WS-ID WS-NAME WS-LOAN-X WS-PROP-X WS-DOWN-X
+[?2004l[?2004h>                     WS-TERM-X WS-RATE-X
+[?2004l[?2004h>            END-UNSTRING
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE LOAN-AMT ROUNDED =
+[?2004l[?2004h>                FUNCTION NUMVAL(WS-LOAN-X) / 100
+[?2004l[?2004h>            COMPUTE PROP-VALUE ROUNDED =
+[?2004l[?2004h>                FUNCTION NUMVAL(WS-PROP-X) / 100
+[?2004l[?2004h>            COMPUTE DOWN-PAY ROUNDED =
+[?2004l[?2004h>                FUNCTION NUMVAL(WS-DOWN-X) / 100
+[?2004l[?2004h>            COMPUTE TERM-YEARS = FUNCTION NUMVAL(WS-TERM-X)
+[?2004l[?2004h>            COMPUTE TERM-MONTHS = TERM-YEARS * 12
+[?2004l[?2004h>            COMPUTE RATE-ANN ROUNDED =
+[?2004l[?2004h>                FUNCTION NUMVAL(WS-RATE-X) / 100.
+[?2004l[?2004h> 
+[?2004l[?2004h>        CHECK-APPLICATION.
+[?2004l[?2004h>            COMPUTE MIN-DOWN ROUNDED = PROP-VALUE * 0.15
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF DOWN-PAY < MIN-DOWN
+[?2004l[?2004h>                MOVE "INSUFFICIENT FUNDS FOR DOWN PAYMENT" TO WS-REASON
+[?2004l[?2004h>                PERFORM WRITE-DENY
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                PERFORM WRITE-APPRO
+[?2004l[?2004h>                PERFORM BUILD-SCHEDULE
+[?2004l[?2004h>            END-IF.
+[?2004l[?2004h> 
+[?2004l[?2004h>        WRITE-DENY.
+[?2004l[?2004h>            MOVE SPACES TO OUT-REC
+[?2004l[?2004h>            STRING WS-ID DELIMITED BY SIZE
+[?2004l[?2004h>                   "DENY " DELIMITED BY SIZE
+[?2004l[?2004h>                   WS-REASON DELIMITED BY SIZE
+[?2004l[?2004h>                   INTO OUT-REC
+[?2004l[?2004h>            END-STRING
+[?2004l[?2004h>            WRITE OUT-REC.
+[?2004l[?2004h> 
+[?2004l[?2004h>        WRITE-APPRO.
+[?2004l[?2004h>            MOVE SPACES TO OUT-REC
+[?2004l[?2004h>            STRING WS-ID DELIMITED BY SIZE
+[?2004l[?2004h>                   "APPRO" DELIMITED BY SIZE
+[?2004l[?2004h>                   INTO OUT-REC
+[?2004l[?2004h>            END-STRING
+[?2004l[?2004h>            WRITE OUT-REC.
+[?2004l[?2004h> 
+[?2004l[?2004h>        BUILD-SCHEDULE.
+[?2004l[?2004h>            IF TERM-MONTHS <= 0
+[?2004l[?2004h>                EXIT PARAGRAPH
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE MONTHLY-RATE ROUNDED = RATE-ANN / 1200
+[?2004l[?2004h>            MOVE LOAN-AMT TO BALANCE
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF MONTHLY-RATE = 0
+[?2004l[?2004h>                COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE
+[?2004l[?2004h>                COMPUTE POWVAL ROUNDED = FUNCTION POWER(BASE, -TERM-MONTHS)
+[?2004l[?2004h>                COMPUTE DENOM ROUNDED = 1 - POWVAL
+[?2004l[?2004h>                COMPUTE MONTHLY-PAY ROUNDED =
+[?2004l[?2004h>                    (LOAN-AMT * MONTHLY-RATE) / DENOM
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS
+[?2004l[?2004h>                COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE
+[?2004l[?2004h>                COMPUTE PRINC-PART ROUNDED = MONTHLY-PAY - INTEREST-PART
+[?2004l[?2004h> 
+[?2004l[?2004h>                IF I = TERM-MONTHS
+[?2004l[?2004h>                    MOVE BALANCE TO PRINC-PART
+[?2004l[?2004h>                    COMPUTE MONTHLY-PAY ROUNDED =
+[?2004l[?2004h>                        INTEREST-PART + PRINC-PART
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>                COMPUTE REMAIN ROUNDED = BALANCE - PRINC-PART
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE I TO ED-MONTH
+[?2004l[?2004h>                MOVE MONTHLY-PAY TO ED-PAY
+[?2004l[?2004h>                MOVE INTEREST-PART TO ED-INT
+[?2004l[?2004h>                MOVE PRINC-PART TO ED-PRN
+[?2004l[?2004h>                MOVE REMAIN TO ED-REM
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE SPACES TO OUT-REC
+[?2004l[?2004h>                STRING ED-MONTH DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-PAY DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-INT DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-PRN DELIMITED BY SIZE
+[?2004l[?2004h>                       " " DELIMITED BY SIZE
+[?2004l[?2004h>                       ED-REM DELIMITED BY SIZE
+[?2004l[?2004h>                       INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE REMAIN TO BALANCE
+[?2004l[?2004h>            END-PERFORM.
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,200p'
+[?2004lprogram.cbl: in paragraph 'BUILD-SCHEDULE':
+program.cbl:142: error: 'TERM-MONTH' is not defined
+program.cbl:143: error: syntax error, unexpected COMPUTE
+[?2004hroot@f2dfd4d3de5d:/app/src# rm -f /app/data/OUTPUT.DAT
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# ./program
+[?2004lbash: ./program: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# sed -n '1,120p' /app/data/OUTPUT.DAT
+[?2004lsed: can't read /app/data/OUTPUT.DAT: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# cd /app/src
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# python3 - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> lines = [
+[?2004l[?2004h> "       IDENTIFICATION DIVISION.",
+[?2004l[?2004h> "       PROGRAM-ID. PROGRAM.",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       ENVIRONMENT DIVISION.",
+[?2004l[?2004h> "       INPUT-OUTPUT SECTION.",
+[?2004l[?2004h> "       FILE-CONTROL.",
+[?2004l[?2004h> "           SELECT INFILE ASSIGN TO \"INPUT.DAT\"",
+[?2004l[?2004h> "               ORGANIZATION IS LINE SEQUENTIAL.",
+[?2004l [?2004h> "           SELECT OUTFILE ASSIGN TO \"../data/OUTPUT.DAT\"",
+[?2004l[?2004h> "               ORGANIZATION IS LINE SEQUENTIAL.",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       DATA DIVISION.",
+[?2004l[?2004h> "       FILE SECTION.",
+[?2004l[?2004h> "       FD  INFILE.",
+[?2004l[?2004h> "       01  IN-REC                   PIC X(256).",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       FD  OUTFILE.",
+[?2004l[?2004h> "       01  OUT-REC                  PIC X(256).",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       WORKING-STORAGE SECTION.",
+[?2004l"[?2004h> "       01  WS-EOF                   PIC X VALUE 'N'.",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       01  WS-FIELDS.",
+[?2004l[?2004h> "           05  WS-ID                PIC X(10).",
+[?2004l[?2004h> "           05  WS-NAME              PIC X(30).",
+[?2004l[?2004h> "           05  WS-LOAN-X            PIC X(20).",
+[?2004l[?2004h> "           05  WS-PROP-X            PIC X(20).",
+[?2004l[?2004h> "           05  WS-DOWN-X            PIC X(20).",
+[?2004l[?2004h> "           05  WS-TERM-X            PIC X(10).",
+[?2004l[?2004h> "           05  WS-RATE-X            PIC X(20).",
+[?2004l[?2004h> "",
+[?2004lO[?2004h> "       01  WS-NUMS.",
+[?2004l[?2004h> "           05  LOAN-AMT             PIC 9(10)V99 VALUE 0.",
+[?2004l[?2004h> "           05  PROP-VALUE           PIC 9(10)V99 VALUE 0.",
+[?2004l[?2004h> "           05  DOWN-PAY             PIC 9(10)V99 VALUE 0.",
+[?2004l[?2004h> "           05  TERM-YEARS           PIC 9(2)     VALUE 0.",
+[?2004l[?2004h> "           05  TERM-MONTHS          PIC 9(4)     VALUE 0.",
+[?2004l[?2004h> "           05  RATE-ANN             PIC 9(3)V9(2) VALUE 0.",
+[?2004l[?2004h> "",
+[?2004l    [?2004h> "       01  WS-CALC.",
+[?2004l[?2004h> "           05  MIN-DOWN             PIC 9(10)V99 VALUE 0.",
+[?2004l[?2004h> "           05  MONTHLY-RATE         PIC 9V9(8)   VALUE 0.",
+[?2004l[?2004h> "           05  BASE                 PIC 9V9(8)   VALUE 0.",
+[?2004l[?2004h> "           05  POWVAL               PIC 9V9(12)  VALUE 0.",
+[?2004l[?2004h> "           05  DENOM                PIC S9V9(12) VALUE 0.",
+[?2004l[?2004h> "           05  MONTHLY-PAY          PIC 9(10)V99 VALUE 0.",
+[?2004l[?2004h> "           05  BALANCE              PIC 9(10)V99 VALUE 0.",
+[?2004l[?2004h> "           05  INTEREST-PART        PIC 9(10)V99 VALUE 0.",
+[?2004l[?2004h> "           05  PRINC-PART           PIC 9(10)V99 VALUE 0.",
+[?2004l[?2004h> "           05  REMAIN               PIC 9(10)V99 VALUE 0.",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       01  WS-OUT-EDIT.",
+[?2004l [?2004h> "           05  ED-MONTH             PIC 9(3).",
+[?2004l[?2004h> "           05  ED-PAY               PIC 9(8).99.",
+[?2004l[?2004h> "           05  ED-INT               PIC 9(8).99.",
+[?2004l[?2004h> "           05  ED-PRN               PIC 9(8).99.",
+[?2004l[?2004h> "           05  ED-REM               PIC 9(10).99.",
+[?2004l [?2004h> "",
+[?2004l[?2004h> "       01  WS-REASON                PIC X(50).",
+[?2004l[?2004h> "       01  I                        PIC 9(4) VALUE 0.",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       PROCEDURE DIVISION.",
+[?2004l
+[?2004h> "       MAIN.",
+[?2004l[?2004h> "           OPEN INPUT INFILE",
+[?2004l[?2004h> "           OPEN OUTPUT OUTFILE",
+[?2004l [?2004h> "",
+[?2004l[?2004h> "           PERFORM UNTIL WS-EOF = 'Y'",
+[?2004l[?2004h> "               READ INFILE",
+[?2004lE[?2004h> "                   AT END",
+[?2004l[?2004h> "                       MOVE 'Y' TO WS-EOF",
+[?2004l[?2004h> "                   NOT AT END",
+[?2004l[?2004h> "                       PERFORM PROCESS-ONE",
+[?2004l[?2004h> "               END-READ",
+[?2004l[?2004h> "           END-PERFORM",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "           CLOSE INFILE",
+[?2004l[?2004h> "           CLOSE OUTFILE",
+[?2004lE'[?2004h> "           STOP RUN.",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       PROCESS-ONE.",
+[?2004l[?2004h> "           PERFORM PARSE-INPUT",
+[?2004l[?2004h> "           PERFORM CHECK-APPLICATION.",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       PARSE-INPUT.",
+[?2004l[?2004h> "           MOVE SPACES TO WS-FIELDS",
+[?2004l[?2004h> "           UNSTRING IN-REC DELIMITED BY ';'",
+[?2004l[?2004h> "               INTO WS-ID WS-NAME WS-LOAN-X WS-PROP-X WS-DOWN-X",
+[?2004l[?2004h> "                    WS-TERM-X WS-RATE-X",
+[?2004l[?2004h> "           END-UNSTRING",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "           COMPUTE LOAN-AMT ROUNDED =",
+[?2004l[?2004h> "               FUNCTION NUMVAL(WS-LOAN-X) / 100",
+[?2004l[?2004h> "           COMPUTE PROP-VALUE ROUNDED =",
+[?2004l[?2004h> "               FUNCTION NUMVAL(WS-PROP-X) / 100",
+[?2004l[?2004h> "           COMPUTE DOWN-PAY ROUNDED =",
+[?2004l[?2004h> "               FUNCTION NUMVAL(WS-DOWN-X) / 100",
+[?2004l[?2004h> "           COMPUTE TERM-YEARS = FUNCTION NUMVAL(WS-TERM-X)",
+[?2004l[?2004h> "           COMPUTE TERM-MONTHS = TERM-YEARS * 12",
+[?2004l[?2004h> "           COMPUTE RATE-ANN ROUNDED =",
+[?2004l[?2004h> "               FUNCTION NUMVAL(WS-RATE-X) / 100.",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       CHECK-APPLICATION.",
+[?2004l[?2004h> "           COMPUTE MIN-DOWN ROUNDED = PROP-VALUE * 0.15",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "           IF DOWN-PAY < MIN-DOWN",
+[?2004l[?2004h> "               MOVE \"INSUFFICIENT FUNDS FOR DOWN PAYMENT\" TO WS-REASON",
+[?2004l[?2004h> "               PERFORM WRITE-DENY",
+[?2004l[?2004h> "           ELSE",
+[?2004l[?2004h> "               PERFORM WRITE-APPRO",
+[?2004l[?2004h> "               PERFORM BUILD-SCHEDULE",
+[?2004l[?2004h> "           END-IF.",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       WRITE-DENY.",
+[?2004l[?2004h> "           MOVE SPACES TO OUT-REC",
+[?2004l[?2004h> "           STRING WS-ID DELIMITED BY SIZE",
+[?2004l[?2004h> "                  \"DENY \" DELIMITED BY SIZE",
+[?2004l[?2004h> "                  WS-REASON DELIMITED BY SIZE",
+[?2004l[?2004h> "                  INTO OUT-REC",
+[?2004l[?2004h> "           END-STRING",
+[?2004l[?2004h> "           WRITE OUT-REC.",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       WRITE-APPRO.",
+[?2004l[?2004h> "           MOVE SPACES TO OUT-REC",
+[?2004l[?2004h> "           STRING WS-ID DELIMITED BY SIZE",
+[?2004l[?2004h> "                  \"APPRO\" DELIMITED BY SIZE",
+[?2004l[?2004h> "                  INTO OUT-REC",
+[?2004l[?2004h> "           END-STRING",
+[?2004l[?2004h> "           WRITE OUT-REC.",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "       BUILD-SCHEDULE.",
+[?2004l[?2004h> "           IF TERM-MONTHS <= 0",
+[?2004l[?2004h> "               EXIT PARAGRAPH",
+[?2004l[?2004h> "           END-IF",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "           COMPUTE MONTHLY-RATE ROUNDED = RATE-ANN / 1200",
+[?2004l[?2004h> "           MOVE LOAN-AMT TO BALANCE",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "           IF MONTHLY-RATE = 0",
+[?2004l[?2004h> "               COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS",
+[?2004l[?2004h> "           ELSE",
+[?2004l[?2004h> "               COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE",
+[?2004l[?2004h> "               COMPUTE POWVAL ROUNDED =",
+[?2004l[?2004h> "                   FUNCTION POWER(BASE, -TERM-MONTHS)",
+[?2004l[?2004h> "               COMPUTE DENOM ROUNDED = 1 - POWVAL",
+[?2004l[?2004h> "               COMPUTE MONTHLY-PAY ROUNDED =",
+[?2004l[?2004h> "                   (LOAN-AMT * MONTHLY-RATE) / DENOM",
+[?2004l[?2004h> "           END-IF",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "           PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS",
+[?2004l[?2004h> "               COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE",
+[?2004l[?2004h> "               COMPUTE PRINC-PART ROUNDED = MONTHLY-PAY - INTEREST-PART",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "               IF I = TERM-MONTHS",
+[?2004l[?2004h> "                   MOVE BALANCE TO PRINC-PART",
+[?2004l[?2004h> "                   COMPUTE MONTHLY-PAY ROUNDED =",
+[?2004l[?2004h> "                       INTEREST-PART + PRINC-PART",
+[?2004l[?2004h> "               END-IF",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "               COMPUTE REMAIN ROUNDED = BALANCE - PRINC-PART",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "               MOVE I TO ED-MONTH",
+[?2004l[?2004h> "               MOVE MONTHLY-PAY TO ED-PAY",
+[?2004l[?2004h> "               MOVE INTEREST-PART TO ED-INT",
+[?2004l[?2004h> "               MOVE PRINC-PART TO ED-PRN",
+[?2004l[?2004h> "               MOVE REMAIN TO ED-REM",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "               MOVE SPACES TO OUT-REC",
+[?2004l[?2004h> "               STRING ED-MONTH DELIMITED BY SIZE",
+[?2004l[?2004h> "                      \" \" DELIMITED BY SIZE",
+[?2004l[?2004h> "                      ED-PAY DELIMITED BY SIZE",
+[?2004l[?2004h> "                      \" \" DELIMITED BY SIZE",
+[?2004l[?2004h> "                      ED-INT DELIMITED BY SIZE",
+[?2004l[?2004h> "                      \" \" DELIMITED BY SIZE",
+[?2004l[?2004h> "                      ED-PRN DELIMITED BY SIZE",
+[?2004l[?2004h> "                      \" \" DELIMITED BY SIZE",
+[?2004l[?2004h> "                      ED-REM DELIMITED BY SIZE",
+[?2004l[?2004h> "                      INTO OUT-REC",
+[?2004l[?2004h> "               END-STRING",
+[?2004l[?2004h> "               WRITE OUT-REC",
+[?2004l[?2004h> "",
+[?2004l[?2004h> "               MOVE REMAIN TO BALANCE",
+[?2004l[?2004h> "           END-PERFORM.",
+[?2004l[?2004h> ]
+[?2004l[?2004h> # validate length
+[?2004l[?2004h> mx = max(len(s) for s in lines)
+[?2004l[?2004h> bad = [(i+1,len(s),s) for i,s in enumerate(lines) if len(s)>80]
+[?2004l[?2004h> if bad:
+[?2004l[?2004h>     raise SystemExit('line >80: '+str(bad[0][:2]))
+[?2004l[?2004h> Path('/app/src/program.cbl').write_text("\n".join(lines)+"\n")
+[?2004l[?2004h> print('WROTE', len(lines), 'lines; max_len', mx)
+[?2004l[?2004h> PY
+[?2004lWROTE 182 lines; max_len 71
+[?2004hroot@f2dfd4d3de5d:/app/src# nl -ba program.cbl | sed -n '120,180p'
+[?2004l   120	           WRITE OUT-REC.
+   121	
+   122	       WRITE-APPRO.
+   123	           MOVE SPACES TO OUT-REC
+   124	           STRING WS-ID DELIMITED BY SIZE
+   125	                  "APPRO" DELIMITED BY SIZE
+   126	                  INTO OUT-REC
+   127	           END-STRING
+   128	           WRITE OUT-REC.
+   129	
+   130	       BUILD-SCHEDULE.
+   131	           IF TERM-MONTHS <= 0
+   132	               EXIT PARAGRAPH
+   133	           END-IF
+   134	
+   135	           COMPUTE MONTHLY-RATE ROUNDED = RATE-ANN / 1200
+   136	           MOVE LOAN-AMT TO BALANCE
+   137	
+   138	           IF MONTHLY-RATE = 0
+   139	               COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS
+   140	           ELSE
+   141	               COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE
+   142	               COMPUTE POWVAL ROUNDED =
+   143	                   FUNCTION POWER(BASE, -TERM-MONTHS)
+   144	               COMPUTE DENOM ROUNDED = 1 - POWVAL
+   145	               COMPUTE MONTHLY-PAY ROUNDED =
+   146	                   (LOAN-AMT * MONTHLY-RATE) / DENOM
+   147	           END-IF
+   148	
+   149	           PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS
+   150	               COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE
+   151	               COMPUTE PRINC-PART ROUNDED = MONTHLY-PAY - INTEREST-PART
+   152	
+   153	               IF I = TERM-MONTHS
+   154	                   MOVE BALANCE TO PRINC-PART
+   155	                   COMPUTE MONTHLY-PAY ROUNDED =
+   156	                       INTEREST-PART + PRINC-PART
+   157	               END-IF
+   158	
+   159	               COMPUTE REMAIN ROUNDED = BALANCE - PRINC-PART
+   160	
+   161	               MOVE I TO ED-MONTH
+   162	               MOVE MONTHLY-PAY TO ED-PAY
+   163	               MOVE INTEREST-PART TO ED-INT
+   164	               MOVE PRINC-PART TO ED-PRN
+   165	               MOVE REMAIN TO ED-REM
+   166	
+   167	               MOVE SPACES TO OUT-REC
+   168	               STRING ED-MONTH DELIMITED BY SIZE
+   169	                      " " DELIMITED BY SIZE
+   170	                      ED-PAY DELIMITED BY SIZE
+   171	                      " " DELIMITED BY SIZE
+   172	                      ED-INT DELIMITED BY SIZE
+   173	                      " " DELIMITED BY SIZE
+   174	                      ED-PRN DELIMITED BY SIZE
+   175	                      " " DELIMITED BY SIZE
+   176	                      ED-REM DELIMITED BY SIZE
+   177	                      INTO OUT-REC
+   178	               END-STRING
+   179	               WRITE OUT-REC
+   180	
+[?2004hroot@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,200p'
+[?2004lprogram.cbl: in paragraph 'BUILD-SCHEDULE':
+program.cbl:143: error: FUNCTION 'POWER' unknown
+[?2004hroot@f2dfd4d3de5d:/app/src# rm -f /app/data/OUTPUT.DAT
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# ./program
+[?2004lbash: ./program: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# sed -n '1,120p' /app/data/OUTPUT.DAT
+[?2004lsed: can't read /app/data/OUTPUT.DAT: No such file or directory
+[?2004hroot@f2dfd4d3de5d:/app/src# cd /app/src
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# nl -ba program.cbl | sed -n '136,150p'
+[?2004l   136	           MOVE LOAN-AMT TO BALANCE
+   137	
+   138	           IF MONTHLY-RATE = 0
+   139	               COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS
+   140	           ELSE
+   141	               COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE
+   142	               COMPUTE POWVAL ROUNDED =
+   143	                   FUNCTION POWER(BASE, -TERM-MONTHS)
+   144	               COMPUTE DENOM ROUNDED = 1 - POWVAL
+   145	               COMPUTE MONTHLY-PAY ROUNDED =
+   146	                   (LOAN-AMT * MONTHLY-RATE) / DENOM
+   147	           END-IF
+   148	
+   149	           PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS
+   150	               COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE
+[?2004hroot@f2dfd4d3de5d:/app/src# python3 - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> p = Path('program.cbl')
+[?2004l[?2004h> text = p.read_text().splitlines()
+[?2004l[?2004h> out = []
+[?2004l[?2004h> i = 0
+[?2004l[?2004h> while i < len(text):
+[?2004l[?2004h>     line = text[i]
+[?2004l[?2004h>     if line.strip() == 'COMPUTE POWVAL ROUNDED =':
+[?2004l[?2004h>         # Replace this + next line with a single exponentiation line
+[?2004l[?2004h>         out.append('               COMPUTE POWVAL ROUNDED = BASE ** (-TERM-MONTHS)')
+[?2004l[?2004h>         i += 2
+[?2004l[?2004h>         continue
+[?2004l[?2004h>     out.append(line)
+[?2004l[?2004h>     i += 1
+[?2004l[?2004h> p.write_text("\n".join(out) + "\n")
+[?2004l[?2004h> print('patched')
+[?2004l[?2004h> PY
+[?2004lpatched
+[?2004hroot@f2dfd4d3de5d:/app/src# python3 - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> p=Path('program.cbl')
+[?2004l[?2004h> mx=0
+[?2004l[?2004h> bad=[]
+[?2004l[?2004h> for i,line in enumerate(p.read_text().splitlines(),1):
+[?2004l[?2004h>     mx=max(mx,len(line))
+[?2004l[?2004h>     if len(line)>80:
+[?2004l[?2004h>         bad.append((i,len(line)))
+[?2004l[?2004h> print('max_len',mx,'over80',len(bad))
+[?2004l[?2004h> if bad:
+[?2004l[?2004h>     print('first_over80',bad[0])
+[?2004l[?2004h> PY
+[?2004lmax_len 71 over80 0
+[?2004hroot@f2dfd4d3de5d:/app/src# nl -ba program.cbl | sed -n '136,150p'
+[?2004l   136	           MOVE LOAN-AMT TO BALANCE
+   137	
+   138	           IF MONTHLY-RATE = 0
+   139	               COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS
+   140	           ELSE
+   141	               COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE
+   142	               COMPUTE POWVAL ROUNDED = BASE ** (-TERM-MONTHS)
+   143	               COMPUTE DENOM ROUNDED = 1 - POWVAL
+   144	               COMPUTE MONTHLY-PAY ROUNDED =
+   145	                   (LOAN-AMT * MONTHLY-RATE) / DENOM
+   146	           END-IF
+   147	
+   148	           PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS
+   149	               COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE
+   150	               COMPUTE PRINC-PART ROUNDED = MONTHLY-PAY - INTEREST-PART
+[?2004hroot@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,200p'
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# rm -f /app/data/OUTPUT.DAT
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# ./program
+[?2004l[?2004hroot@f2dfd4d3de5d:/app/src# sed -n '1,120p' /app/data/OUTPUT.DAT
+[?2004lAPP0000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT
+APP0000002APPRO
+001 00000004.29 00000000.23 00000004.06 0000000045.94
+002 00000004.29 00000000.21 00000004.08 0000000041.86
+003 00000004.29 00000000.19 00000004.10 0000000037.76
+004 00000004.29 00000000.17 00000004.12 0000000033.64
+005 00000004.29 00000000.15 00000004.14 0000000029.50
+006 00000004.29 00000000.14 00000004.15 0000000025.35
+007 00000004.29 00000000.12 00000004.17 0000000021.18
+008 00000004.29 00000000.10 00000004.19 0000000016.99
+009 00000004.29 00000000.08 00000004.21 0000000012.78
+010 00000004.29 00000000.06 00000004.23 0000000008.55
+011 00000004.29 00000000.04 00000004.25 0000000004.30
+012 00000004.32 00000000.02 00000004.30 0000000000.00
+[?2004hroot@f2dfd4d3de5d:/app/src# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/agent.cast[0m
+[?2004hroot@f2dfd4d3de5d:/app# 

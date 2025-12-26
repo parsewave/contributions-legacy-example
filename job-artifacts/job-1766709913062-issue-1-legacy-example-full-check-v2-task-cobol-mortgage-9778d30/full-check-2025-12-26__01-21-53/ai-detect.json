@@ -1,0 +1,20 @@
+{
+  "task_id": "task-cobol-mortgage",
+  "task_path": "/workspace/parsewave/contributions-legacy-example/contributor_tasks/task-cobol-mortgage",
+  "files_analyzed": [
+    "task.yaml (instruction field)"
+  ],
+  "documents": [
+    {
+      "predicted_class": "human",
+      "confidence_score": 0.8603016868772052,
+      "confidence_category": "high",
+      "average_generated_prob": 0,
+      "completely_generated_prob": 0.05548836493601356,
+      "document_classification": "HUMAN_ONLY",
+      "result_message": "Our detector is highly confident that the text is written entirely by a human.",
+      "language": "en",
+      "version": "2025-10-30-base"
+    }
+  ]
+}

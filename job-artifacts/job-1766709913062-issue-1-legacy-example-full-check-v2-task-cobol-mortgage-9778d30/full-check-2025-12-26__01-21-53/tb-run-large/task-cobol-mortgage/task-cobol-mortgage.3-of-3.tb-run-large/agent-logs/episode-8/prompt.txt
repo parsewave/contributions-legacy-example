@@ -1,0 +1,252 @@
+New Terminal Output:
+
+root@f2dfd4d3de5d:/app/src# cd /app/src
+root@f2dfd4d3de5d:/app/src# python3 - <<'PY'
+> from pathlib import Path
+> lines = [
+> "       IDENTIFICATION DIVISION.",
+> "       PROGRAM-ID. PROGRAM.",
+> "",
+> "       ENVIRONMENT DIVISION.",
+> "       INPUT-OUTPUT SECTION.",
+> "       FILE-CONTROL.",
+> "           SELECT INFILE ASSIGN TO \"INPUT.DAT\"",
+> "               ORGANIZATION IS LINE SEQUENTIAL.",
+ > "           SELECT OUTFILE ASSIGN TO \"../data/OUTPUT.DAT\"",
+> "               ORGANIZATION IS LINE SEQUENTIAL.",
+> "",
+> "       DATA DIVISION.",
+> "       FILE SECTION.",
+> "       FD  INFILE.",
+> "       01  IN-REC                   PIC X(256).",
+> "",
+> "       FD  OUTFILE.",
+> "       01  OUT-REC                  PIC X(256).",
+> "",
+> "       WORKING-STORAGE SECTION.",
+"> "       01  WS-EOF                   PIC X VALUE 'N'.",
+> "",
+> "       01  WS-FIELDS.",
+> "           05  WS-ID                PIC X(10).",
+> "           05  WS-NAME              PIC X(30).",
+> "           05  WS-LOAN-X            PIC X(20).",
+> "           05  WS-PROP-X            PIC X(20).",
+> "           05  WS-DOWN-X            PIC X(20).",
+> "           05  WS-TERM-X            PIC X(10).",
+> "           05  WS-RATE-X            PIC X(20).",
+> "",
+O> "       01  WS-NUMS.",
+> "           05  LOAN-AMT             PIC 9(10)V99 VALUE 0.",
+> "           05  PROP-VALUE           PIC 9(10)V99 VALUE 0.",
+> "           05  DOWN-PAY             PIC 9(10)V99 VALUE 0.",
+> "           05  TERM-YEARS           PIC 9(2)     VALUE 0.",
+> "           05  TERM-MONTHS          PIC 9(4)     VALUE 0.",
+> "           05  RATE-ANN             PIC 9(3)V9(2) VALUE 0.",
+> "",
+    > "       01  WS-CALC.",
+> "           05  MIN-DOWN             PIC 9(10)V99 VALUE 0.",
+> "           05  MONTHLY-RATE         PIC 9V9(8)   VALUE 0.",
+> "           05  BASE                 PIC 9V9(8)   VALUE 0.",
+> "           05  POWVAL               PIC 9V9(12)  VALUE 0.",
+> "           05  DENOM                PIC S9V9(12) VALUE 0.",
+> "           05  MONTHLY-PAY          PIC 9(10)V99 VALUE 0.",
+> "           05  BALANCE              PIC 9(10)V99 VALUE 0.",
+> "           05  INTEREST-PART        PIC 9(10)V99 VALUE 0.",
+> "           05  PRINC-PART           PIC 9(10)V99 VALUE 0.",
+> "           05  REMAIN               PIC 9(10)V99 VALUE 0.",
+> "",
+> "       01  WS-OUT-EDIT.",
+ > "           05  ED-MONTH             PIC 9(3).",
+> "           05  ED-PAY               PIC 9(8).99.",
+> "           05  ED-INT               PIC 9(8).99.",
+> "           05  ED-PRN               PIC 9(8).99.",
+> "           05  ED-REM               PIC 9(10).99.",
+ > "",
+> "       01  WS-REASON                PIC X(50).",
+> "       01  I                        PIC 9(4) VALUE 0.",
+> "",
+> "       PROCEDURE DIVISION.",
+
+> "       MAIN.",
+> "           OPEN INPUT INFILE",
+> "           OPEN OUTPUT OUTFILE",
+ > "",
+> "           PERFORM UNTIL WS-EOF = 'Y'",
+> "               READ INFILE",
+E> "                   AT END",
+> "                       MOVE 'Y' TO WS-EOF",
+> "                   NOT AT END",
+> "                       PERFORM PROCESS-ONE",
+> "               END-READ",
+> "           END-PERFORM",
+> "",
+> "           CLOSE INFILE",
+> "           CLOSE OUTFILE",
+E'> "           STOP RUN.",
+> "",
+> "       PROCESS-ONE.",
+> "           PERFORM PARSE-INPUT",
+> "           PERFORM CHECK-APPLICATION.",
+> "",
+> "       PARSE-INPUT.",
+> "           MOVE SPACES TO WS-FIELDS",
+> "           UNSTRING IN-REC DELIMITED BY ';'",
+> "               INTO WS-ID WS-NAME WS-LOAN-X WS-PROP-X WS-DOWN-X",
+> "                    WS-TERM-X WS-RATE-X",
+> "           END-UNSTRING",
+> "",
+> "           COMPUTE LOAN-AMT ROUNDED =",
+> "               FUNCTION NUMVAL(WS-LOAN-X) / 100",
+> "           COMPUTE PROP-VALUE ROUNDED =",
+> "               FUNCTION NUMVAL(WS-PROP-X) / 100",
+> "           COMPUTE DOWN-PAY ROUNDED =",
+> "               FUNCTION NUMVAL(WS-DOWN-X) / 100",
+> "           COMPUTE TERM-YEARS = FUNCTION NUMVAL(WS-TERM-X)",
+> "           COMPUTE TERM-MONTHS = TERM-YEARS * 12",
+> "           COMPUTE RATE-ANN ROUNDED =",
+> "               FUNCTION NUMVAL(WS-RATE-X) / 100.",
+> "",
+> "       CHECK-APPLICATION.",
+> "           COMPUTE MIN-DOWN ROUNDED = PROP-VALUE * 0.15",
+> "",
+> "           IF DOWN-PAY < MIN-DOWN",
+> "               MOVE \"INSUFFICIENT FUNDS FOR DOWN PAYMENT\" TO WS-REASON",
+> "               PERFORM WRITE-DENY",
+> "           ELSE",
+> "               PERFORM WRITE-APPRO",
+> "               PERFORM BUILD-SCHEDULE",
+> "           END-IF.",
+> "",
+> "       WRITE-DENY.",
+> "           MOVE SPACES TO OUT-REC",
+> "           STRING WS-ID DELIMITED BY SIZE",
+> "                  \"DENY \" DELIMITED BY SIZE",
+> "                  WS-REASON DELIMITED BY SIZE",
+> "                  INTO OUT-REC",
+> "           END-STRING",
+> "           WRITE OUT-REC.",
+> "",
+> "       WRITE-APPRO.",
+> "           MOVE SPACES TO OUT-REC",
+> "           STRING WS-ID DELIMITED BY SIZE",
+> "                
+[... output limited to 10000 bytes; 69 interior bytes omitted ...]
+ COMPUTE MONTHLY-PAY ROUNDED =",
+> "                   (LOAN-AMT * MONTHLY-RATE) / DENOM",
+> "           END-IF",
+> "",
+> "           PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS",
+> "               COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE",
+> "               COMPUTE PRINC-PART ROUNDED = MONTHLY-PAY - INTEREST-PART",
+> "",
+> "               IF I = TERM-MONTHS",
+> "                   MOVE BALANCE TO PRINC-PART",
+> "                   COMPUTE MONTHLY-PAY ROUNDED =",
+> "                       INTEREST-PART + PRINC-PART",
+> "               END-IF",
+> "",
+> "               COMPUTE REMAIN ROUNDED = BALANCE - PRINC-PART",
+> "",
+> "               MOVE I TO ED-MONTH",
+> "               MOVE MONTHLY-PAY TO ED-PAY",
+> "               MOVE INTEREST-PART TO ED-INT",
+> "               MOVE PRINC-PART TO ED-PRN",
+> "               MOVE REMAIN TO ED-REM",
+> "",
+> "               MOVE SPACES TO OUT-REC",
+> "               STRING ED-MONTH DELIMITED BY SIZE",
+> "                      \" \" DELIMITED BY SIZE",
+> "                      ED-PAY DELIMITED BY SIZE",
+> "                      \" \" DELIMITED BY SIZE",
+> "                      ED-INT DELIMITED BY SIZE",
+> "                      \" \" DELIMITED BY SIZE",
+> "                      ED-PRN DELIMITED BY SIZE",
+> "                      \" \" DELIMITED BY SIZE",
+> "                      ED-REM DELIMITED BY SIZE",
+> "                      INTO OUT-REC",
+> "               END-STRING",
+> "               WRITE OUT-REC",
+> "",
+> "               MOVE REMAIN TO BALANCE",
+> "           END-PERFORM.",
+> ]
+> # validate length
+> mx = max(len(s) for s in lines)
+> bad = [(i+1,len(s),s) for i,s in enumerate(lines) if len(s)>80]
+> if bad:
+>     raise SystemExit('line >80: '+str(bad[0][:2]))
+> Path('/app/src/program.cbl').write_text("\n".join(lines)+"\n")
+> print('WROTE', len(lines), 'lines; max_len', mx)
+> PY
+WROTE 182 lines; max_len 71
+root@f2dfd4d3de5d:/app/src# nl -ba program.cbl | sed -n '120,180p'
+   120             WRITE OUT-REC.
+   121
+   122         WRITE-APPRO.
+   123             MOVE SPACES TO OUT-REC
+   124             STRING WS-ID DELIMITED BY SIZE
+   125                    "APPRO" DELIMITED BY SIZE
+   126                    INTO OUT-REC
+   127             END-STRING
+   128             WRITE OUT-REC.
+   129
+   130         BUILD-SCHEDULE.
+   131             IF TERM-MONTHS <= 0
+   132                 EXIT PARAGRAPH
+   133             END-IF
+   134
+   135             COMPUTE MONTHLY-RATE ROUNDED = RATE-ANN / 1200
+   136             MOVE LOAN-AMT TO BALANCE
+   137
+   138             IF MONTHLY-RATE = 0
+   139                 COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS
+   140             ELSE
+   141                 COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE
+   142                 COMPUTE POWVAL ROUNDED =
+   143                     FUNCTION POWER(BASE, -TERM-MONTHS)
+   144                 COMPUTE DENOM ROUNDED = 1 - POWVAL
+   145                 COMPUTE MONTHLY-PAY ROUNDED =
+   146                     (LOAN-AMT * MONTHLY-RATE) / DENOM
+   147             END-IF
+   148
+   149             PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS
+   150                 COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE
+   151                 COMPUTE PRINC-PART ROUNDED = MONTHLY-PAY - INTEREST-PART
+   152
+   153                 IF I = TERM-MONTHS
+   154                     MOVE BALANCE TO PRINC-PART
+   155                     COMPUTE MONTHLY-PAY ROUNDED =
+   156                         INTEREST-PART + PRINC-PART
+   157                 END-IF
+   158
+   159                 COMPUTE REMAIN ROUNDED = BALANCE - PRINC-PART
+   160
+   161                 MOVE I TO ED-MONTH
+   162                 MOVE MONTHLY-PAY TO ED-PAY
+   163                 MOVE INTEREST-PART TO ED-INT
+   164                 MOVE PRINC-PART TO ED-PRN
+   165                 MOVE REMAIN TO ED-REM
+   166
+   167                 MOVE SPACES TO OUT-REC
+   168                 STRING ED-MONTH DELIMITED BY SIZE
+   169                        " " DELIMITED BY SIZE
+   170                        ED-PAY DELIMITED BY SIZE
+   171                        " " DELIMITED BY SIZE
+   172                        ED-INT DELIMITED BY SIZE
+   173                        " " DELIMITED BY SIZE
+   174                        ED-PRN DELIMITED BY SIZE
+   175                        " " DELIMITED BY SIZE
+   176                        ED-REM DELIMITED BY SIZE
+   177                        INTO OUT-REC
+   178                 END-STRING
+   179                 WRITE OUT-REC
+   180
+root@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,200p'
+program.cbl: in paragraph 'BUILD-SCHEDULE':
+program.cbl:143: error: FUNCTION 'POWER' unknown
+root@f2dfd4d3de5d:/app/src# rm -f /app/data/OUTPUT.DAT
+root@f2dfd4d3de5d:/app/src# ./program
+bash: ./program: No such file or directory
+root@f2dfd4d3de5d:/app/src# sed -n '1,120p' /app/data/OUTPUT.DAT
+sed: can't read /app/data/OUTPUT.DAT: No such file or directory
+root@f2dfd4d3de5d:/app/src#

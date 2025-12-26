@@ -1,0 +1,298 @@
+[?2004hroot@fd18caf110c5:/app# asciinema rec --stdin /logs/agent.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@fd18caf110c5:/app# clear
+[?2004l[H[J[3J[?2004hroot@fd18caf110c5:/app# cat > /app/src/program.cbl <<'EOF'
+[?2004l[?2004h> IDENTIFICATION DIVISION.
+[?2004l[?2004h> PROGRAM-ID. PROGRAM.
+[?2004l[?2004h> ENVIRONMENT DIVISION.
+[?2004l[?2004h> INPUT-OUTPUT SECTION.
+[?2004l[?2004h> FILE-CONTROL.
+[?2004l[?2004h>     SELECT INFILE ASSIGN TO '/app/src/INPUT.DAT'
+[?2004l[?2004h>         ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>     SELECT OUTFILE ASSIGN TO '/app/data/OUTPUT.DAT'
+[?2004l[?2004h>         ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> DATA DIVISION.
+[?2004l[?2004h> FILE SECTION.
+[?2004l[?2004h> FD INFILE.
+[?2004l[?2004h> 01 IN-REC PIC X(200).
+[?2004l[?2004h> FD OUTFILE.
+[?2004l[?2004h> 01 OUT-REC PIC X(200).
+[?2004l[?2004h> WORKING-STORAGE SECTION.
+[?2004l[?2004h> 01 WS-EOF        PIC X VALUE 'N'.
+[?2004l[?2004h> 01 WS-DELIM      PIC X VALUE ';'.
+[?2004l[?2004h> 01 WS-ID         PIC X(10).
+[?2004l[?2004h> 01 WS-NAME       PIC X(30).
+[?2004l[?2004h> 01 WS-LOAN-AMT   PIC 9(10)V99.
+[?2004l[?2004h> 01 WS-PROP-VALUE PIC 9(10)V99.
+[?2004l[?2004h> 01 WS-DOWN-PAY   PIC 9(10)V99.
+[?2004l[?2004h> 01 WS-TERM       PIC 9(2) COMP.
+[?2004l[?2004h> 01 WS-RATE       PIC 9(3)V99.
+[?2004l[?2004h> 01 WS-MIN-DOWN   PIC 9(10)V99.
+[?2004l[?2004h> 01 WS-MONTHLY-RATE PIC S9(4)V9(6).
+[?2004l[?2004h> 01 WS-MONTHLY-PMT PIC 9(8)V99.
+[?2004l[?2004h> 01 WS-INTEREST   PIC 9(8)V99.
+[?2004l[?2004h> 01 WS-PRINCIPAL  PIC 9(8)V99.
+[?2004l[?2004h> 01 WS-REMAIN-BAL PIC 9(10)V99.
+[?2004l[?2004h> 01 WS-MON-NUM    PIC 9(3).
+[?2004l[?2004h> 01 WS-REASON     PIC X(50) VALUE
+[?2004l[?2004h>    'INSUFFICIENT FUNDS FOR DOWN PAYMENT'.
+[?2004l[?2004h> PROCEDURE DIVISION.
+[?2004l[?2004h> MAIN-LOGIC.
+[?2004l[?2004h>     OPEN INPUT INFILE
+[?2004l[?2004h>     OPEN OUTPUT OUTFILE
+[?2004l[?2004h>     PERFORM UNTIL WS-EOF = 'Y'
+[?2004l[?2004h>         READ INFILE AT END
+[?2004l[?2004h>             MOVE 'Y' TO WS-EOF
+[?2004l[?2004h>         NOT AT END
+[?2004l[?2004h>             PERFORM SPLIT-RECORD
+[?2004l[?2004h>             PERFORM PROCESS-APP
+[?2004l[?2004h>         END-READ
+[?2004l[?2004h>     END-PERFORM
+[?2004l[?2004h>     CLOSE INFILE
+[?2004l[?2004h>     CLOSE OUTFILE
+[?2004l[?2004h>     STOP RUN.
+[?2004l[?2004h> SPLIT-RECORD.
+[?2004l[?2004h>     UNSTRING IN-REC DELIMITED BY WS-DELIM
+[?2004l[?2004h>         INTO WS-ID, WS-NAME, WS-LOAN-AMT,
+[?2004l[?2004h>              WS-PROP-VALUE, WS-DOWN-PAY,
+[?2004l[?2004h>              WS-TERM, WS-RATE.
+[?2004l[?2004h> PROCESS-APP.
+[?2004l[?2004h>     COMPUTE WS-MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED
+[?2004l[?2004h>     IF WS-DOWN-PAY < WS-MIN-DOWN
+[?2004l[?2004h>         MOVE WS-ID TO OUT-REC(1:10)
+[?2004l[?2004h>         STRING 'DENY ' WS-REASON DELIMITED BY SIZE
+[?2004l[?2004h>             INTO OUT-REC(11:)
+[?2004l[?2004h>         WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>     ELSE
+[?2004l[?2004h>         MOVE WS-ID TO OUT-REC(1:10)
+[?2004l[?2004h>         STRING 'APPRO' DELIMITED BY SIZE
+[?2004l[?2004h>             INTO OUT-REC(11:)
+[?2004l[?2004h>         WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>         PERFORM CALCULATE-PAYMENT
+[?2004l[?2004h>     END-IF.
+[?2004l[?2004h> CALCULATE-PAYMENT.
+[?2004l[?2004h>     COMPUTE WS-MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+[?2004l[?2004h>     COMPUTE WS-MONTHLY-PMT =
+[?2004l[?2004h>         WS-LOAN-AMT * WS-MONTHLY-RATE /
+[?2004l[?2004h>         (1 - (1 + WS-MONTHLY-RATE) ** (-WS-TERM))
+[?2004l[?2004h>         ROUNDED
+[?2004l[?2004h>     MOVE WS-LOAN-AMT TO WS-REMAIN-BAL
+[?2004l[?2004h>     PERFORM VARYING WS-MON-NUM FROM 1 BY 1
+[?2004l[?2004h>         UNTIL WS-MON-NUM > WS-TERM
+[?2004l[?2004h>         COMPUTE WS-INTEREST = WS-REMAIN-BAL * WS-MONTHLY-RATE ROUNDED
+[?2004l[?2004h>         COMPUTE WS-PRINCIPAL = WS-MONTHLY-PMT - WS-INTEREST ROUNDED
+[?2004l[?2004h>         SUBTRACT WS-PRINCIPAL FROM WS-REMAIN-BAL
+[?2004l[?2004h>         MOVE WS-MON-NUM TO OUT-REC(1:3)
+[?2004l[?2004h>         STRING
+[?2004l[?2004h>           FUNCTION NUMVAL-C (WS-MONTHLY-PMT) DELIMITED BY SIZE
+[?2004l[?2004h>           ' ' FUNCTION NUMVAL-C (WS-INTEREST) DELIMITED BY SIZE
+[?2004l[?2004h>           ' ' FUNCTION NUMVAL-C (WS-PRINCIPAL) DELIMITED BY SIZE
+[?2004l[?2004h>           ' ' FUNCTION NUMVAL-C (WS-REMAIN-BAL) DELIMITED BY SIZE
+[?2004l[?2004h>           INTO OUT-REC(4:)
+[?2004l[?2004h>         WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>     END-PERFORM.
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@fd18caf110c5:/app# cobc -x -o /app/src/program /app/src/program.cbl
+[?2004l/app/src/program.cbl:1: error: invalid indicator 'F' at column 7
+/app/src/program.cbl:2: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:3: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:4: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:5: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:6: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:8: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:10: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:11: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:12: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:13: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:14: error: invalid indicator 'F' at column 7
+/app/src/program.cbl:15: warning: continuation of COBOL words used [-Wdialect]
+/app/src/program.cbl:16: error: invalid indicator 'G' at column 7
+/app/src/program.cbl:17: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:19: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:20: error: invalid indicator 'N' at column 7
+/app/src/program.cbl:21: error: invalid indicator 'L' at column 7
+/app/src/program.cbl:22: error: invalid indicator 'P' at column 7
+/app/src/program.cbl:24: error: invalid indicator 'T' at column 7
+/app/src/program.cbl:25: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:26: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:27: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:28: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:29: error: invalid indicator 'I' at column 7
+/app/src/program.cbl:30: error: invalid indicator 'P' at column 7
+/app/src/program.cbl:31: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:32: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:33: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:34: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:35: error: invalid indicator 'U' at column 7
+/app/src/program.cbl:36: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:37: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:38: error: invalid indicator 'E' at column 7
+/app/src/program.cbl:39: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:47: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:48: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:49: error: invalid indicator 'O' at column 7
+/app/src/program.cbl:50: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:51: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:55: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:56: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:62: error: invalid indicator 'S' at column 7
+/app/src/program.cbl:69: error: invalid indicator 'A' at column 7
+/app/src/program.cbl:70: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:71: error: invalid indicator 'M' at column 7
+/app/src/program.cbl:75: error: invalid indicator 'V' at column 7
+/app/src/program.cbl:76: error: invalid indicator 'R' at column 7
+/app/src/program.cbl:7: error: PROGRAM-ID header missing
+/app/src/program.cbl:7: error: PROCEDURE DIVISION header missing
+/app/src/program.cbl:7: error: syntax error, unexpected ORGANIZATION
+/app/src/program.cbl:9: error: syntax error, unexpected ORGANIZATION
+/app/src/program.cbl:9: error: unknown statement 'REC'
+/app/src/program.cbl:40: error: 'INFILE' is not defined
+/app/src/program.cbl:40: error: 'INFILE' is not a file name
+/app/src/program.cbl:41: error: 'WS-EOF' is not defined
+/app/src/program.cbl:52: error: syntax error, unexpected INTO
+/app/src/program.cbl:57: error: unknown statement 'WS-DOWN-PAY'
+/app/src/program.cbl:58: error: 'WS-ID' is not defined
+/app/src/program.cbl:58: error: 'OUT-REC' is not defined
+/app/src/program.cbl:59: error: 'WS-REASON' is not defined
+/app/src/program.cbl:61: error: 'OUTFILE' is not defined
+/app/src/program.cbl:72: error: 'WS-LOAN-AMT' is not defined
+/app/src/program.cbl:72: error: syntax error, unexpected *, expecting TIMES
+/app/src/program.cbl:78: error: 'WS-INTEREST' is not defined
+/app/src/program.cbl:78: error: 'WS-REMAIN-BAL' is not defined
+/app/src/program.cbl:78: error: 'WS-MONTHLY-RATE' is not defined
+/app/src/program.cbl:78: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:79: error: 'WS-PRINCIPAL' is not defined
+/app/src/program.cbl:79: error: 'WS-MONTHLY-PMT' is not defined
+/app/src/program.cbl:79: error: syntax error, unexpected ROUNDED
+/app/src/program.cbl:81: error: 'WS-MON-NUM' is not defined
+/app/src/program.cbl:90: error: syntax error, unexpected end of file
+[?2004hroot@fd18caf110c5:/app# cat > /app/src/program.cbl <<'EOF'
+[?2004lNG 'APPRO' DELIMITED BY SIZE
+             INTO OUT-REC(11:)
+         WRITE OUTFILE FROM OUT-REC
+         PERFORM CALCULATE-PAYMENT
+     END-IF.
+ CALCULATE-PAYMENT.
+     COMPUTE WS-MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+     COMPUTE WS-MONTHLY-PMT =
+         WS-LOAN-AMT * WS-MONTHLY-RATE /
+         (1 - (1 + WS-MONTHLY-RATE) ** (-WS-TERM))
+         ROUNDED
+     MOVE WS-LOAN-AMT TO WS-REMAIN-BAL
+     PERFORM VARYING WS-MON-NUM FROM 1 BY 1
+         UNTIL WS-MON-NUM > WS-TERM
+         COMPUTE WS-INTEREST = WS-REMAIN-BAL * WS-MONTHLY-RATE ROUNDED
+         COMPUTE WS-PRINCIPAL = WS-MONTHLY-PMT - WS-INTEREST ROUNDED
+         SUBTRACT WS-PRINCIPAL FROM WS-REMAIN-BAL
+         MOVE WS-MON-NUM TO WS-MON-NUM-STR
+         MOVE WS-MONTHLY-PMT TO WS-PMT-STR
+         MOVE WS-INTEREST TO WS-INT-STR
+         MOVE WS-PRINCIPAL TO WS-PRIN-STR
+         MOVE WS-REMAIN-BAL TO WS-BAL-STR
+         STRING WS-MON-NUM-STR SPACE WS-PMT-STR SPACE WS-INT-STR
+                SPACE WS-PRIN-STR SPACE WS-BAL-STR
+                INTO OUT-REC
+         WRITE OUTFILE FROM OUT-REC
+     END-PERFORM.
+ EOF
+[?2004h>  IDENTIFICATION DIVISION.
+[?2004l[?2004h>  PROGRAM-ID. PROGRAM.
+[?2004l[?2004h>  ENVIRONMENT DIVISION.
+[?2004l[?2004h>  INPUT-OUTPUT SECTION.
+[?2004l[?2004h>  FILE-CONTROL.
+[?2004l[?2004h>      SELECT INFILE ASSIGN TO '/app/src/INPUT.DAT'
+[?2004l[?2004h>          ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>      SELECT OUTFILE ASSIGN TO '/app/data/OUTPUT.DAT'
+[?2004l[?2004h>          ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>  DATA DIVISION.
+[?2004l[?2004h>  FILE SECTION.
+[?2004l[?2004h>  FD INFILE.
+[?2004l[?2004h>  01 IN-REC PIC X(200).
+[?2004l[?2004h>  FD OUTFILE.
+[?2004l[?2004h>  01 OUT-REC PIC X(200).
+[?2004l[?2004h>  WORKING-STORAGE SECTION.
+[?2004l[?2004h>  01 WS-EOF        PIC X VALUE 'N'.
+[?2004l[?2004h>  01 WS-DELIM      PIC X VALUE ';'.
+[?2004l[?2004h>  01 WS-ID         PIC X(10).
+[?2004l[?2004h>  01 WS-NAME       PIC X(30).
+[?2004l[?2004h>  01 WS-LOAN-AMT   PIC 9(10)V99.
+[?2004l[?2004h>  01 WS-PROP-VALUE PIC 9(10)V99.
+[?2004l[?2004h>  01 WS-DOWN-PAY   PIC 9(10)V99.
+[?2004l[?2004h>  01 WS-TERM       PIC 9(2) COMP.
+[?2004l[?2004h>  01 WS-RATE       PIC 9(3)V99.
+[?2004l[?2004h>  01 WS-MIN-DOWN   PIC 9(10)V99.
+[?2004l[?2004h>  01 WS-MONTHLY-RATE PIC S9(4)V9(6).
+[?2004l[?2004h>  01 WS-MONTHLY-PMT PIC 9(8)V99.
+[?2004l[?2004h>  01 WS-INTEREST   PIC 9(8)V99.
+[?2004l[?2004h>  01 WS-PRINCIPAL  PIC 9(8)V99.
+[?2004l[?2004h>  01 WS-REMAIN-BAL PIC 9(10)V99.
+[?2004l[?2004h>  01 WS-MON-NUM    PIC 9(3).
+[?2004l[?2004h>  01 WS-REASON     PIC X(50) VALUE
+[?2004l[?2004h>     'INSUFFICIENT FUNDS FOR DOWN PAYMENT'.
+[?2004l[?2004h>  01 WS-MON-NUM-STR    PIC X(3).
+[?2004l[?2004h>  01 WS-PMT-STR        PIC X(12).
+[?2004l[?2004h>  01 WS-INT-STR        PIC X(12).
+[?2004l[?2004h>  01 WS-PRIN-STR       PIC X(12).
+[?2004l[?2004h>  01 WS-BAL-STR        PIC X(12).
+[?2004l[?2004h>  PROCEDURE DIVISION.
+[?2004l[?2004h>  MAIN-LOGIC.
+[?2004l[?2004h>      OPEN INPUT INFILE
+[?2004l[?2004h>      OPEN OUTPUT OUTFILE
+[?2004l[?2004h>      PERFORM UNTIL WS-EOF = 'Y'
+[?2004l[?2004h>          READ INFILE AT END
+[?2004l[?2004h>              MOVE 'Y' TO WS-EOF
+[?2004l[?2004h>          NOT AT END
+[?2004l[?2004h>              PERFORM SPLIT-REC
+[?2004l[?2004h>              PERFORM PROCESS-APP
+[?2004l[?2004h>          END-READ
+[?2004l[?2004h>      END-PERFORM
+[?2004l[?2004h>      CLOSE INFILE
+[?2004l[?2004h>      CLOSE OUTFILE
+[?2004l[?2004h>      STOP RUN.
+[?2004l[?2004h>  SPLIT-REC.
+[?2004l[?2004h>      UNSTRING IN-REC DELIMITED BY WS-DELIM
+[?2004l[?2004h>          INTO WS-ID, WS-NAME, WS-LOAN-AMT,
+[?2004l[?2004h>               WS-PROP-VALUE, WS-DOWN-PAY,
+[?2004l[?2004h>               WS-TERM, WS-RATE.
+[?2004l[?2004h>  PROCESS-APP.
+[?2004l[?2004h>      COMPUTE WS-MIN-DOWN = WS-PROP-VALUE * 0.15 ROUNDED
+[?2004l[?2004h>      IF WS-DOWN-PAY < WS-MIN-DOWN
+[?2004l[?2004h>          MOVE WS-ID TO OUT-REC(1:10)
+[?2004l[?2004h>          STRING 'DENY ' WS-REASON DELIMITED BY SIZE
+[?2004l[?2004h>              INTO OUT-REC(11:)
+[?2004l[?2004h>          WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>      ELSE
+[?2004l[?2004h>          MOVE WS-ID TO OUT-REC(1:10)
+[?2004l[?2004h>          STRING 'APPRO' DELIMITED BY SIZE
+[?2004l[?2004h>              INTO OUT-REC(11:)
+[?2004l[?2004h>          WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>          PERFORM CALCULATE-PAYMENT
+[?2004l[?2004h>      END-IF.
+[?2004l[?2004h>  CALCULATE-PAYMENT.
+[?2004l[?2004h>      COMPUTE WS-MONTHLY-RATE = WS-RATE / 1200 ROUNDED
+[?2004l[?2004h>      COMPUTE WS-MONTHLY-PMT =
+[?2004l[?2004h>          WS-LOAN-AMT * WS-MONTHLY-RATE /
+[?2004l[?2004h>          (1 - (1 + WS-MONTHLY-RATE) ** (-WS-TERM))
+[?2004l[?2004h>          ROUNDED
+[?2004l[?2004h>      MOVE WS-LOAN-AMT TO WS-REMAIN-BAL
+[?2004l[?2004h>      PERFORM VARYING WS-MON-NUM FROM 1 BY 1
+[?2004l[?2004h>          UNTIL WS-MON-NUM > WS-TERM
+[?2004l[?2004h>          COMPUTE WS-INTEREST = WS-REMAIN-BAL * WS-MONTHLY-RATE ROUNDED
+[?2004l[?2004h>          COMPUTE WS-PRINCIPAL = WS-MONTHLY-PMT - WS-INTEREST ROUNDED
+[?2004l[?2004h>          SUBTRACT WS-PRINCIPAL FROM WS-REMAIN-BAL
+[?2004l[?2004h>          MOVE WS-MON-NUM TO WS-MON-NUM-STR
+[?2004l[?2004h>          MOVE WS-MONTHLY-PMT TO WS-PMT-STR
+[?2004l[?2004h>          MOVE WS-INTEREST TO WS-INT-STR
+[?2004l[?2004h>          MOVE WS-PRINCIPAL TO WS-PRIN-STR
+[?2004l[?2004h>          MOVE WS-REMAIN-BAL TO WS-BAL-STR
+[?2004l[?2004h>          STRING WS-MON-NUM-STR SPACE WS-PMT-STR SPACE WS-INT-STR
+[?2004l[?2004h>                 SPACE WS-PRIN-STR SPACE WS-BAL-STR
+[?2004l[?2004h>                 INTO OUT-REC
+[?2004l[?2004h>          WRITE OUTFILE FROM OUT-REC
+[?2004l[?2004h>      END-PERFORM.
+[?2004l[?2004h>  EOF
+[?2004l[?2004h> cobc -x -o /app/src/program /app/src/program.cbl
+[?2004l[?2004h> [?2004l
+bash: warning: here-document at line 94 delimited by end-of-file (wanted `EOF')
+[?2004hroot@fd18caf110c5:/app# 

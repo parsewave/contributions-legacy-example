@@ -1,0 +1,117 @@
+New Terminal Output:
+
+root@89ebd35e8c9b:/app/src# cd /app/src
+root@89ebd35e8c9b:/app/src# nl -ba program.cbl | sed -n '1,30p'
+     1         IDENTIFICATION DIVISION.
+     2         PROGRAM-ID. MORTGAGE.
+     3
+     4         ENVIRONMENT DIVISION.
+     5         CONFIGURATION SECTION.
+     6         SPECIAL-NAMES.
+     7             DECIMAL-POINT IS DOT.
+     8         INPUT-OUTPUT SECTION.
+     9         FILE-CONTROL.
+    10             SELECT INFILE ASSIGN TO "INPUT.DAT"
+    11                 ORGANIZATION IS LINE SEQUENTIAL.
+    12             SELECT OUTFILE ASSIGN TO "/app/data/OUTPUT.DAT"
+    13                 ORGANIZATION IS LINE SEQUENTIAL.
+    14
+    15         DATA DIVISION.
+    16         FILE SECTION.
+    17         FD  INFILE.
+    18         01  IN-REC                   PIC X(200).
+    19         FD  OUTFILE.
+    20         01  OUT-REC                  PIC X(200).
+    21
+    22         WORKING-STORAGE SECTION.
+    23         01  WS-EOF                   PIC X VALUE "N".
+    24
+    25         01  WS-ID                    PIC X(10).
+    26         01  WS-NAME                  PIC X(30).
+    27         01  WS-LOAN-TXT              PIC X(20).
+    28         01  WS-PROP-TXT              PIC X(20).
+    29         01  WS-DOWN-TXT              PIC X(20).
+    30         01  WS-TERM-TXT              PIC X(10).
+root@89ebd35e8c9b:/app/src# grep -n "SPECIAL-NAMES\.|DECIMAL-POINT" -n program.cbl || true
+root@89ebd35e8c9b:/app/src# sed -i '/^[[:space:]]*SPECIAL-NAMES\./d; /^[[:space:]]*DECIMAL-POINT IS DOT\./d' program.cbl
+root@89ebd35e8c9b:/app/src# nl -ba program.cbl | sed -n '1,20p'
+     1         IDENTIFICATION DIVISION.
+     2         PROGRAM-ID. MORTGAGE.
+     3
+     4         ENVIRONMENT DIVISION.
+     5         CONFIGURATION SECTION.
+     6         INPUT-OUTPUT SECTION.
+     7         FILE-CONTROL.
+     8             SELECT INFILE ASSIGN TO "INPUT.DAT"
+     9                 ORGANIZATION IS LINE SEQUENTIAL.
+    10             SELECT OUTFILE ASSIGN TO "/app/data/OUTPUT.DAT"
+    11                 ORGANIZATION IS LINE SEQUENTIAL.
+    12
+    13         DATA DIVISION.
+    14         FILE SECTION.
+    15         FD  INFILE.
+    16         01  IN-REC                   PIC X(200).
+    17         FD  OUTFILE.
+    18         01  OUT-REC                  PIC X(200).
+    19
+    20         WORKING-STORAGE SECTION.
+root@89ebd35e8c9b:/app/src# cobc -x -Wall -Wextra -std=default program.cbl -o program
+program.cbl: in paragraph 'CONVERT-FIELDS':
+program.cbl:109: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:110: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:111: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:113: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:114: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:121: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:123: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:125: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl: in paragraph 'DECIDE-AND-WRITE':
+program.cbl:138: warning: WRITE statement not terminated by END-WRITE [-Wterminator]
+program.cbl:146: warning: WRITE statement not terminated by END-WRITE [-Wterminator]
+program.cbl: in paragraph 'CALC-MONTHLY-PAY':
+program.cbl:152: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:160: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:166: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:167: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:169: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl: in paragraph 'WRITE-SCHEDULE':
+program.cbl:178: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:183: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:187: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:189: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:191: warning: COMPUTE statement not terminated by END-COMPUTE [-Wterminator]
+program.cbl:195: warning: some digits may be truncated [-Wpossible-truncate]
+program.cbl:48: note: 'WS-MON' defined here as PIC 9(4) [-Wpossible-truncate]
+program.cbl:62: note: 'WS-MON-ED' defined here as PIC 9(3) [-Wpossible-truncate]
+program.cbl:196: warning: some digits may be truncated [-Wpossible-truncate]
+program.cbl:46: note: 'WS-PAYMENT' defined here as PIC 9(11)V99 [-Wpossible-truncate]
+program.cbl:63: note: 'WS-PAY-ED' defined here as PIC 9(8).99 [-Wpossible-truncate]
+program.cbl:197: warning: some digits may be truncated [-Wpossible-truncate]
+program.cbl:44: note: 'WS-INTEREST' defined here as PIC 9(11)V99 [-Wpossible-truncate]
+program.cbl:64: note: 'WS-INT-ED' defined here as PIC 9(8).99 [-Wpossible-truncate]
+program.cbl:198: warning: some digits may be truncated [-Wpossible-truncate]
+program.cbl:45: note: 'WS-PRINCIPAL' defined here as PIC 9(11)V99 [-Wpossible-truncate]
+program.cbl:65: note: 'WS-PRN-ED' defined here as PIC 9(8).99 [-Wpossible-truncate]
+program.cbl:199: warning: some digits may be truncated [-Wpossible-truncate]
+program.cbl:43: note: 'WS-BALANCE' defined here as PIC 9(11)V99 [-Wpossible-truncate]
+program.cbl:66: note: 'WS-BAL-ED' defined here as PIC 9(10).99 [-Wpossible-truncate]
+program.cbl:214: warning: WRITE statement not terminated by END-WRITE [-Wterminator]
+root@89ebd35e8c9b:/app/src# rm -f /app/data/OUTPUT.DAT && : > /app/data/OUTPUT.DAT
+root@89ebd35e8c9b:/app/src# ./program
+root@89ebd35e8c9b:/app/src# ls -la /app/data/OUTPUT.DAT && sed -n '1,120p' /app/data/OUTPUT.DAT
+-rw-r--r-- 1 root root 716 Dec 26 01:36 /app/data/OUTPUT.DAT
+APP0000001DENY  INSUFFICIENT FUNDS FOR DOWN PAYMENT
+APP0000002APPRO
+001 00000429.18 00000022.92 00000406.26 0000004593.74
+002 00000429.18 00000021.05 00000408.13 0000004185.61
+003 00000429.18 00000019.18 00000410.00 0000003775.61
+004 00000429.18 00000017.30 00000411.88 0000003363.73
+005 00000429.18 00000015.42 00000413.76 0000002949.97
+006 00000429.18 00000013.52 00000415.66 0000002534.31
+007 00000429.18 00000011.62 00000417.56 0000002116.75
+008 00000429.18 00000009.70 00000419.48 0000001697.27
+009 00000429.18 00000007.78 00000421.40 0000001275.87
+010 00000429.18 00000005.85 00000423.33 0000000852.54
+011 00000429.18 00000003.91 00000425.27 0000000427.27
+012 00000429.23 00000001.96 00000427.27 0000000000.00
+root@89ebd35e8c9b:/app/src#

@@ -1,0 +1,41 @@
+New Terminal Output:
+root@7c360067301d:/app# ls -l /app/src
+total 4
+-rw-r--r-- 1 root root 167 Dec 26 01:21 INPUT.DAT
+root@7c360067301d:/app# ls -l /app/data
+total 4
+-rw-r--r-- 1 root root 1 Dec 26 01:21 OUTPUT.DAT
+root@7c360067301d:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

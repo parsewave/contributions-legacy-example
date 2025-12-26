@@ -1,0 +1,46 @@
+Current terminal state:
+New Terminal Output:
+
+root@8932fc9aa05e:/app/src# sed -n '1,25p' /app/src/program.cbl | cat -n
+     1         IDENTIFICATION DIVISION.
+     2         PROGRAM-ID. PROGRAM.
+     3
+     4         ENVIRONMENT DIVISION.
+     5         INPUT-OUTPUT SECTION.
+     6         FILE-CONTROL.
+     7             SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+     8                 ORGANIZATION IS LINE SEQUENTIAL.
+     9             SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+    10                 ORGANIZATION IS LINE SEQUENTIAL.
+    11
+    12         DATA DIVISION.
+    13         FILE SECTION.
+    14         FD  IN-FILE.
+    15         01  IN-REC                 PIC X(256).
+    16
+    17         FD  OUT-FILE.
+    18         01  OUT-REC                PIC X(256).
+    19
+    20         WORKING-STORAGE SECTION.
+    21         01  WS-EOF                 PIC X VALUE 'N'.
+    22
+    23         01  WS-IN.
+    24             05  IN-ID              PIC X(10).
+    25             05  IN-NAME            PIC X(30).
+root@8932fc9aa05e:/app/src# python3 - <<'PY'
+> mx=0
+> bad=[]
+> for i,l in enumerate(open('/app/src/program.cbl','r',encoding='utf-8'),1):
+>     n=len(l.rstrip('\n'))
+>     mx=max(mx,n)
+>     if n>80:
+>         bad.append((i,n))
+> print('max_len',mx)
+> print('lines_over_80',len(bad))
+> PY
+max_len 72
+lines_over_80 0
+root@8932fc9aa05e:/app/src#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

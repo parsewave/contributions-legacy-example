@@ -1,0 +1,78 @@
+[?2004hroot@9c6f98dfcef8:/app# asciinema rec --stdin /logs/tests.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/tests.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@9c6f98dfcef8:/app# clear
+[?2004l[H[J[3J[?2004hroot@9c6f98dfcef8:/app# bash /tests/run-tests.sh; tmux wait -S done
+[?2004l[1m===================================================================== test session starts ======================================================================[0m
+platform linux -- Python 3.13.1, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /tests
+[1mcollecting ... [0m[1mcollected 4 items                                                                                                                                              [0m
+
+../tests/test_outputs.py::test_required_files_exist [32mPASSED[0m[32m                                                                                               [ 25%][0m
+../tests/test_outputs.py::test_fixed_format_constraints [31mFAILED[0m[31m                                                                                           [ 50%][0m
+../tests/test_outputs.py::test_data_files_exist [32mPASSED[0m[31m                                                                                                   [ 75%][0m
+../tests/test_outputs.py::test_program_output [31mFAILED[0m[31m                                                                                                     [100%][0m
+
+=========================================================================== FAILURES ===========================================================================
+[31m[1m________________________________________________________________ test_fixed_format_constraints _________________________________________________________________[0m
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92mtest_fixed_format_constraints[39;49;00m():[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Test that the code is written in fixed format"""[39;49;00m[90m[39;49;00m
+        src = Path([33m"[39;49;00m[33m/app/src/program.cbl[39;49;00m[33m"[39;49;00m).read_text()[90m[39;49;00m
+        [94massert[39;49;00m [33m"[39;49;00m[33m>>SOURCE FORMAT IS FIXED[39;49;00m[33m"[39;49;00m [95mnot[39;49;00m [95min[39;49;00m src[90m[39;49;00m
+        longest = [96mmax[39;49;00m([96mlen[39;49;00m(line.rstrip([33m"[39;49;00m[33m\n[39;49;00m[33m"[39;49;00m)) [94mfor[39;49;00m line [95min[39;49;00m src.splitlines())[90m[39;49;00m
+>       [94massert[39;49;00m longest <= [94m80[39;49;00m[90m[39;49;00m
+[1m[31mE       assert 82 <= 80[0m
+
+[1m[31m/tests/test_outputs.py[0m:20: AssertionError
+[31m[1m_____________________________________________________________________ test_program_output ______________________________________________________________________[0m
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92mtest_program_output[39;49;00m():[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Test that the program produces the expected output and file contents"""[39;49;00m[90m[39;49;00m
+        initial_OUTPUT = [33m"[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+    [90m[39;49;00m
+        data_dir = Path([33m"[39;49;00m[33m/app/data[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+        (data_dir / [33m"[39;49;00m[33mOUTPUT.DAT[39;49;00m[33m"[39;49;00m).write_text(initial_OUTPUT)[90m[39;49;00m
+    [90m[39;49;00m
+        Path([33m"[39;49;00m[33m/app/src/INPUT.DAT[39;49;00m[33m"[39;49;00m).write_text([90m[39;49;00m
+    [33m"""APP0000001;Williams David Robert         ;2000000000;3500000000;0500000000;20;00550[39;49;00m
+    [33mAPP0000002;John Smith Clark              ;0000005000;0000004000;0000003500;01;00550"""[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+        [90m# Compile the COBOL program[39;49;00m[90m[39;49;00m
+        compile_result = subprocess.run([[90m[39;49;00m
+            [33m'[39;49;00m[33mcobc[39;49;00m[33m'[39;49;00m,[90m[39;49;00m
+            [33m'[39;49;00m[33m-x[39;49;00m[33m'[39;49;00m,[90m[39;49;00m
+            [33m'[39;49;00m[33m-o[39;49;00m[33m'[39;49;00m,[90m[39;49;00m
+            [33m'[39;49;00m[33m/app/src/programCOMP[39;49;00m[33m'[39;49;00m,[90m[39;49;00m
+            [33m'[39;49;00m[33m/app/src/program.cbl[39;49;00m[33m'[39;49;00m[90m[39;49;00m
+        ], capture_output=[94mTrue[39;49;00m, text=[94mTrue[39;49;00m)[90m[39;49;00m
+    [90m[39;49;00m
+>       [94massert[39;49;00m compile_result.returncode == [94m0[39;49;00m, [33mf[39;49;00m[33m"[39;49;00m[33mCompilation failed: [39;49;00m[33m{[39;49;00mcompile_result.stderr[33m}[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+[1m[31mE       AssertionError: Compilation failed: /app/src/program.cbl: in paragraph 'PROCESS-RECORD':[0m
+[1m[31mE         /app/src/program.cbl:52: error: syntax error, unexpected ROUNDED[0m
+[1m[31mE         /app/src/program.cbl:62: error: syntax error, unexpected ROUNDED[0m
+[1m[31mE         /app/src/program.cbl:65: error: FUNCTION 'POWER' unknown[0m
+[1m[31mE         /app/src/program.cbl:66: error: syntax error, unexpected ROUNDED[0m
+[1m[31mE         /app/src/program.cbl:67: error: invalid expression[0m
+[1m[31mE         /app/src/program.cbl:68: error: syntax error, unexpected Identifier[0m
+[1m[31mE         /app/src/program.cbl:69: error: syntax error, unexpected Identifier[0m
+[1m[31mE         /app/src/program.cbl:70: error: syntax error, unexpected Identifier[0m
+[1m[31mE         [0m
+[1m[31mE       assert 1 == 0[0m
+[1m[31mE        +  where 1 = CompletedProcess(args=['cobc', '-x', '-o', '/app/src/programCOMP', '/app/src/program.cbl'], returncode=1, stdout='', stderr="/app/src/program.cbl: in paragraph 'PROCESS-RECORD':\n/app/src/program.cbl:52: error: syntax error, unexpected ROUNDED\n/app/src/program.cbl:62: error: syntax error, unexpected ROUNDED\n/app/src/program.cbl:65: error: FUNCTION 'POWER' unknown\n/app/src/program.cbl:66: error: syntax error, unexpected ROUNDED\n/app/src/program.cbl:67: error: invalid expression\n/app/src/program.cbl:68: error: syntax error, unexpected Identifier\n/app/src/program.cbl:69: error: syntax error, unexpected Identifier\n/app/src/program.cbl:70: error: syntax error, unexpected Identifier\n").returncode[0m
+
+[1m[31m/tests/test_outputs.py[0m:52: AssertionError
+============================================================================ PASSES ============================================================================
+[36m[1m=================================================================== short test summary info ====================================================================[0m
+[32mPASSED[0m ../tests/test_outputs.py::[1mtest_required_files_exist[0m
+[32mPASSED[0m ../tests/test_outputs.py::[1mtest_data_files_exist[0m
+[31mFAILED[0m ../tests/test_outputs.py::[1mtest_fixed_format_constraints[0m - assert 82 <= 80
+[31mFAILED[0m ../tests/test_outputs.py::[1mtest_program_output[0m - AssertionError: Compilation failed: /app/src/program.cbl: in paragraph 'PROCESS-RECORD':
+[31m================================================================= [31m[1m2 failed[0m, [32m2 passed[0m[31m in 0.07s[0m[31m ==================================================================[0m
+[?2004hroot@9c6f98dfcef8:/app# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/tests.cast[0m
+[?2004hroot@9c6f98dfcef8:/app# 

@@ -1,0 +1,276 @@
+New Terminal Output:
+
+root@f2dfd4d3de5d:/app/src# cd /app/src
+root@f2dfd4d3de5d:/app/src# nl -ba program.cbl | sed -n '1,80p'
+     1         IDENTIFICATION DIVISION.
+     2         PROGRAM-ID. PROGRAM.
+     3
+     4         ENVIRONMENT DIVISION.
+     5         INPUT-OUTPUT SECTION.
+     6         FILE-CONTROL.
+     7             SELECT INFILE ASSIGN TO "INPUT.DAT"
+     8                 ORGANIZATION IS LINE SEQUENTIAL.
+     9             SELECT OUTFILE ASSIGN TO "../data/OUTPUT.DAT"
+    10                 ORGANIZATION IS LINE SEQUENTIAL.
+    11
+    12         DATA DIVISION.
+    13         FILE SECTION.
+    14         FD  INFILE.
+    15         01  IN-REC               PIC X(256).
+    16
+    17         FD  OUTFILE.
+    18         01  OUT-REC              PIC X(256).
+    19
+    20         WORKING-STORAGE SECTION.
+    21         01  WS-EOF               PIC X VALUE 'N'.
+    22
+    23         01  WS-FIELDS.
+    24             05  WS-ID            PIC X(10).
+    25             05  WS-NAME          PIC X(30).
+    26             05  WS-LOAN-X        PIC X(20).
+    27             05  WS-PROP-X        PIC X(20).
+    28             05  WS-DOWN-X        PIC X(20).
+    29             05  WS-TERM-X        PIC X(10).
+    30             05  WS-RATE-X        PIC X(20).
+    31
+    32         01  WS-NUMS.
+    33             05  LOAN-AMT         PIC 9(10)V99 VALUE 0.
+    34             05  PROP-VALUE       PIC 9(10)V99 VALUE 0.
+    35             05  DOWN-PAY         PIC 9(10)V99 VALUE 0.
+    36             05  TERM-MONTHS      PIC 9(4)     VALUE 0.
+    37             05  RATE-ANN         PIC 9(3)V9(2) VALUE 0.
+    38
+    39         01  WS-CALC.
+    40             05  MIN-DOWN         PIC 9(10)V99 VALUE 0.
+    41             05  MONTHLY-RATE     PIC 9V9(8)   VALUE 0.
+    42             05  BASE             PIC 9V9(8)   VALUE 0.
+    43             05  POWVAL           PIC 9V9(12)  VALUE 0.
+    44             05  DENOM            PIC S9V9(12) VALUE 0.
+    45             05  MONTHLY-PAY      PIC 9(10)V99 VALUE 0.
+    46             05  BALANCE          PIC 9(10)V99 VALUE 0.
+    47             05  INTEREST-PART    PIC 9(10)V99 VALUE 0.
+    48             05  PRINC-PART       PIC 9(10)V99 VALUE 0.
+    49             05  REMAIN           PIC 9(10)V99 VALUE 0.
+    50
+    51         01  WS-OUT-EDIT.
+    52             05  ED-MONTH         PIC 9(3).
+    53             05  ED-PAY           PIC 9(8).99.
+    54             05  ED-INT           PIC 9(8).99.
+    55             05  ED-PRN           PIC 9(8).99.
+    56             05  ED-REM           PIC 9(10).99.
+    57
+    58         01  WS-REASON            PIC X(50).
+    59         01  I                    PIC 9(4) VALUE 0.
+    60
+    61         PROCEDURE DIVISION.
+    62         MAIN.
+    63             OPEN INPUT INFILE
+    64             OPEN OUTPUT OUTFILE
+    65
+    66             PERFORM UNTIL WS-EOF = 'Y'
+    67                 READ INFILE
+    68                     AT END
+    69                         MOVE 'Y' TO WS-EOF
+    70                     NOT AT END
+    71                         PERFORM PROCESS-ONE
+    72                 END-READ
+    73             END-PERFORM
+    74
+    75             CLOSE INFILE
+    76             CLOSE OUTFILE
+    77             STOP RUN.
+    78
+    79         PROCESS-ONE.
+    80             PERFORM PARSE-INPUT
+root@f2dfd4d3de5d:/app/src# which cobc
+/usr/bin/cobc
+root@f2dfd4d3de5d:/app/src# cobc -V || true
+cobc (GnuCOBOL) 3.1.2.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch, Edward Hart
+Built     Sep 19 2022 04:27:09
+Packaged  Dec 23 2020 12:04:58 UTC
+C version "12.2.0"
+root@f2dfd4d3de5d:/app/src# env | grep -E '^COB' || true
+root@f2dfd4d3de5d:/app/src# find / -maxdepth 5 -type f -name 'gnucobol.conf' 2>/dev/null | head
+root@f2dfd4d3de5d:/app/src# COB_CONFIG_FILE=/dev/null cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,120p'
+configuration error:
+gnucobol.conf: No such file or directory
+root@f2dfd4d3de5d:/app/src# cat > /app/src/program.cbl <<'EOF'
+>        IDENTIFICATION DIVISION.
+>        PROGRAM-ID. PROGRAM.
+ >
+>        ENVIRONMENT DIVISION.
+>        INPUT-OUTPUT SECTION.
+>        FILE-CONTROL.
+>            SELECT INFILE ASSIGN TO "INPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+D->            SELECT OUTFILE ASSIGN TO "../data/OUTPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>
+U>        DATA DIVISION.
+>        FILE SECTION.
+>        FD  INFILE.
+>        01  IN-REC                   PIC X(256).
+>
+>        FD  OUTFILE.
+>        01  OUT-REC                  PIC X(256).
+>
+>        WORKING-STORAGE SECTION.
+OM>        01  WS-EOF                   PIC X VALUE 'N'.
+>
+>        01  WS-FIELDS.
+ED =>            05  WS-ID            
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+                PIC 9(4) VALUE 0.
+>
+>        PROCEDURE DIVISION.
+>        MAIN.
+>            OPEN INPUT INFILE
+>            OPEN OUTPUT OUTFILE
+>
+>            PERFORM UNTIL WS-EOF = 'Y'
+>                READ INFILE
+>                    AT END
+>                        MOVE 'Y' TO WS-EOF
+>                    NOT AT END
+>                        PERFORM PROCESS-ONE
+>                END-READ
+>            END-PERFORM
+>
+>            CLOSE INFILE
+>            CLOSE OUTFILE
+>            STOP RUN.
+>
+>        PROCESS-ONE.
+>            PERFORM PARSE-INPUT
+>            PERFORM CHECK-APPLICATION.
+>
+>        PARSE-INPUT.
+>            MOVE SPACES TO WS-FIELDS
+>            UNSTRING IN-REC DELIMITED BY ';'
+>                INTO WS-ID WS-NAME WS-LOAN-X WS-PROP-X WS-DOWN-X
+>                     WS-TERM-X WS-RATE-X
+>            END-UNSTRING
+>
+>            COMPUTE LOAN-AMT ROUNDED =
+>                FUNCTION NUMVAL(WS-LOAN-X) / 100
+>            COMPUTE PROP-VALUE ROUNDED =
+>                FUNCTION NUMVAL(WS-PROP-X) / 100
+>            COMPUTE DOWN-PAY ROUNDED =
+>                FUNCTION NUMVAL(WS-DOWN-X) / 100
+>            COMPUTE TERM-YEARS = FUNCTION NUMVAL(WS-TERM-X)
+>            COMPUTE TERM-MONTHS = TERM-YEARS * 12
+>            COMPUTE RATE-ANN ROUNDED =
+>                FUNCTION NUMVAL(WS-RATE-X) / 100.
+>
+>        CHECK-APPLICATION.
+>            COMPUTE MIN-DOWN ROUNDED = PROP-VALUE * 0.15
+>
+>            IF DOWN-PAY < MIN-DOWN
+>                MOVE "INSUFFICIENT FUNDS FOR DOWN PAYMENT" TO WS-REASON
+>                PERFORM WRITE-DENY
+>            ELSE
+>                PERFORM WRITE-APPRO
+>                PERFORM BUILD-SCHEDULE
+>            END-IF.
+>
+>        WRITE-DENY.
+>            MOVE SPACES TO OUT-REC
+>            STRING WS-ID DELIMITED BY SIZE
+>                   "DENY " DELIMITED BY SIZE
+>                   WS-REASON DELIMITED BY SIZE
+>                   INTO OUT-REC
+>            END-STRING
+>            WRITE OUT-REC.
+>
+>        WRITE-APPRO.
+>            MOVE SPACES TO OUT-REC
+>            STRING WS-ID DELIMITED BY SIZE
+>                   "APPRO" DELIMITED BY SIZE
+>                   INTO OUT-REC
+>            END-STRING
+>            WRITE OUT-REC.
+>
+>        BUILD-SCHEDULE.
+>            IF TERM-MONTHS <= 0
+>                EXIT PARAGRAPH
+>            END-IF
+>
+>            COMPUTE MONTHLY-RATE ROUNDED = RATE-ANN / 1200
+>            MOVE LOAN-AMT TO BALANCE
+>
+>            IF MONTHLY-RATE = 0
+>                COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS
+>            ELSE
+>                COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE
+>                COMPUTE POWVAL ROUNDED = FUNCTION POWER(BASE, -TERM-MONTHS)
+>                COMPUTE DENOM ROUNDED = 1 - POWVAL
+>                COMPUTE MONTHLY-PAY ROUNDED =
+>                    (LOAN-AMT * MONTHLY-RATE) / DENOM
+>            END-IF
+>
+>            PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS
+>                COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE
+>                COMPUTE PRINC-PART ROUNDED = MONTHLY-PAY - INTEREST-PART
+>
+>                IF I = TERM-MONTHS
+>                    MOVE BALANCE TO PRINC-PART
+>                    COMPUTE MONTHLY-PAY ROUNDED =
+>                        INTEREST-PART + PRINC-PART
+>                END-IF
+>
+>                COMPUTE REMAIN ROUNDED = BALANCE - PRINC-PART
+>
+>                MOVE I TO ED-MONTH
+>                MOVE MONTHLY-PAY TO ED-PAY
+>                MOVE INTEREST-PART TO ED-INT
+>                MOVE PRINC-PART TO ED-PRN
+>                MOVE REMAIN TO ED-REM
+>
+>                MOVE SPACES TO OUT-REC
+>                STRING ED-MONTH DELIMITED BY SIZE
+>                       " " DELIMITED BY SIZE
+>                       ED-PAY DELIMITED BY SIZE
+>                       " " DELIMITED BY SIZE
+>                       ED-INT DELIMITED BY SIZE
+>                       " " DELIMITED BY SIZE
+>                       ED-PRN DELIMITED BY SIZE
+>                       " " DELIMITED BY SIZE
+>                       ED-REM DELIMITED BY SIZE
+>                       INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>
+>                MOVE REMAIN TO BALANCE
+>            END-PERFORM.
+> EOF
+root@f2dfd4d3de5d:/app/src# python3 - <<'PY'
+> from pathlib import Path
+> p=Path('/app/src/program.cbl')
+> mx=0
+> bad=[]
+> for i,line in enumerate(p.read_text().splitlines(),1):
+>     l=len(line)
+>     mx=max(mx,l)
+>     if l>80:
+>         bad.append((i,l,line))
+> print('max_len',mx)
+> print('over_80',len(bad))
+> for i,l,_ in bad[:10]:
+>     print('line',i,'len',l)
+> PY
+max_len 74
+over_80 0
+root@f2dfd4d3de5d:/app/src# rm -f /app/data/OUTPUT.DAT
+root@f2dfd4d3de5d:/app/src# COB_CONFIG_FILE=/dev/null cobc -x -std=gnucobol program.cbl
+configuration error:
+gnucobol.conf: No such file or directory
+root@f2dfd4d3de5d:/app/src# ./program
+bash: ./program: No such file or directory
+root@f2dfd4d3de5d:/app/src# sed -n '1,80p' /app/data/OUTPUT.DAT
+sed: can't read /app/data/OUTPUT.DAT: No such file or directory
+root@f2dfd4d3de5d:/app/src#

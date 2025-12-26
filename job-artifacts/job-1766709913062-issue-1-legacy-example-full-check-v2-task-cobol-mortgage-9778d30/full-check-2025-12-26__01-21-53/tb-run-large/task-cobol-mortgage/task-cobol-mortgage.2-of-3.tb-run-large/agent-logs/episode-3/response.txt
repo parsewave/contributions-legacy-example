@@ -1,0 +1,6 @@
+{
+  "analysis": "The COBOL program /app/src/program.cbl exists, compiles with GnuCOBOL 3, and runs from /app/src reading INPUT.DAT and writing /app/data/OUTPUT.DAT. Output contains the required DENY/APPRO records and, for approved applications, a detailed payment schedule without a header. Line-length checks show no lines > 80 (and none > 72), satisfying the fixed-format constraint.",
+  "plan": "No further changes needed; mark the task complete.",
+  "commands": [],
+  "task_complete": true
+}

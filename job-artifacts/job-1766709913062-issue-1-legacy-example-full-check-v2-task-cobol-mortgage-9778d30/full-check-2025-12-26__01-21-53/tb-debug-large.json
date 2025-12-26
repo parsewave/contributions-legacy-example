@@ -1,0 +1,4 @@
+{
+    "outcome": "PASS",
+    "explanation": "The task instructions clearly specify absolute file locations: read from /app/src/INPUT.DAT and write to /app/data/OUTPUT.DAT, and that the program will be run from /app/src. The failures show the program attempted to use relative or environment-mapped filenames (e.g., INFILE mapped to INPUT.DAT and OUT-FILE to ../data/OUTPUT.DAT), which, when executed from the pytest working directory, caused file-not-found or invalid path errors (status 35 and status 30). The tests created the files at the absolute paths as specified. Therefore, the agent failed to implement the required absolute paths, not due to insufficient instructions. The instructions are sufficient; the failures stem from the agent’s implementation choices."
+}

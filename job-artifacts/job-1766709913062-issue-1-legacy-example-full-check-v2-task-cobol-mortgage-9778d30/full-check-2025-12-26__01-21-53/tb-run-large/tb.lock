@@ -1,0 +1,70 @@
+{
+    "lockfile_version": "1.0",
+    "created_at": "2025-12-26T01:26:37.368180+00:00",
+    "invocation": {
+        "command": "tb",
+        "args": [
+            "run",
+            "--agent",
+            "terminus-2",
+            "--model",
+            "openrouter/openai/gpt-5.2",
+            "--task-id",
+            "task-cobol-mortgage",
+            "--n-attempts",
+            "1",
+            "--n-concurrent",
+            "1",
+            "--dataset-path",
+            "/workspace/parsewave/contributions-legacy-example/contributor_tasks",
+            "--output-path",
+            "runs/full-check/full-check-2025-12-26__01-21-53",
+            "--run-id",
+            "tb-run-large-1",
+            "--global-agent-timeout-sec",
+            "600"
+        ]
+    },
+    "harness": {
+        "package": "terminal-bench",
+        "version": "0.2.18",
+        "is_editable_installation": true
+    },
+    "agent": {
+        "name": "terminus-2",
+        "import_path": "terminal_bench.agents.terminus_2.terminus_2:Terminus2",
+        "model_name": "openrouter/openai/gpt-5.2",
+        "extra_kwargs": {
+            "no_rebuild": false,
+            "use_subscription": false,
+            "model_name": "openrouter/openai/gpt-5.2"
+        }
+    },
+    "run_config": {
+        "log_level": "info",
+        "livestream": false,
+        "n_concurrent_trials": 1,
+        "n_attempts": 1,
+        "no_rebuild": false,
+        "cleanup": true,
+        "count_commands": true,
+        "global_timeout_multiplier": 1.0,
+        "global_agent_timeout_sec": 600.0,
+        "global_test_timeout_sec": null
+    },
+    "dataset": {
+        "name": null,
+        "version": null,
+        "local_path": "/workspace/parsewave/contributions-legacy-example/contributor_tasks",
+        "task_ids": [
+            "task-cobol-mortgage"
+        ],
+        "registry_url": null,
+        "local_registry_path": null
+    },
+    "local_config": {
+        "output_path": "runs/full-check/full-check-2025-12-26__01-21-53",
+        "run_id": "tb-run-large-1",
+        "upload_results": false
+    }
+}

@@ -1,0 +1,16 @@
+asciinema rec --stdin /logs/tests.cast
+[?2004hroot@fe3c0f365793:/app# asciinema rec --stdin /logs/tests.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/tests.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@fe3c0f365793:/app# clear
+[?2004l[H[J[3J[?2004hroot@fe3c0f365793:/app# bash /tests/run-tests.sh; tmux wait -S done
+[?2004l[1m===================================================================== test session starts ======================================================================[0m
+platform linux -- Python 3.13.1, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /tests
+[1mcollecting ... [0m[1mcollected 4 items                                                                                                                                              [0m
+
+../tests/test_outputs.py::test_required_files_exist [32mPASSED[0m[32m                                                                                               [ 25%][0m
+../tests/test_outputs.py::test_fixed_format_constraints [32mPASSED[0m[32m                                                                                           [ 50%][0m
+../tests/test_outputs.py::test_data_files_exist [32mPASSED[0m[32m                                                                                                   [ 75%][0m
+../tests/test_outputs.py::test_program_output 

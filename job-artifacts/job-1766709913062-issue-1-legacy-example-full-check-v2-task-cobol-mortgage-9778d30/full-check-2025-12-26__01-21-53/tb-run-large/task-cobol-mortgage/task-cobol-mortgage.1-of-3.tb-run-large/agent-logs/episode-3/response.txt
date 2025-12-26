@@ -1,0 +1,15 @@
+{
+  "analysis": "program.cbl now compiles with GnuCOBOL 3.1.2 and runs successfully from /app/src, producing /app/data/OUTPUT.DAT with a DENY record for APP0000001 and an APPRO record plus a 12-month payment schedule for APP0000002. The schedule lines match the requested numeric formatting and there are no headers. Need only a quick sanity check that program.cbl begins correctly (no stray characters) and meets fixed-format/<=80 char constraints (already checked).",
+  "plan": "Verify the beginning of /app/src/program.cbl to ensure there is no accidental junk before IDENTIFICATION DIVISION, and re-confirm max line length. No further changes are expected; task should then be complete.",
+  "commands": [
+    {
+      "keystrokes": "sed -n '1,25p' /app/src/program.cbl | cat -n\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "python3 - <<'PY'\nmx=0\nbad=[]\nfor i,l in enumerate(open('/app/src/program.cbl','r',encoding='utf-8'),1):\n    n=len(l.rstrip('\\n'))\n    mx=max(mx,n)\n    if n>80:\n        bad.append((i,n))\nprint('max_len',mx)\nprint('lines_over_80',len(bad))\nPY\n",
+      "duration": 0.2
+    }
+  ],
+  "task_complete": true
+}

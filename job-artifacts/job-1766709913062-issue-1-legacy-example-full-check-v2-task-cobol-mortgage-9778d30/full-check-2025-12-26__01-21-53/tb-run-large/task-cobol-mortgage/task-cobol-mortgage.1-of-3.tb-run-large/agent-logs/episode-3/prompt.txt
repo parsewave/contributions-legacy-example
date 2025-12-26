@@ -1,0 +1,236 @@
+New Terminal Output:
+
+root@8932fc9aa05e:/app/src# cat > /app/src/program.cbl <<'COB'
+A) * 100
+           COMPUTE WS-DOW>        IDENTIFICATION DIVISION.
+>        PROGRAM-ID. PROGRAM.
+>
+S>        ENVIRONMENT DIVISION.
+>        INPUT-OUTPUT SECTION.
+>        FILE-CONTROL.
+>            SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>            SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+>                ORGANIZATION IS LINE SEQUENTIAL.
+>
+->        DATA DIVISION.
+>        FILE SECTION.
+>        FD  IN-FILE.
+>        01  IN-REC                 PIC X(256).
+>
+->        FD  OUT-FILE.
+>        01  OUT-REC                PIC X(256).
+>
+E>        WORKING-STORAGE SECTION.
+>        01  WS-EOF                 PIC X VALUE 'N'.
+>
+P>        01  WS-IN.
+>            05  IN-ID              PIC X(10).
+>            05  IN-NAME            PIC X(30).
+>            05  IN-LOAN-A          PIC X(32).
+>            05  IN-PROP-A          PIC X(32).
+>            05  IN-DOWN-A          PIC X(32).
+>            05  IN-TERM-A          PIC X(32).
+>            05  IN-RATE-A          PIC X(32).
+>
+ >        01  WS-RAW.
+>            05  WS-TERM-YRS        PIC 9(4) COMP-3.
+>            05  WS-TERM-MOS        PIC 9(5) COMP-3.
+>            05  WS-RATE-PCT        COMP-2.
+>
+S>        01  WS-MONEY-CENTS.
+>            05  WS-LOAN-C          PIC 9(14) COMP-3.
+>            05  WS-PROP-C          PIC 9(14) COMP-3.
+>            05  WS-DOWN-C          PIC 9(14) COMP-3.
+ >            05  WS-MIN-DOWN-C      PIC 9(14) COMP-3.
+>            05  WS-BAL-C           PIC 9(14) COMP-3.
+>            05  WS-PAY-C           PIC 9(14) COMP-3.
+>            05  WS-INT-C           PIC 9(14) COMP-3.
+>            05  WS-PRIN-C          PIC 9(14) COMP-3.
+>            05  WS-NEWBAL-C        PIC 9(14) COMP-3.
+>
+O>        01  WS-MATH.
+O>            05  WS-MR              COMP-2.
+>            05  WS-ONE-PLUS        COMP-2.
+>            05  WS-POW             COMP-2.
+>            05  WS-DEN             COMP-2.
+-I>
+>        01  WS-AMTS.
+>            05  WS-PAY-AMT         PIC 9(10)V99 COMP-3.
+>            05  WS-INT-AMT         PIC 9(10)V99 COMP-3.
+>            05  WS-PRIN-AMT        PIC 9(10)V99 COMP-3.
+>            05  WS-REM-AMT         PIC 9(12)V99 COMP-3.
+>
+>        01  WS-OUT-FIELDS.
+ >            05  O-ID               PIC X(10).
+>            05  O-STATUS           PIC X(5).
+>            05  O-REASON           PIC X(50).
+>
+ >        01  WS-LINE.
+ >            05  L-MON              PIC 9(3).
+>            05  L-PAY              PIC 9(8).99.
+>            05  L-INT              PIC 9(8).99.
+>            05  L-PRIN             PIC 9(8).99.
+>            05  L-REM              PIC 9(10).99.
+>
+A>        PROCEDURE DIVISION.
+>        MAIN.
+>            OPEN INPUT IN-FILE
+>                 OUTPUT OUT-FILE
+>
+>            PERFORM UNTIL WS-EOF = 'Y'
+>                READ IN-FILE
+>                    AT END
+>                        MOVE 'Y' TO WS-EOF
+>                    NOT AT END
+>                        PERFORM PROCESS-REC
+>                END-READ
+>            END-PERFORM
+>
+>            CLOSE IN-FILE OUT-FILE
+>            STOP RUN.
+>
+>        PROCESS-REC.
+>            MOVE SPACES TO WS-IN
+>            UNSTRING IN-REC DELIMITED BY ';'
+>                INTO IN-ID IN-NAME IN-LOAN-A IN-PROP-A
+>                     IN-DOWN-A IN-TERM-A IN-RATE-A
+>            END-UNSTRING
+>
+>            PERFORM CONVERT-INPUT
+>
+>            COMPUTE WS-MIN-DOWN-C ROUNDED = WS-PROP-C * 0.15
+>
+>            IF WS-DOWN-C < WS-MIN-DOWN-C
+>                MOVE IN-ID TO O-ID
+>                MOVE 'DENY ' TO O-STATUS
+>                MOVE 'INSUFFICIENT FUNDS FOR DOWN PAYMENT' TO O-REASON
+>                MOVE SPACES TO OUT-REC
+>                STRING O-ID DELIMITED BY SIZE
+>                       O-STATUS DELIMITED BY SIZE
+>                       O-REASON DELIMITED BY SIZE
+>                  INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>            ELSE
+>                MOVE SPACES TO OUT-REC
+>                STRING IN-ID DELIMITED BY SIZE
+>                       'APPRO' DELIMITED BY SIZE
+>                  INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>
+>                PERFORM BUILD-SCHEDULE
+>            END-IF.
+>
+>        CONVERT-INPUT.
+>            COMPUTE WS-LOAN-C = FUNCTION NUMVAL(IN-LOAN-A) * 100
+>            COMPUTE WS-PROP-C = FUNCTION NUMVAL(IN-PROP-A) * 100
+>            COMPUTE WS-DOWN-C = FUNCTION NUMVAL(IN-DOWN-A) * 100
+>
+>            COMPUTE WS-TERM-YRS = FUNCTION NUMVAL(IN-TERM-A)
+>            COMPUTE WS-TERM-MOS = WS-TERM-YRS * 12
+>
+>            COMPUTE WS-RATE-PCT = FUNCTION NUMVAL(IN-RATE-A) / 100.0.
+>
+>        BUILD-SCHEDULE.
+>            IF WS-TERM-MOS <= 0
+>                EXIT PARAGRAPH
+>            END-IF
+>
+>            MOVE WS-LOAN-C TO WS-BAL-C
+>
+>            COMPUTE WS-MR = WS-RATE-PCT / 1200.0
+>            COMPUTE WS-ONE-PLUS = 1.0 + WS-MR
+>
+>            IF WS-MR = 0.0
+>                COMPUTE WS-PAY-C ROUNDED = WS-LOAN-C / WS-TERM-MOS
+>            ELSE
+>                COMPUTE WS-POW = WS-ONE-PLUS ** WS-TERM-MOS
+>                COMPUTE WS-DEN = 1.0 - (1.0 / WS-POW)
+>                IF WS-DEN = 0.0
+>                    COMPUTE WS-PAY-C ROUNDED = WS-LOAN-C / WS-TERM-MOS
+>                ELSE
+>                    COMPUTE WS-PAY-C ROUNDED = WS-LOAN-C * WS-MR / WS-DEN
+>                END-IF
+>            END-IF
+>
+>            PERFORM VARYING L-MON FROM 1 BY 1
+>                UNTIL L-MON > WS-TERM-MOS
+>
+>                COMPUTE WS-INT-C ROUNDED = WS-BAL-C * WS-MR
+>                COMPUTE WS-PRIN-C ROUNDED = WS-PAY-C - WS-INT-C
+>
+>                IF L-MON = WS-TERM-MOS
+>                    MOVE WS-BAL-C TO WS-PRIN-C
+>                    COMPUTE WS-PAY-C ROUNDED = WS-INT-C + WS-PRIN-C
+>                END-IF
+>
+>                COMPUTE WS-NEWBAL-C ROUNDED = WS-BAL-C - WS-PRIN-C
+>                IF WS-NEWBAL-C < 0
+>                    MOVE 0 TO WS-NEWBAL-C
+>                END-IF
+>
+>                COMPUTE WS-PAY-AMT ROUNDED = WS-PAY-C / 100.0
+>                COMPUTE WS-INT-AMT ROUNDED = WS-INT-C / 100.0
+>                COMPUTE WS-PRIN-AMT ROUNDED = WS-PRIN-C / 100.0
+>                COMPUTE WS-REM-AMT ROUNDED = WS-NEWBAL-C / 100.0
+>
+>                MOVE WS-PAY-AMT TO L-PAY
+>                MOVE WS-INT-AMT TO L-INT
+>                MOVE WS-PRIN-AMT TO L-PRIN
+>                MOVE WS-REM-AMT TO L-REM
+>
+>                MOVE SPACES TO OUT-REC
+>                STRING L-MON DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       L-PAY DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       L-INT DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       L-PRIN DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       L-REM DELIMITED BY SIZE
+>                  INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>
+>                MOVE WS-NEWBAL-C TO WS-BAL-C
+>            END-PERFORM.
+> COB
+root@8932fc9aa05e:/app/src# python3 - <<'PY'
+> # verify fixed-format line length requirement
+> mx=0
+> bad=[]
+> for i,l in enumerate(open('/app/src/program.cbl','r',encoding='utf-8'),1):
+>     n=len(l.rstrip('\n'))
+>     mx=max(mx,n)
+>     if n>80:
+>         bad.append((i,n,l.rstrip('\n')))
+> print('max_len',mx)
+> if bad:
+>     print('lines>80:',len(bad))
+>     for b in bad[:10]:
+>         print(b)
+> PY
+max_len 72
+root@8932fc9aa05e:/app/src# cd /app/src
+root@8932fc9aa05e:/app/src# cobc -x program.cbl
+root@8932fc9aa05e:/app/src# ./program
+root@8932fc9aa05e:/app/src# wc -l /app/data/OUTPUT.DAT && sed -n '1,80p' /app/data/OUTPUT.DAT
+14 /app/data/OUTPUT.DAT
+APP0000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT
+APP0000002APPRO
+001 00000429.18 00000022.92 00000406.26 0000004593.74
+002 00000429.18 00000021.05 00000408.13 0000004185.61
+003 00000429.18 00000019.18 00000410.00 0000003775.61
+004 00000429.18 00000017.30 00000411.88 0000003363.73
+005 00000429.18 00000015.42 00000413.76 0000002949.97
+006 00000429.18 00000013.52 00000415.66 0000002534.31
+007 00000429.18 00000011.62 00000417.56 0000002116.75
+008 00000429.18 00000009.70 00000419.48 0000001697.27
+009 00000429.18 00000007.78 00000421.40 0000001275.87
+010 00000429.18 00000005.85 00000423.33 0000000852.54
+011 00000429.18 00000003.91 00000425.27 0000000427.27
+012 00000429.23 00000001.96 00000427.27 0000000000.00
+root@8932fc9aa05e:/app/src#

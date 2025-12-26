@@ -1,0 +1,39 @@
+{
+  "analysis": "program.cbl is now clean and within 80 columns, and cobc runs (config issue fixed). Current compile failure is because GnuCOBOL 3.1.2 doesn’t recognize intrinsic FUNCTION POWER. We must implement exponentiation using the COBOL ** operator as required by the task ((1 + monthly_rate)**(-term_months)). After fixing that, we should recompile, run, and verify /app/data/OUTPUT.DAT.",
+  "plan": "1) Edit BUILD-SCHEDULE to replace `FUNCTION POWER(BASE, -TERM-MONTHS)` with `BASE ** (-TERM-MONTHS)`. 2) Recompile with cobc. 3) Run program from /app/src and inspect the beginning of /app/data/OUTPUT.DAT to confirm DENY/APPRO lines and schedule lines.",
+  "commands": [
+    {
+      "keystrokes": "cd /app/src\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "nl -ba program.cbl | sed -n '136,150p'\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "python3 - <<'PY'\nfrom pathlib import Path\np = Path('program.cbl')\ntext = p.read_text().splitlines()\nout = []\ni = 0\nwhile i < len(text):\n    line = text[i]\n    if line.strip() == 'COMPUTE POWVAL ROUNDED =':\n        # Replace this + next line with a single exponentiation line\n        out.append('               COMPUTE POWVAL ROUNDED = BASE ** (-TERM-MONTHS)')\n        i += 2\n        continue\n    out.append(line)\n    i += 1\np.write_text(\"\\n\".join(out) + \"\\n\")\nprint('patched')\nPY\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "python3 - <<'PY'\nfrom pathlib import Path\np=Path('program.cbl')\nmx=0\nbad=[]\nfor i,line in enumerate(p.read_text().splitlines(),1):\n    mx=max(mx,len(line))\n    if len(line)>80:\n        bad.append((i,len(line)))\nprint('max_len',mx,'over80',len(bad))\nif bad:\n    print('first_over80',bad[0])\nPY\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "nl -ba program.cbl | sed -n '136,150p'\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,200p'\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "rm -f /app/data/OUTPUT.DAT\n./program\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "sed -n '1,120p' /app/data/OUTPUT.DAT\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

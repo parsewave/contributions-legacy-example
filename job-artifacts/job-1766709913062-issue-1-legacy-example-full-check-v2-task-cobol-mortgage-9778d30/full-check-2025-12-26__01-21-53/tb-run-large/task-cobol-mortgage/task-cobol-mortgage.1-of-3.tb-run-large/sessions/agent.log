@@ -1,0 +1,776 @@
+[?2004hroot@8932fc9aa05e:/app# asciinema rec --stdin /logs/agent.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@8932fc9aa05e:/app# clear
+[?2004l[H[J[3J[?2004hroot@8932fc9aa05e:/app# ls -la /app /app/src /app/data
+[?2004l/app:
+total 16
+drwxr-xr-x  4 root root 4096 Dec 26 01:24 .
+drwxr-xr-x 20 root root 4096 Dec 26 01:26 ..
+drwxr-xr-x  2 root root 4096 Dec 26 01:21 data
+drwxr-xr-x  2 root root 4096 Dec 26 01:21 src
+
+/app/data:
+total 12
+drwxr-xr-x 2 root root 4096 Dec 26 01:21 .
+drwxr-xr-x 4 root root 4096 Dec 26 01:24 ..
+-rw-r--r-- 1 root root    1 Dec 26 01:21 OUTPUT.DAT
+
+/app/src:
+total 12
+drwxr-xr-x 2 root root 4096 Dec 26 01:21 .
+drwxr-xr-x 4 root root 4096 Dec 26 01:24 ..
+-rw-r--r-- 1 root root  167 Dec 26 01:21 INPUT.DAT
+[?2004hroot@8932fc9aa05e:/app# sed -n '1,5p' /app/src/INPUT.DAT
+[?2004lAPP0000001;Williams David Robert         ;2000000000;3500000000;0500000000;20;00550
+APP0000002;John Smith Clark              ;0000005000;0000004000;0000003500;01;00550[?2004hroot@8932fc9aa05e:/app# sed -n '1,120p' /app/src/INPUT.DAT | cat -A
+[?2004lAPP0000001;Williams David Robert         ;2000000000;3500000000;0500000000;20;00550$
+APP0000002;John Smith Clark              ;0000005000;0000004000;0000003500;01;00550[?2004hroot@8932fc9aa05e:/app# cat > /app/src/program.cbl <<'COB'
+[?2004l[?2004h>        IDENTIFICATION DIVISION.
+[?2004l[?2004h>        PROGRAM-ID. PROGRAM.
+[?2004l[?2004h> 
+[?2004l[?2004h>        ENVIRONMENT DIVISION.
+[?2004lAL(WS-TERM-A)
+           COMPUTE WS-RATE = FUNCTION NUMVAL(WS-RATE-A) * 100.
+
+       BUILD-SCHEDULE.
+           MOVE WS-LOAN[?2004h>        INPUT-OUTPUT SECTION.
+[?2004lT[?2004h>        FILE-CONTROL.
+[?2004l / [?2004h>            SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+[?2004l-M[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>            SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+[?2004l           IF[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> 
+[?2004lE[?2004h>        DATA DIVISION.
+[?2004l[?2004h>        FILE SECTION.
+[?2004l[?2004h>        FD  IN-FILE.
+[?2004l[?2004h>        01  IN-REC                      PIC X(256).
+[?2004l[?2004h> 
+[?2004l[?2004h>        FD  OUT-FILE.
+[?2004l[?2004h>        01  OUT-REC                     PIC X(256).
+[?2004l[?2004h> 
+[?2004l [?2004h>        WORKING-STORAGE SECTION.
+[?2004l[?2004h>        01  WS-EOF                      PIC X VALUE 'N'.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-FIELDS.
+[?2004l[?2004h>            05  WS-ID                   PIC X(10).
+[?2004l[?2004h>            05  WS-NAME                 PIC X(30).
+[?2004l[?2004h>            05  WS-LOAN-A               PIC X(32).
+[?2004l  [?2004h>            05  WS-PROP-A               PIC X(32).
+[?2004l[?2004h>            05  WS-DOWN-A               PIC X(32).
+[?2004l[?2004h>            05  WS-TERM-A               PIC X(32).
+[?2004l[?2004h>            05  WS-RATE-A               PIC X(32).
+[?2004l[?2004h> 
+[?2004lE[?2004h>        01  WS-NUMS.
+[?2004l[?2004h>            05  WS-LOAN                 PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-PROP                 PIC 9(12)V99 COMP-3.
+[?2004l  [?2004h>            05  WS-DOWN                 PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-TERM                 PIC 9(4) COMP-3.
+[?2004l[?2004h>            05  WS-RATE                 PIC 9(5)V99 COMP-3.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-CALC.
+[?2004l[?2004h>            05  WS-MIN-DOWN             PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-BAL                  PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-MR                   COMP-2.
+[?2004lI[?2004h>            05  WS-ONE-PLUS-MR          COMP-2.
+[?2004l[?2004h>            05  WS-POW                  COMP-2.
+[?2004l[?2004h>            05  WS-DENOM                COMP-2.
+[?2004l[?2004h>            05  WS-PAY-DBL              COMP-2.
+[?2004l[?2004h>            05  WS-PAY                  PIC 9(12)V99 COMP-3.
+[?2004l  [?2004h>            05  WS-INT                  PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-PRIN                 PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-NEWBAL               PIC 9(12)V99 COMP-3.
+[?2004lND-[?2004h> 
+[?2004lP[?2004h>        01  WS-OUT-FMTS.
+[?2004l[?2004h>            05  F-MON                   PIC 9(3).
+[?2004l[?2004h>            05  F-PAY                   PIC 9(8).99.
+[?2004l[?2004h>            05  F-INT                   PIC 9(8).99.
+[?2004l[?2004h>            05  F-PRIN                  PIC 9(8).99.
+[?2004l[?2004h>            05  F-REM                   PIC 9(10).99.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-STATUS                   PIC X(5).
+[?2004l[?2004h>        01  WS-REASON                   PIC X(50).
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCEDURE DIVISION.
+[?2004l[?2004h>        MAIN.
+[?2004l[?2004h>            OPEN INPUT IN-FILE
+[?2004l[?2004h>                 OUTPUT OUT-FILE.
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM UNTIL WS-EOF = 'Y'
+[?2004l[?2004h>                READ IN-FILE
+[?2004l[?2004h>                    AT END
+[?2004l[?2004h>                        MOVE 'Y' TO WS-EOF
+[?2004l[?2004h>                    NOT AT END
+[?2004l[?2004h>                        PERFORM PROCESS-REC
+[?2004l[?2004h>                END-READ
+[?2004l[?2004h>            END-PERFORM.
+[?2004l[?2004h> 
+[?2004l[?2004h>            CLOSE IN-FILE OUT-FILE.
+[?2004l[?2004h>            STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCESS-REC.
+[?2004l[?2004h>            MOVE SPACES TO WS-FIELDS
+[?2004l[?2004h>            UNSTRING IN-REC DELIMITED BY ';'
+[?2004l[?2004h>                INTO WS-ID WS-NAME WS-LOAN-A WS-PROP-A
+[?2004l[?2004h>                     WS-DOWN-A WS-TERM-A WS-RATE-A
+[?2004l[?2004h>            END-UNSTRING
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM CONVERT-NUMBERS
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP * 0.15
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF WS-DOWN < WS-MIN-DOWN
+[?2004l[?2004h>                MOVE 'DENY ' TO WS-STATUS
+[?2004l[?2004h>                MOVE 'INSUFFICIENT FUNDS FOR DOWN PAYMENT' TO WS-REASON
+[?2004l[?2004h>                STRING WS-ID DELIMITED BY SIZE
+[?2004l[?2004h>                       WS-STATUS DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       WS-REASON DELIMITED BY SIZE
+[?2004l[?2004h>                    INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                MOVE 'APPRO' TO WS-STATUS
+[?2004l[?2004h>                MOVE SPACES TO OUT-REC
+[?2004l[?2004h>                STRING WS-ID DELIMITED BY SIZE
+[?2004l[?2004h>                       WS-STATUS DELIMITED BY SIZE
+[?2004l[?2004h>                    INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h> 
+[?2004l[?2004h>                PERFORM BUILD-SCHEDULE
+[?2004l[?2004h>            END-IF.
+[?2004l[?2004h> 
+[?2004l[?2004h>        CONVERT-NUMBERS.
+[?2004l[?2004h>            COMPUTE WS-LOAN = FUNCTION NUMVAL(WS-LOAN-A) * 100
+[?2004l[?2004h>            COMPUTE WS-PROP = FUNCTION NUMVAL(WS-PROP-A) * 100
+[?2004l[?2004h>            COMPUTE WS-DOWN = FUNCTION NUMVAL(WS-DOWN-A) * 100
+[?2004l[?2004h>            COMPUTE WS-TERM = FUNCTION NUMVAL(WS-TERM-A)
+[?2004l[?2004h>            COMPUTE WS-RATE = FUNCTION NUMVAL(WS-RATE-A) * 100.
+[?2004l[?2004h> 
+[?2004l[?2004h>        BUILD-SCHEDULE.
+[?2004l[?2004h>            MOVE WS-LOAN TO WS-BAL
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-MR = (WS-RATE / 100.0) / 1200.0
+[?2004l[?2004h>            COMPUTE WS-ONE-PLUS-MR = 1.0 + WS-MR
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF WS-TERM <= 0
+[?2004l[?2004h>                EXIT PARAGRAPH
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF WS-MR = 0.0
+[?2004l[?2004h>                COMPUTE WS-PAY ROUNDED = WS-LOAN / WS-TERM
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                COMPUTE WS-POW = FUNCTION POWER(WS-ONE-PLUS-MR, WS-TERM)
+[?2004l[?2004h>                COMPUTE WS-DENOM = 1.0 - (1.0 / WS-POW)
+[?2004l[?2004h>                COMPUTE WS-PAY-DBL = (WS-LOAN / 100.0) * WS-MR / WS-DENOM
+[?2004l[?2004h>                COMPUTE WS-PAY ROUNDED = WS-PAY-DBL * 100.0
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM VARYING F-MON FROM 1 BY 1 UNTIL F-MON > WS-TERM
+[?2004l[?2004h>                COMPUTE WS-INT ROUNDED = WS-BAL * WS-MR
+[?2004l[?2004h> 
+[?2004l[?2004h>                COMPUTE WS-PRIN ROUNDED = WS-PAY - WS-INT
+[?2004l[?2004h> 
+[?2004l[?2004h>                IF F-MON = WS-TERM
+[?2004l[?2004h>                    MOVE WS-BAL TO WS-PRIN
+[?2004l[?2004h>                    COMPUTE WS-PAY ROUNDED = WS-INT + WS-PRIN
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>                COMPUTE WS-NEWBAL ROUNDED = WS-BAL - WS-PRIN
+[?2004l[?2004h>                IF WS-NEWBAL < 0
+[?2004l[?2004h>                    MOVE 0 TO WS-NEWBAL
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>                COMPUTE F-PAY = WS-PAY / 100
+[?2004l[?2004h>                COMPUTE F-INT = WS-INT / 100
+[?2004l[?2004h>                COMPUTE F-PRIN = WS-PRIN / 100
+[?2004l[?2004h>                COMPUTE F-REM = WS-NEWBAL / 100
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE SPACES TO OUT-REC
+[?2004l[?2004h>                STRING F-MON DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       F-PAY DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       F-INT DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       F-PRIN DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       F-REM DELIMITED BY SIZE
+[?2004l[?2004h>                    INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE WS-NEWBAL TO WS-BAL
+[?2004l[?2004h>            END-PERFORM.
+[?2004l[?2004h> COB
+[?2004l[?2004hroot@8932fc9aa05e:/app# cd /app/src
+[?2004l[?2004hroot@8932fc9aa05e:/app/src# cobc -x -std=gnucobol program.cbl
+[?2004lconfiguration error:
+gnucobol.conf: No such file or directory
+[?2004hroot@8932fc9aa05e:/app/src# ./program
+[?2004lbash: ./program: No such file or directory
+[?2004hroot@8932fc9aa05e:/app/src# wc -l /app/data/OUTPUT.DAT && sed -n '1,40p' /app/data/OUTPUT.DAT
+[?2004l1 /app/data/OUTPUT.DAT
+
+[?2004hroot@8932fc9aa05e:/app/src# sed -n '1,60p' /app/src/program.cbl 2>/dev/null || true
+[?2004l       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PROGRAM.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+               ORGANIZATION IS LINE SEQUENTIAL.
+           SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  IN-FILE.
+       01  IN-REC                      PIC X(256).
+
+       FD  OUT-FILE.
+       01  OUT-REC                     PIC X(256).
+
+       WORKING-STORAGE SECTION.
+       01  WS-EOF                      PIC X VALUE 'N'.
+
+       01  WS-FIELDS.
+           05  WS-ID                   PIC X(10).
+           05  WS-NAME                 PIC X(30).
+           05  WS-LOAN-A               PIC X(32).
+           05  WS-PROP-A               PIC X(32).
+           05  WS-DOWN-A               PIC X(32).
+           05  WS-TERM-A               PIC X(32).
+           05  WS-RATE-A               PIC X(32).
+
+       01  WS-NUMS.
+           05  WS-LOAN                 PIC 9(12)V99 COMP-3.
+           05  WS-PROP                 PIC 9(12)V99 COMP-3.
+           05  WS-DOWN                 PIC 9(12)V99 COMP-3.
+           05  WS-TERM                 PIC 9(4) COMP-3.
+           05  WS-RATE                 PIC 9(5)V99 COMP-3.
+
+       01  WS-CALC.
+           05  WS-MIN-DOWN             PIC 9(12)V99 COMP-3.
+           05  WS-BAL                  PIC 9(12)V99 COMP-3.
+           05  WS-MR                   COMP-2.
+           05  WS-ONE-PLUS-MR          COMP-2.
+           05  WS-POW                  COMP-2.
+           05  WS-DENOM                COMP-2.
+           05  WS-PAY-DBL              COMP-2.
+           05  WS-PAY                  PIC 9(12)V99 COMP-3.
+           05  WS-INT                  PIC 9(12)V99 COMP-3.
+           05  WS-PRIN                 PIC 9(12)V99 COMP-3.
+           05  WS-NEWBAL               PIC 9(12)V99 COMP-3.
+
+       01  WS-OUT-FMTS.
+           05  F-MON                   PIC 9(3).
+           05  F-PAY                   PIC 9(8).99.
+           05  F-INT                   PIC 9(8).99.
+           05  F-PRIN                  PIC 9(8).99.
+           05  F-REM                   PIC 9(10).99.
+
+       01  WS-STATUS                   PIC X(5).
+       01  WS-REASON                   PIC X(50).
+[?2004hroot@8932fc9aa05e:/app/src# env | grep -E '^(COB|COBC)' || true
+[?2004l[?2004hroot@8932fc9aa05e:/app/src# find / -name 'gnucobol.conf' 2>/dev/null | head -n 20
+[?2004l[?2004hroot@8932fc9aa05e:/app/src# cobc -V 2>&1 | sed -n '1,40p'
+[?2004lcobc (GnuCOBOL) 3.1.2.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch, Edward Hart
+Built     Sep 19 2022 04:27:09
+Packaged  Dec 23 2020 12:04:58 UTC
+C version "12.2.0"
+[?2004hroot@8932fc9aa05e:/app/src# python3 - <<'PY'
+[?2004l[?2004h> content = """       IDENTIFICATION DIVISION.
+[?2004l[?2004h>        PROGRAM-ID. PROGRAM.
+[?2004l[?2004h> 
+[?2004l[?2004h>        ENVIRONMENT DIVISION.
+[?2004l[?2004h>        INPUT-OUTPUT SECTION.
+[?2004l[?2004h>        FILE-CONTROL.
+[?2004l[?2004h>            SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+[?2004l /[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>            SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+[?2004l COMPUTE WS-[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> 
+[?2004l[?2004h>        DATA DIVISION.
+[?2004l[?2004h>        FILE SECTION.
+[?2004lON[?2004h>        FD  IN-FILE.
+[?2004lUS, [?2004h>        01  IN-REC                 PIC X(256).
+[?2004l[?2004h> 
+[?2004l[?2004h>        FD  OUT-FILE.
+[?2004l[?2004h>        01  OUT-REC                PIC X(256).
+[?2004l1[?2004h> 
+[?2004l.[?2004h>        WORKING-STORAGE SECTION.
+[?2004l[?2004h>        01  WS-EOF                 PIC X VALUE 'N'.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-FIELDS.
+[?2004l PERFO[?2004h>            05  WS-ID              PIC X(10).
+[?2004l[?2004h>            05  WS-NAME            PIC X(30).
+[?2004l[?2004h>            05  WS-LOAN-A          PIC X(32).
+[?2004l    [?2004h>            05  WS-PROP-A          PIC X(32).
+[?2004lWS-I[?2004h>            05  WS-DOWN-A          PIC X(32).
+[?2004l[?2004h>            05  WS-TERM-A          PIC X(32).
+[?2004l     [?2004h>            05  WS-RATE-A          PIC X(32).
+[?2004l[?2004h> 
+[?2004l+[?2004h>        01  WS-NUMS.
+[?2004l[?2004h>            05  WS-LOAN            PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-PROP            PIC 9(12)V99 COMP-3.
+[?2004l      [?2004h>            05  WS-DOWN            PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-TERM-YRS        PIC 9(4) COMP-3.
+[?2004l[?2004h>            05  WS-TERM-MOS        PIC 9(5) COMP-3.
+[?2004l[?2004h>            05  WS-RATE-PCT        PIC 9(3)V99 COMP-3.
+[?2004l     [?2004h> 
+[?2004l[?2004h>        01  WS-CALC.
+[?2004l[?2004h>            05  WS-MIN-DOWN        PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-BAL             PIC 9(12)V99 COMP-3.
+[?2004l      [?2004h>            05  WS-MR              COMP-2.
+[?2004l[?2004h>            05  WS-ONE-PLUS        COMP-2.
+[?2004l[?2004h>            05  WS-POW             COMP-2.
+[?2004l[?2004h>            05  WS-DEN             COMP-2.
+[?2004lS[?2004h>            05  WS-PAY-DBL         COMP-2.
+[?2004l[?2004h>            05  WS-PAY             PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-INT             PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-PRIN            PIC 9(12)V99 COMP-3.
+[?2004l[?2004h>            05  WS-NEWBAL          PIC 9(12)V99 COMP-3.
+[?2004l[?2004h> 
+[?2004l-[?2004h>        01  WS-OUT.
+[?2004l[?2004h>            05  O-ID               PIC X(10).
+[?2004l'w',[?2004h>            05  O-STATUS           PIC X(5).
+[?2004l[?2004h>            05  O-REASON           PIC X(50).
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-LINE.
+[?2004l[?2004h>            05  L-MON              PIC 9(3).
+[?2004l[?2004h>            05  L-PAY              PIC 9(8).99.
+[?2004l[?2004h>            05  L-INT              PIC 9(8).99.
+[?2004l[?2004h>            05  L-PRIN             PIC 9(8).99.
+[?2004l[?2004h>            05  L-REM              PIC 9(10).99.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCEDURE DIVISION.
+[?2004l[?2004h>        MAIN.
+[?2004l[?2004h>            OPEN INPUT IN-FILE
+[?2004l[?2004h>                 OUTPUT OUT-FILE.
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM UNTIL WS-EOF = 'Y'
+[?2004l[?2004h>                READ IN-FILE
+[?2004l[?2004h>                    AT END
+[?2004l[?2004h>                        MOVE 'Y' TO WS-EOF
+[?2004l[?2004h>                    NOT AT END
+[?2004l[?2004h>                        PERFORM PROCESS-REC
+[?2004l[?2004h>                END-READ
+[?2004l[?2004h>            END-PERFORM.
+[?2004l[?2004h> 
+[?2004l[?2004h>            CLOSE IN-FILE OUT-FILE.
+[?2004l[?2004h>            STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCESS-REC.
+[?2004l[?2004h>            MOVE SPACES TO WS-FIELDS
+[?2004l[?2004h>            UNSTRING IN-REC DELIMITED BY ';'
+[?2004l[?2004h>                INTO WS-ID WS-NAME WS-LOAN-A WS-PROP-A
+[?2004l[?2004h>                     WS-DOWN-A WS-TERM-A WS-RATE-A
+[?2004l[?2004h>            END-UNSTRING
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM CONVERT-INPUT
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP * 0.15
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF WS-DOWN < WS-MIN-DOWN
+[?2004l[?2004h>                MOVE WS-ID TO O-ID
+[?2004l[?2004h>                MOVE 'DENY ' TO O-STATUS
+[?2004l[?2004h>                MOVE 'INSUFFICIENT FUNDS FOR DOWN PAYMENT' TO O-REASON
+[?2004l[?2004h>                MOVE SPACES TO OUT-REC
+[?2004l[?2004h>                STRING O-ID DELIMITED BY SIZE
+[?2004l[?2004h>                       O-STATUS DELIMITED BY SIZE
+[?2004l[?2004h>                       O-REASON DELIMITED BY SIZE
+[?2004l[?2004h>                  INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                MOVE SPACES TO OUT-REC
+[?2004l[?2004h>                STRING WS-ID DELIMITED BY SIZE
+[?2004l[?2004h>                       'APPRO' DELIMITED BY SIZE
+[?2004l[?2004h>                  INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h> 
+[?2004l[?2004h>                PERFORM BUILD-SCHEDULE
+[?2004l[?2004h>            END-IF.
+[?2004l[?2004h> 
+[?2004l[?2004h>        CONVERT-INPUT.
+[?2004l[?2004h>            COMPUTE WS-LOAN = FUNCTION NUMVAL(WS-LOAN-A)
+[?2004l[?2004h>            COMPUTE WS-PROP = FUNCTION NUMVAL(WS-PROP-A)
+[?2004l[?2004h>            COMPUTE WS-DOWN = FUNCTION NUMVAL(WS-DOWN-A)
+[?2004l[?2004h>            COMPUTE WS-TERM-YRS = FUNCTION NUMVAL(WS-TERM-A)
+[?2004l[?2004h>            COMPUTE WS-TERM-MOS = WS-TERM-YRS * 12
+[?2004l[?2004h>            COMPUTE WS-RATE-PCT = FUNCTION NUMVAL(WS-RATE-A) / 100.
+[?2004l[?2004h> 
+[?2004l[?2004h>        BUILD-SCHEDULE.
+[?2004l[?2004h>            IF WS-TERM-MOS <= 0
+[?2004l[?2004h>                EXIT PARAGRAPH
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            MOVE WS-LOAN TO WS-BAL
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-MR = (WS-RATE-PCT / 1.0) / 1200.0
+[?2004l[?2004h>            COMPUTE WS-ONE-PLUS = 1.0 + WS-MR
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF WS-MR = 0.0
+[?2004l[?2004h>                COMPUTE WS-PAY ROUNDED = WS-LOAN / WS-TERM-MOS
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                COMPUTE WS-POW = FUNCTION POWER(WS-ONE-PLUS, WS-TERM-MOS)
+[?2004l[?2004h>                COMPUTE WS-DEN = 1.0 - (1.0 / WS-POW)
+[?2004l[?2004h>                COMPUTE WS-PAY-DBL = (WS-LOAN / 1.0) * WS-MR / WS-DEN
+[?2004l[?2004h>                COMPUTE WS-PAY ROUNDED = WS-PAY-DBL
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM VARYING L-MON FROM 1 BY 1
+[?2004l[?2004h>                UNTIL L-MON > WS-TERM-MOS
+[?2004l[?2004h> 
+[?2004l[?2004h>                COMPUTE WS-INT ROUNDED = WS-BAL * WS-MR
+[?2004l[?2004h>                COMPUTE WS-PRIN ROUNDED = WS-PAY - WS-INT
+[?2004l[?2004h> 
+[?2004l[?2004h>                IF L-MON = WS-TERM-MOS
+[?2004l[?2004h>                    MOVE WS-BAL TO WS-PRIN
+[?2004l[?2004h>                    COMPUTE WS-PAY ROUNDED = WS-INT + WS-PRIN
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>                COMPUTE WS-NEWBAL ROUNDED = WS-BAL - WS-PRIN
+[?2004l[?2004h>                IF WS-NEWBAL < 0
+[?2004l[?2004h>                    MOVE 0 TO WS-NEWBAL
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE WS-PAY TO L-PAY
+[?2004l[?2004h>                MOVE WS-INT TO L-INT
+[?2004l[?2004h>                MOVE WS-PRIN TO L-PRIN
+[?2004l[?2004h>                MOVE WS-NEWBAL TO L-REM
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE SPACES TO OUT-REC
+[?2004l[?2004h>                STRING L-MON DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       L-PAY DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       L-INT DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       L-PRIN DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       L-REM DELIMITED BY SIZE
+[?2004l[?2004h>                  INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE WS-NEWBAL TO WS-BAL
+[?2004l[?2004h>            END-PERFORM.
+[?2004l[?2004h> """
+[?2004l[?2004h> open('/app/src/program.cbl','w',encoding='utf-8').write(content)
+[?2004l[?2004h> PY
+[?2004l[?2004hroot@8932fc9aa05e:/app/src# python3 - <<'PY'
+[?2004l[?2004h> # quick check: no line > 80 chars
+[?2004l[?2004h> p = '/app/src/program.cbl'
+[?2004l[?2004h> mx = 0
+[?2004l[?2004h> bad = []
+[?2004l[?2004h> with open(p,'r',encoding='utf-8') as f:
+[?2004l[?2004h>     for i,l in enumerate(f,1):
+[?2004l[?2004h>         n = len(l.rstrip('\n'))
+[?2004l[?2004h>         mx = max(mx,n)
+[?2004l[?2004h>         if n > 80:
+[?2004l[?2004h>             bad.append((i,n,l.rstrip('\n')))
+[?2004l[?2004h> print('max_len', mx)
+[?2004l[?2004h> for i,n,l in bad[:10]:
+[?2004l[?2004h>     print(i,n,l)
+[?2004l[?2004h> PY
+[?2004lmax_len 72
+[?2004hroot@8932fc9aa05e:/app/src# cd /app/src
+[?2004l[?2004hroot@8932fc9aa05e:/app/src# unset COB_CONFIG_FILE COB_CONFIG_DIR COB_COPY_DIR COB_LIBARIES COB_LIBRARY_PATH 2>/dev/null || true
+[?2004l[?2004hroot@8932fc9aa05e:/app/src# CONF=$(find / -name 'gnucobol.conf' 2>/dev/null | head -n 1); echo "CONF=$CONF"; if [ -n "$CONF" ]; then export COB_CONFIG_FILE="$CONF"; fi; echo "COB_CONFIG_FILE=$COB_CONFIG_FILE"
+[?2004lCONF=
+COB_CONFIG_FILE=
+[?2004hroot@8932fc9aa05e:/app/src# cobc -x program.cbl
+[?2004lprogram.cbl: in paragraph 'BUILD-SCHEDULE':
+program.cbl:136: error: FUNCTION 'POWER' unknown
+[?2004hroot@8932fc9aa05e:/app/src# ./program
+[?2004lbash: ./program: No such file or directory
+[?2004hroot@8932fc9aa05e:/app/src# wc -l /app/data/OUTPUT.DAT && sed -n '1,120p' /app/data/OUTPUT.DAT
+[?2004l1 /app/data/OUTPUT.DAT
+
+[?2004hroot@8932fc9aa05e:/app/src# cat > /app/src/program.cbl <<'COB'
+[?2004lA) * 100
+           COMPUTE WS-DOW[?2004h>        IDENTIFICATION DIVISION.
+[?2004l[?2004h>        PROGRAM-ID. PROGRAM.
+[?2004l[?2004h> 
+[?2004lS[?2004h>        ENVIRONMENT DIVISION.
+[?2004l[?2004h>        INPUT-OUTPUT SECTION.
+[?2004l[?2004h>        FILE-CONTROL.
+[?2004l[?2004h>            SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h>            SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+[?2004l[?2004h>                ORGANIZATION IS LINE SEQUENTIAL.
+[?2004l[?2004h> 
+[?2004l-[?2004h>        DATA DIVISION.
+[?2004l[?2004h>        FILE SECTION.
+[?2004l[?2004h>        FD  IN-FILE.
+[?2004l[?2004h>        01  IN-REC                 PIC X(256).
+[?2004l[?2004h> 
+[?2004l-[?2004h>        FD  OUT-FILE.
+[?2004l[?2004h>        01  OUT-REC                PIC X(256).
+[?2004l[?2004h> 
+[?2004lE[?2004h>        WORKING-STORAGE SECTION.
+[?2004l[?2004h>        01  WS-EOF                 PIC X VALUE 'N'.
+[?2004l[?2004h> 
+[?2004lP[?2004h>        01  WS-IN.
+[?2004l[?2004h>            05  IN-ID              PIC X(10).
+[?2004l[?2004h>            05  IN-NAME            PIC X(30).
+[?2004l[?2004h>            05  IN-LOAN-A          PIC X(32).
+[?2004l[?2004h>            05  IN-PROP-A          PIC X(32).
+[?2004l[?2004h>            05  IN-DOWN-A          PIC X(32).
+[?2004l[?2004h>            05  IN-TERM-A          PIC X(32).
+[?2004l[?2004h>            05  IN-RATE-A          PIC X(32).
+[?2004l[?2004h> 
+[?2004l [?2004h>        01  WS-RAW.
+[?2004l[?2004h>            05  WS-TERM-YRS        PIC 9(4) COMP-3.
+[?2004l[?2004h>            05  WS-TERM-MOS        PIC 9(5) COMP-3.
+[?2004l[?2004h>            05  WS-RATE-PCT        COMP-2.
+[?2004l[?2004h> 
+[?2004lS[?2004h>        01  WS-MONEY-CENTS.
+[?2004l[?2004h>            05  WS-LOAN-C          PIC 9(14) COMP-3.
+[?2004l[?2004h>            05  WS-PROP-C          PIC 9(14) COMP-3.
+[?2004l[?2004h>            05  WS-DOWN-C          PIC 9(14) COMP-3.
+[?2004l [?2004h>            05  WS-MIN-DOWN-C      PIC 9(14) COMP-3.
+[?2004l[?2004h>            05  WS-BAL-C           PIC 9(14) COMP-3.
+[?2004l[?2004h>            05  WS-PAY-C           PIC 9(14) COMP-3.
+[?2004l[?2004h>            05  WS-INT-C           PIC 9(14) COMP-3.
+[?2004l[?2004h>            05  WS-PRIN-C          PIC 9(14) COMP-3.
+[?2004l[?2004h>            05  WS-NEWBAL-C        PIC 9(14) COMP-3.
+[?2004l[?2004h> 
+[?2004lO[?2004h>        01  WS-MATH.
+[?2004lO[?2004h>            05  WS-MR              COMP-2.
+[?2004l[?2004h>            05  WS-ONE-PLUS        COMP-2.
+[?2004l[?2004h>            05  WS-POW             COMP-2.
+[?2004l[?2004h>            05  WS-DEN             COMP-2.
+[?2004l-I[?2004h> 
+[?2004l[?2004h>        01  WS-AMTS.
+[?2004l[?2004h>            05  WS-PAY-AMT         PIC 9(10)V99 COMP-3.
+[?2004l[?2004h>            05  WS-INT-AMT         PIC 9(10)V99 COMP-3.
+[?2004l[?2004h>            05  WS-PRIN-AMT        PIC 9(10)V99 COMP-3.
+[?2004l[?2004h>            05  WS-REM-AMT         PIC 9(12)V99 COMP-3.
+[?2004l[?2004h> 
+[?2004l[?2004h>        01  WS-OUT-FIELDS.
+[?2004l [?2004h>            05  O-ID               PIC X(10).
+[?2004l[?2004h>            05  O-STATUS           PIC X(5).
+[?2004l[?2004h>            05  O-REASON           PIC X(50).
+[?2004l[?2004h> 
+[?2004l [?2004h>        01  WS-LINE.
+[?2004l [?2004h>            05  L-MON              PIC 9(3).
+[?2004l[?2004h>            05  L-PAY              PIC 9(8).99.
+[?2004l[?2004h>            05  L-INT              PIC 9(8).99.
+[?2004l[?2004h>            05  L-PRIN             PIC 9(8).99.
+[?2004l[?2004h>            05  L-REM              PIC 9(10).99.
+[?2004l[?2004h> 
+[?2004lA[?2004h>        PROCEDURE DIVISION.
+[?2004l[?2004h>        MAIN.
+[?2004l[?2004h>            OPEN INPUT IN-FILE
+[?2004l[?2004h>                 OUTPUT OUT-FILE
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM UNTIL WS-EOF = 'Y'
+[?2004l[?2004h>                READ IN-FILE
+[?2004l[?2004h>                    AT END
+[?2004l[?2004h>                        MOVE 'Y' TO WS-EOF
+[?2004l[?2004h>                    NOT AT END
+[?2004l[?2004h>                        PERFORM PROCESS-REC
+[?2004l[?2004h>                END-READ
+[?2004l[?2004h>            END-PERFORM
+[?2004l[?2004h> 
+[?2004l[?2004h>            CLOSE IN-FILE OUT-FILE
+[?2004l[?2004h>            STOP RUN.
+[?2004l[?2004h> 
+[?2004l[?2004h>        PROCESS-REC.
+[?2004l[?2004h>            MOVE SPACES TO WS-IN
+[?2004l[?2004h>            UNSTRING IN-REC DELIMITED BY ';'
+[?2004l[?2004h>                INTO IN-ID IN-NAME IN-LOAN-A IN-PROP-A
+[?2004l[?2004h>                     IN-DOWN-A IN-TERM-A IN-RATE-A
+[?2004l[?2004h>            END-UNSTRING
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM CONVERT-INPUT
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-MIN-DOWN-C ROUNDED = WS-PROP-C * 0.15
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF WS-DOWN-C < WS-MIN-DOWN-C
+[?2004l[?2004h>                MOVE IN-ID TO O-ID
+[?2004l[?2004h>                MOVE 'DENY ' TO O-STATUS
+[?2004l[?2004h>                MOVE 'INSUFFICIENT FUNDS FOR DOWN PAYMENT' TO O-REASON
+[?2004l[?2004h>                MOVE SPACES TO OUT-REC
+[?2004l[?2004h>                STRING O-ID DELIMITED BY SIZE
+[?2004l[?2004h>                       O-STATUS DELIMITED BY SIZE
+[?2004l[?2004h>                       O-REASON DELIMITED BY SIZE
+[?2004l[?2004h>                  INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                MOVE SPACES TO OUT-REC
+[?2004l[?2004h>                STRING IN-ID DELIMITED BY SIZE
+[?2004l[?2004h>                       'APPRO' DELIMITED BY SIZE
+[?2004l[?2004h>                  INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h> 
+[?2004l[?2004h>                PERFORM BUILD-SCHEDULE
+[?2004l[?2004h>            END-IF.
+[?2004l[?2004h> 
+[?2004l[?2004h>        CONVERT-INPUT.
+[?2004l[?2004h>            COMPUTE WS-LOAN-C = FUNCTION NUMVAL(IN-LOAN-A) * 100
+[?2004l[?2004h>            COMPUTE WS-PROP-C = FUNCTION NUMVAL(IN-PROP-A) * 100
+[?2004l[?2004h>            COMPUTE WS-DOWN-C = FUNCTION NUMVAL(IN-DOWN-A) * 100
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-TERM-YRS = FUNCTION NUMVAL(IN-TERM-A)
+[?2004l[?2004h>            COMPUTE WS-TERM-MOS = WS-TERM-YRS * 12
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-RATE-PCT = FUNCTION NUMVAL(IN-RATE-A) / 100.0.
+[?2004l[?2004h> 
+[?2004l[?2004h>        BUILD-SCHEDULE.
+[?2004l[?2004h>            IF WS-TERM-MOS <= 0
+[?2004l[?2004h>                EXIT PARAGRAPH
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            MOVE WS-LOAN-C TO WS-BAL-C
+[?2004l[?2004h> 
+[?2004l[?2004h>            COMPUTE WS-MR = WS-RATE-PCT / 1200.0
+[?2004l[?2004h>            COMPUTE WS-ONE-PLUS = 1.0 + WS-MR
+[?2004l[?2004h> 
+[?2004l[?2004h>            IF WS-MR = 0.0
+[?2004l[?2004h>                COMPUTE WS-PAY-C ROUNDED = WS-LOAN-C / WS-TERM-MOS
+[?2004l[?2004h>            ELSE
+[?2004l[?2004h>                COMPUTE WS-POW = WS-ONE-PLUS ** WS-TERM-MOS
+[?2004l[?2004h>                COMPUTE WS-DEN = 1.0 - (1.0 / WS-POW)
+[?2004l[?2004h>                IF WS-DEN = 0.0
+[?2004l[?2004h>                    COMPUTE WS-PAY-C ROUNDED = WS-LOAN-C / WS-TERM-MOS
+[?2004l[?2004h>                ELSE
+[?2004l[?2004h>                    COMPUTE WS-PAY-C ROUNDED = WS-LOAN-C * WS-MR / WS-DEN
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h>            END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>            PERFORM VARYING L-MON FROM 1 BY 1
+[?2004l[?2004h>                UNTIL L-MON > WS-TERM-MOS
+[?2004l[?2004h> 
+[?2004l[?2004h>                COMPUTE WS-INT-C ROUNDED = WS-BAL-C * WS-MR
+[?2004l[?2004h>                COMPUTE WS-PRIN-C ROUNDED = WS-PAY-C - WS-INT-C
+[?2004l[?2004h> 
+[?2004l[?2004h>                IF L-MON = WS-TERM-MOS
+[?2004l[?2004h>                    MOVE WS-BAL-C TO WS-PRIN-C
+[?2004l[?2004h>                    COMPUTE WS-PAY-C ROUNDED = WS-INT-C + WS-PRIN-C
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>                COMPUTE WS-NEWBAL-C ROUNDED = WS-BAL-C - WS-PRIN-C
+[?2004l[?2004h>                IF WS-NEWBAL-C < 0
+[?2004l[?2004h>                    MOVE 0 TO WS-NEWBAL-C
+[?2004l[?2004h>                END-IF
+[?2004l[?2004h> 
+[?2004l[?2004h>                COMPUTE WS-PAY-AMT ROUNDED = WS-PAY-C / 100.0
+[?2004l[?2004h>                COMPUTE WS-INT-AMT ROUNDED = WS-INT-C / 100.0
+[?2004l[?2004h>                COMPUTE WS-PRIN-AMT ROUNDED = WS-PRIN-C / 100.0
+[?2004l[?2004h>                COMPUTE WS-REM-AMT ROUNDED = WS-NEWBAL-C / 100.0
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE WS-PAY-AMT TO L-PAY
+[?2004l[?2004h>                MOVE WS-INT-AMT TO L-INT
+[?2004l[?2004h>                MOVE WS-PRIN-AMT TO L-PRIN
+[?2004l[?2004h>                MOVE WS-REM-AMT TO L-REM
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE SPACES TO OUT-REC
+[?2004l[?2004h>                STRING L-MON DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       L-PAY DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       L-INT DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       L-PRIN DELIMITED BY SIZE
+[?2004l[?2004h>                       ' ' DELIMITED BY SIZE
+[?2004l[?2004h>                       L-REM DELIMITED BY SIZE
+[?2004l[?2004h>                  INTO OUT-REC
+[?2004l[?2004h>                END-STRING
+[?2004l[?2004h>                WRITE OUT-REC
+[?2004l[?2004h> 
+[?2004l[?2004h>                MOVE WS-NEWBAL-C TO WS-BAL-C
+[?2004l[?2004h>            END-PERFORM.
+[?2004l[?2004h> COB
+[?2004l[?2004hroot@8932fc9aa05e:/app/src# python3 - <<'PY'
+[?2004l[?2004h> # verify fixed-format line length requirement
+[?2004l[?2004h> mx=0
+[?2004l[?2004h> bad=[]
+[?2004l[?2004h> for i,l in enumerate(open('/app/src/program.cbl','r',encoding='utf-8'),1):
+[?2004l[?2004h>     n=len(l.rstrip('\n'))
+[?2004l[?2004h>     mx=max(mx,n)
+[?2004l[?2004h>     if n>80:
+[?2004l[?2004h>         bad.append((i,n,l.rstrip('\n')))
+[?2004l[?2004h> print('max_len',mx)
+[?2004l[?2004h> if bad:
+[?2004l[?2004h>     print('lines>80:',len(bad))
+[?2004l[?2004h>     for b in bad[:10]:
+[?2004l[?2004h>         print(b)
+[?2004l[?2004h> PY
+[?2004lmax_len 72
+[?2004hroot@8932fc9aa05e:/app/src# cd /app/src
+[?2004l[?2004hroot@8932fc9aa05e:/app/src# cobc -x program.cbl
+[?2004l[?2004hroot@8932fc9aa05e:/app/src# ./program
+[?2004l[?2004hroot@8932fc9aa05e:/app/src# wc -l /app/data/OUTPUT.DAT && sed -n '1,80p' /app/data/OUTPUT.DAT
+[?2004l14 /app/data/OUTPUT.DAT
+APP0000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT
+APP0000002APPRO
+001 00000429.18 00000022.92 00000406.26 0000004593.74
+002 00000429.18 00000021.05 00000408.13 0000004185.61
+003 00000429.18 00000019.18 00000410.00 0000003775.61
+004 00000429.18 00000017.30 00000411.88 0000003363.73
+005 00000429.18 00000015.42 00000413.76 0000002949.97
+006 00000429.18 00000013.52 00000415.66 0000002534.31
+007 00000429.18 00000011.62 00000417.56 0000002116.75
+008 00000429.18 00000009.70 00000419.48 0000001697.27
+009 00000429.18 00000007.78 00000421.40 0000001275.87
+010 00000429.18 00000005.85 00000423.33 0000000852.54
+011 00000429.18 00000003.91 00000425.27 0000000427.27
+012 00000429.23 00000001.96 00000427.27 0000000000.00
+[?2004hroot@8932fc9aa05e:/app/src# sed -n '1,25p' /app/src/program.cbl | cat -n
+[?2004l     1	       IDENTIFICATION DIVISION.
+     2	       PROGRAM-ID. PROGRAM.
+     3	
+     4	       ENVIRONMENT DIVISION.
+     5	       INPUT-OUTPUT SECTION.
+     6	       FILE-CONTROL.
+     7	           SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+     8	               ORGANIZATION IS LINE SEQUENTIAL.
+     9	           SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+    10	               ORGANIZATION IS LINE SEQUENTIAL.
+    11	
+    12	       DATA DIVISION.
+    13	       FILE SECTION.
+    14	       FD  IN-FILE.
+    15	       01  IN-REC                 PIC X(256).
+    16	
+    17	       FD  OUT-FILE.
+    18	       01  OUT-REC                PIC X(256).
+    19	
+    20	       WORKING-STORAGE SECTION.
+    21	       01  WS-EOF                 PIC X VALUE 'N'.
+    22	
+    23	       01  WS-IN.
+    24	           05  IN-ID              PIC X(10).
+    25	           05  IN-NAME            PIC X(30).
+[?2004hroot@8932fc9aa05e:/app/src# python3 - <<'PY'
+[?2004l[?2004h> mx=0
+[?2004l[?2004h> bad=[]
+[?2004l[?2004h> for i,l in enumerate(open('/app/src/program.cbl','r',encoding='utf-8'),1):
+[?2004l[?2004h>     n=len(l.rstrip('\n'))
+[?2004l[?2004h>     mx=max(mx,n)
+[?2004l[?2004h>     if n>80:
+[?2004l[?2004h>         bad.append((i,n))
+[?2004l[?2004h> print('max_len',mx)
+[?2004l[?2004h> print('lines_over_80',len(bad))
+[?2004l[?2004h> PY
+[?2004lmax_len 72
+lines_over_80 0
+[?2004hroot@8932fc9aa05e:/app/src# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/agent.cast[0m
+[?2004hroot@8932fc9aa05e:/app# 

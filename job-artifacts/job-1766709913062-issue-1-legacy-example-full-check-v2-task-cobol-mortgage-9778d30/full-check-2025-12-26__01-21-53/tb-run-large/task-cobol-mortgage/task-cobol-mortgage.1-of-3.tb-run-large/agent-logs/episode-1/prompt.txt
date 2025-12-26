@@ -1,0 +1,213 @@
+New Terminal Output:
+root@8932fc9aa05e:/app# ls -la /app /app/src /app/data
+/app:
+total 16
+drwxr-xr-x  4 root root 4096 Dec 26 01:24 .
+drwxr-xr-x 20 root root 4096 Dec 26 01:26 ..
+drwxr-xr-x  2 root root 4096 Dec 26 01:21 data
+drwxr-xr-x  2 root root 4096 Dec 26 01:21 src
+
+/app/data:
+total 12
+drwxr-xr-x 2 root root 4096 Dec 26 01:21 .
+drwxr-xr-x 4 root root 4096 Dec 26 01:24 ..
+-rw-r--r-- 1 root root    1 Dec 26 01:21 OUTPUT.DAT
+
+/app/src:
+total 12
+drwxr-xr-x 2 root root 4096 Dec 26 01:21 .
+drwxr-xr-x 4 root root 4096 Dec 26 01:24 ..
+-rw-r--r-- 1 root root  167 Dec 26 01:21 INPUT.DAT
+root@8932fc9aa05e:/app# sed -n '1,5p' /app/src/INPUT.DAT
+APP0000001;Williams David Robert         ;2000000000;3500000000;0500000000;20;00550
+APP0000002;John Smith Clark              ;0000005000;0000004000;0000003500;01;00550root@8932fc9aa05e:/app# sed -n '1,120p' /app/src/INPUT.DAT | cat -A
+APP0000001;Williams David Robert         ;2000000000;3500000000;0500000000;20;00550$
+APP0000002;John Smith Clark              ;0000005000;0000004000;0000003500;01;00550root@8932fc9aa05e:/app# cat > /app/src/program.cbl <<'COB'
+>        IDENTIFICATION DIVISION.
+>        PROGRAM-ID. PROGRAM.
+>
+>        ENVIRONMENT DIVISION.
+AL(WS-TERM-A)
+           COMPUTE WS-RATE = FUNCTION NUMVAL(WS-RATE-A) * 100.
+
+       BUILD-SCHEDULE.
+           MOVE WS-LOAN>        INPUT-OUTPUT SECTION.
+T>        FILE-CONTROL.
+ / >            SELECT IN-FILE ASSIGN TO "INPUT.DAT"
+-M>                ORGANIZATION IS LINE SEQUENTIAL.
+>            SELECT OUT-FILE ASSIGN TO "../data/OUTPUT.DAT"
+           IF>                ORGANIZATION IS LINE SEQUENTIAL.
+>
+E>        DATA DIVISION.
+>        FILE SECTION.
+>        FD  IN-FILE.
+>        01  IN-REC                      PIC X(256).
+>
+>        FD  OUT-FILE.
+>        01  OUT-REC                     PIC X(256).
+>
+ >        WORKING-STORAGE SECTION.
+>        01  WS-EOF                      PIC X VALUE 'N'.
+>
+>        01  WS-FIELDS.
+>            05  WS-ID                   PIC X(10).
+>            05  WS-NAME                 PIC X(30).
+>            05  WS-LOAN-A               PIC X(32).
+  >            05  WS-PROP-A               PIC X(32).
+>            05  WS-DOWN-A               PIC X(32).
+>            05  WS-TERM-A               PIC X(32).
+>            05  WS-RATE-A               PIC X(32).
+>
+E>        01  WS-NUMS.
+>            05  WS-LOAN                 PIC 9(12)V99 COMP-3.
+>            05  WS-PROP                 PIC 9(12)V99 COMP-3.
+  >            05  WS-DOWN                 PIC 9(12)V99 COMP-3.
+>            05  WS-TERM                 PIC 9(4) COMP-3.
+>            05  WS-RATE                 PIC 9(5)V99 COMP-3.
+>
+>        01  WS-CALC.
+>            05  WS-MIN-DOWN             PIC 9(12)V99 COMP-3.
+>            05  WS-BAL                  PIC 9(12)V99 COMP-3.
+>            05  WS-MR                   COMP-2.
+I>            05  WS-ONE-PLUS-MR          COMP-2.
+>            05  WS-POW                  COMP-2.
+>            05  WS-DENOM                COMP-2.
+>            05  WS-PAY-DBL              COMP-2.
+>            05  WS-PAY                  PIC 9(12)V99 COMP-3.
+  >            05  WS-INT                  PIC 9(12)V99 COMP-3.
+>            05  WS-PRIN                 PIC 9(12)V99 COMP-3.
+>            05  WS-NEWBAL               PIC 9(12)V99 COMP-3.
+ND->
+P>        01  WS-OUT-FMTS.
+>            05  F-MON                   PIC 9(3).
+>            05  F-PAY                   PIC 9(8).99.
+>            05  F-INT                   PIC 9(8).99.
+>            05  F-PRIN                  PIC 9(8).99.
+>            05  F-REM                   PIC 9(10).99.
+>
+>        01  WS-STATUS                   PIC X(5).
+>        01  WS-REASON                   PIC X(50).
+>
+>        PROCEDURE DIVISION.
+>        MAIN.
+>            OPEN INPUT IN-FILE
+>                 OUTPUT OUT-FILE.
+>
+>            PERFORM UNTIL WS-EOF = 'Y'
+>                READ IN-FILE
+>                    AT END
+>                        MOVE 'Y' TO WS-EOF
+>                    NOT AT END
+>                        PERFORM PROCESS-REC
+>                END-READ
+>            END-PERFORM.
+>
+>            CLOSE IN-FILE OUT-FILE.
+>            STOP RUN.
+>
+>        PROCESS-REC.
+>            MOVE SPACES TO WS-FIELDS
+>            UNSTRING IN-REC DELIMITED BY ';'
+>                INTO WS-ID WS-NAME WS-LOAN-A WS-PROP-A
+>                     WS-DOWN-A WS-TERM-A WS-RATE-A
+>            END-UNSTRING
+>
+>            PERFORM CONVERT-NUMBERS
+>
+>            COMPUTE WS-MIN-DOWN ROUNDED = WS-PROP * 0.15
+>
+>            IF WS-DOWN < WS-MIN-DOWN
+>                MOVE 'DENY ' TO WS-STATUS
+>                MOVE 'INSUFFICIENT FUNDS FOR DOWN PAYMENT' TO WS-REASON
+>                STRING WS-ID DELIMITED BY SIZE
+>                       WS-STATUS DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       WS-REASON DELIMITED BY SIZE
+>                    INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>            ELSE
+>                MOVE 'APPRO' TO WS-STATUS
+>                MOVE SPACES TO OUT-REC
+>                STRING WS-ID DELIMITED BY SIZE
+>                       WS-STATUS DELIMITED BY SIZE
+>                    INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>
+>                PERFORM BUILD-SCHEDULE
+>            END-IF.
+>
+>        CONVERT-NUMBERS.
+>            COMPUTE WS-LOAN = FUNCTION NUMVAL(WS-LOAN-A) * 100
+>            COMPUTE WS-PROP = FUNCTION NUMVAL(WS-PROP-A) * 100
+>            COMPUTE WS-DOWN = FUNCTION NUMVAL(WS-DOWN-A) * 100
+>            COMPUTE WS-TERM = FUNCTION NUMVAL(WS-TERM-A)
+>            COMPUTE WS-RATE = FUNCTION NUMVAL(WS-RATE-A) * 100.
+>
+>        BUILD-SCHEDULE.
+>            MOVE WS-LOAN TO WS-BAL
+>
+>            COMPUTE WS-MR = (WS-RATE / 100.0) / 1200.0
+>            COMPUTE WS-ONE-PLUS-MR = 1.0 + WS-MR
+>
+>            IF WS-TERM <= 0
+>                EXIT PARAGRAPH
+>            END-IF
+>
+>            IF WS-MR = 0.0
+>                COMPUTE WS-PAY ROUNDED = WS-LOAN / WS-TERM
+>            ELSE
+>                COMPUTE WS-POW = FUNCTION POWER(WS-ONE-PLUS-MR, WS-TERM)
+>                COMPUTE WS-DENOM = 1.0 - (1.0 / WS-POW)
+>                COMPUTE WS-PAY-DBL = (WS-LOAN / 100.0) * WS-MR / WS-DENOM
+>                COMPUTE WS-PAY ROUNDED = WS-PAY-DBL * 100.0
+>            END-IF
+>
+>            PERFORM VARYING F-MON FROM 1 BY 1 UNTIL F-MON > WS-TERM
+>                COMPUTE WS-INT ROUNDED = WS-BAL * WS-MR
+>
+>                COMPUTE WS-PRIN ROUNDED = WS-PAY - WS-INT
+>
+>                IF F-MON = WS-TERM
+>                    MOVE WS-BAL TO WS-PRIN
+>                    COMPUTE WS-PAY ROUNDED = WS-INT + WS-PRIN
+>                END-IF
+>
+>                COMPUTE WS-NEWBAL ROUNDED = WS-BAL - WS-PRIN
+>                IF WS-NEWBAL < 0
+>                    MOVE 0 TO WS-NEWBAL
+>                END-IF
+>
+>                COMPUTE F-PAY = WS-PAY / 100
+>                COMPUTE F-INT = WS-INT / 100
+>                COMPUTE F-PRIN = WS-PRIN / 100
+>                COMPUTE F-REM = WS-NEWBAL / 100
+>
+>                MOVE SPACES TO OUT-REC
+>                STRING F-MON DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       F-PAY DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       F-INT DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       F-PRIN DELIMITED BY SIZE
+>                       ' ' DELIMITED BY SIZE
+>                       F-REM DELIMITED BY SIZE
+>                    INTO OUT-REC
+>                END-STRING
+>                WRITE OUT-REC
+>
+>                MOVE WS-NEWBAL TO WS-BAL
+>            END-PERFORM.
+> COB
+root@8932fc9aa05e:/app# cd /app/src
+root@8932fc9aa05e:/app/src# cobc -x -std=gnucobol program.cbl
+configuration error:
+gnucobol.conf: No such file or directory
+root@8932fc9aa05e:/app/src# ./program
+bash: ./program: No such file or directory
+root@8932fc9aa05e:/app/src# wc -l /app/data/OUTPUT.DAT && sed -n '1,40p' /app/data/OUTPUT.DAT
+1 /app/data/OUTPUT.DAT
+
+root@8932fc9aa05e:/app/src#

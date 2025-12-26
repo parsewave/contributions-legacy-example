@@ -1,0 +1,87 @@
+New Terminal Output:
+
+root@f2dfd4d3de5d:/app/src# cd /app/src
+root@f2dfd4d3de5d:/app/src# nl -ba program.cbl | sed -n '136,150p'
+   136             MOVE LOAN-AMT TO BALANCE
+   137
+   138             IF MONTHLY-RATE = 0
+   139                 COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS
+   140             ELSE
+   141                 COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE
+   142                 COMPUTE POWVAL ROUNDED =
+   143                     FUNCTION POWER(BASE, -TERM-MONTHS)
+   144                 COMPUTE DENOM ROUNDED = 1 - POWVAL
+   145                 COMPUTE MONTHLY-PAY ROUNDED =
+   146                     (LOAN-AMT * MONTHLY-RATE) / DENOM
+   147             END-IF
+   148
+   149             PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS
+   150                 COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE
+root@f2dfd4d3de5d:/app/src# python3 - <<'PY'
+> from pathlib import Path
+> p = Path('program.cbl')
+> text = p.read_text().splitlines()
+> out = []
+> i = 0
+> while i < len(text):
+>     line = text[i]
+>     if line.strip() == 'COMPUTE POWVAL ROUNDED =':
+>         # Replace this + next line with a single exponentiation line
+>         out.append('               COMPUTE POWVAL ROUNDED = BASE ** (-TERM-MONTHS)')
+>         i += 2
+>         continue
+>     out.append(line)
+>     i += 1
+> p.write_text("\n".join(out) + "\n")
+> print('patched')
+> PY
+patched
+root@f2dfd4d3de5d:/app/src# python3 - <<'PY'
+> from pathlib import Path
+> p=Path('program.cbl')
+> mx=0
+> bad=[]
+> for i,line in enumerate(p.read_text().splitlines(),1):
+>     mx=max(mx,len(line))
+>     if len(line)>80:
+>         bad.append((i,len(line)))
+> print('max_len',mx,'over80',len(bad))
+> if bad:
+>     print('first_over80',bad[0])
+> PY
+max_len 71 over80 0
+root@f2dfd4d3de5d:/app/src# nl -ba program.cbl | sed -n '136,150p'
+   136             MOVE LOAN-AMT TO BALANCE
+   137
+   138             IF MONTHLY-RATE = 0
+   139                 COMPUTE MONTHLY-PAY ROUNDED = LOAN-AMT / TERM-MONTHS
+   140             ELSE
+   141                 COMPUTE BASE ROUNDED = 1 + MONTHLY-RATE
+   142                 COMPUTE POWVAL ROUNDED = BASE ** (-TERM-MONTHS)
+   143                 COMPUTE DENOM ROUNDED = 1 - POWVAL
+   144                 COMPUTE MONTHLY-PAY ROUNDED =
+   145                     (LOAN-AMT * MONTHLY-RATE) / DENOM
+   146             END-IF
+   147
+   148             PERFORM VARYING I FROM 1 BY 1 UNTIL I > TERM-MONTHS
+   149                 COMPUTE INTEREST-PART ROUNDED = BALANCE * MONTHLY-RATE
+   150                 COMPUTE PRINC-PART ROUNDED = MONTHLY-PAY - INTEREST-PART
+root@f2dfd4d3de5d:/app/src# cobc -x -std=gnucobol program.cbl 2>&1 | sed -n '1,200p'
+root@f2dfd4d3de5d:/app/src# rm -f /app/data/OUTPUT.DAT
+root@f2dfd4d3de5d:/app/src# ./program
+root@f2dfd4d3de5d:/app/src# sed -n '1,120p' /app/data/OUTPUT.DAT
+APP0000001DENY INSUFFICIENT FUNDS FOR DOWN PAYMENT
+APP0000002APPRO
+001 00000004.29 00000000.23 00000004.06 0000000045.94
+002 00000004.29 00000000.21 00000004.08 0000000041.86
+003 00000004.29 00000000.19 00000004.10 0000000037.76
+004 00000004.29 00000000.17 00000004.12 0000000033.64
+005 00000004.29 00000000.15 00000004.14 0000000029.50
+006 00000004.29 00000000.14 00000004.15 0000000025.35
+007 00000004.29 00000000.12 00000004.17 0000000021.18
+008 00000004.29 00000000.10 00000004.19 0000000016.99
+009 00000004.29 00000000.08 00000004.21 0000000012.78
+010 00000004.29 00000000.06 00000004.23 0000000008.55
+011 00000004.29 00000000.04 00000004.25 0000000004.30
+012 00000004.32 00000000.02 00000004.30 0000000000.00
+root@f2dfd4d3de5d:/app/src#
