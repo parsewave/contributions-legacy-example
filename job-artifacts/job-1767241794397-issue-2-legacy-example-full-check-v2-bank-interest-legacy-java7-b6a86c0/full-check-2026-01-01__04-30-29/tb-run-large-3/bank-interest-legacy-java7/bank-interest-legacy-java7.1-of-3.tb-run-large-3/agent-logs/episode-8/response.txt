@@ -1,0 +1,6 @@
+{
+  "analysis": "All requirements are satisfied: /app/job.jar exists and contains BankBatchJob classes; classfile major version is 51 (Java 7 bytecode). Running the job generates /app/output/interest.csv and exceptions.csv with LF and trailing newline, stats.json is single-line with no newline, and /app/output/bankdb.h2.db is created. H2 DB has ACCOUNTS=4, TXNS row_num 1..20 count 20, and exactly one RUN_AUDIT row containing the required JDBC_URL (starts with jdbc:h2:, includes MODE=DB2 and /app/output/bankdb), biz_date, accounts, valid_txs, skipped_txs, and report_md5 matching interest.csv. Re-running the job produces identical outputs (verified by md5/diff). No further changes are needed.",
+  "plan": "No further steps; task is complete.",
+  "commands": [],
+  "task_complete": true
+}

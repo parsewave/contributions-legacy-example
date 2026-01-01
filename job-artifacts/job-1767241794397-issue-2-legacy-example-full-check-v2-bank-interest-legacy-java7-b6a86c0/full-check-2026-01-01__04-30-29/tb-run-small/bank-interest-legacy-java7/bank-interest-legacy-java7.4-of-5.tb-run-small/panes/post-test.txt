@@ -1,0 +1,41 @@
+root@534c3e9c095c:/app# bash /tests/run-tests.sh; tmux wait -S done
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.13.1, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /tests
+collected 1 item
+
+../tests/test_outputs.py::test_outputs_via_java_validator FAILED                                                                                         [100%]
+
+=========================================================================== FAILURES ===========================================================================
+_______________________________________________________________ test_outputs_via_java_validator ________________________________________________________________
+
+    def test_outputs_via_java_validator():
+        """Runs the job end-to-end and validates outputs + key runtime constraints."""
+        out_dir = Path("/app/output")
+        if out_dir.exists():
+            shutil.rmtree(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        data_files = {
+            "/app/data/accounts.csv": "505829c96c9fa568cf70abf7c52247d5",
+            "/app/data/transactions.csv": "ad100f16f2e9b52929da8eca55b3edad",
+            "/app/data/biz_date.txt": "4a58c5b49dafc91047e9f999ede44581",
+            "/app/data/fx_rates.csv": "d351af4cc717a6d8d9353f53d8616c05",
+            "/app/data/fx_pivots.csv": "31e9e031a576af3d943424f47d9f9390",
+            "/app/data/fee_rules.csv": "a2a8a66a3db722b2f4a051612c8e8bd7",
+        }
+        for path, expected_md5 in data_files.items():
+            got = hashlib.md5(Path(path).read_bytes()).hexdigest()
+            assert got == expected_md5, f"input modified before run: {path}"
+        job_jar = Path("/app/job.jar")
+>       assert job_jar.exists(), "/app/job.jar is missing"
+E       AssertionError: /app/job.jar is missing
+E       assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/app/job.jar').exists
+
+/tests/test_outputs.py:352: AssertionError
+=================================================================== short test summary info ====================================================================
+FAILED ../tests/test_outputs.py::test_outputs_via_java_validator - AssertionError: /app/job.jar is missing
+====================================================================== 1 failed in 0.10s =======================================================================
+root@534c3e9c095c:/app#

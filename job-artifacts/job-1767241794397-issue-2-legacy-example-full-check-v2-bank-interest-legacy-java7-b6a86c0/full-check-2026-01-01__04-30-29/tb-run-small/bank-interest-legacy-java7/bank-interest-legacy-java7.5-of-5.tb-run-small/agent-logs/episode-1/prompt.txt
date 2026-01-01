@@ -1,0 +1,44 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+
+New Terminal Output:
+root@757c60dc43dd:/app# ls -R
+.:
+data
+
+./data:
+accounts.csv  biz_date.txt  fee_rules.csv  fx_pivots.csv  fx_rates.csv  transactions.csv
+root@757c60dc43dd:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

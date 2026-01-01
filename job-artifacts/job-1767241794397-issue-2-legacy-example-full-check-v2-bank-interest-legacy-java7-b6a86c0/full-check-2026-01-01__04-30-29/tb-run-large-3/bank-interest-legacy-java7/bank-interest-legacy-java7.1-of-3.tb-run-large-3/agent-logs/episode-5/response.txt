@@ -1,0 +1,83 @@
+{
+  "analysis": "BankBatchJob.java now exists, but javac failed because `Date` is ambiguous due to importing both `java.util.*` and `java.sql.*`. Also, the current adjusted amount computation rounds the converted amount to 2dp before subtracting the fee, which can change results vs spec (adjusted = amount - fee, then round). The jar currently contains no classes because compilation failed, so the job can’t run and outputs aren’t produced.",
+  "plan": "1) Patch BankBatchJob.java to qualify `java.util.Date` where used (avoid ambiguity).\n2) Patch fee/adjusted calculation to subtract fee from the full-precision converted amount and then round to 2dp.\n3) Patch stats.json to emit total_interest as a JSON number (still 2dp) instead of a string.\n4) Recompile, rebuild /app/job.jar, run the job, and inspect outputs.\n5) Rerun and diff outputs to confirm determinism.",
+  "commands": [
+    {
+      "keystrokes": "grep -n 'Date d =\\|new Date(\\|BigDecimal adj2 =\\|total_interest' /app/src/BankBatchJob.java | head -50\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "perl -pi -e 's/\\bDate d =/java.util.Date d =/g; s/new Date\\(/new java.util.Date(/g' /app/src/BankBatchJob.java\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "python - <<'PY'\nfrom pathlib import Path\np=Path('/app/src/BankBatchJob.java')\ns=p.read_text('utf-8')\ns=s.replace('BigDecimal adj2 = amtAcct10.setScale(2,RM).subtract(fee2).setScale(2,RM);',\n            'BigDecimal adj2 = amtAcct10.subtract(fee2).setScale(2,RM);')\ns=s.replace('\"\\\\\"total_interest\\\\\":\\\\\"\"+total2.toPlainString()+\"\\\\\",\"+',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+')\n# Now remove the extra quotes around total_interest (make it a number)\ns=s.replace('\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+')\n# The line above keeps the quotes; fix precisely for numeric:\ns=s.replace('\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+')\n# If the code is exactly as expected, do an exact replace:\ns=s.replace('\"\\\\\"total_interest\\\\\":\\\\\"\"+total2.toPlainString()+\"\\\\\",\"+',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+')\n# Fallback: replace the actual source snippet seen earlier:\ns=s.replace('\"\\\\\"total_interest\\\\\":\\\\\"\"+total2.toPlainString()+\"\\\\\",\"+',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+')\n# Final targeted replace based on the plain Java snippet:\ns=s.replace('\"\\\\\"total_interest\\\\\":\\\\\"\"+total2.toPlainString()+\"\\\\\",\"+',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+')\n# If it was written without the extra escaping (common):\ns=s.replace('\"total_interest\":\"'+\"+total2.toPlainString()+\"+'\",'+\"+\",\n            '\"total_interest\":'+\"+total2.toPlainString()+\"+'\",'+\"+\",\n           )\n# Safer: just do a direct replace of the exact line fragment\ns=s.replace('\"\\\\\"total_interest\\\\\":\\\\\"\"+total2.toPlainString()+\"\\\\\",\"+',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+')\n# If still not replaced, do a regex replace\nimport re\ns=re.sub(r'\"\\\\\"total_interest\\\\\":\\\\\"\"\\+total2\\.toPlainString\\(\\)\\+\"\\\\\",\"\\+','\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+',s)\n# Now remove the quotes around the numeric value in JSON construction\ns=re.sub(r'\"\\\\\"total_interest\\\\\":\\\\\"\"\\+total2\\.toPlainString\\(\\)\\+\"\\\\\",\"\\+','\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+',s)\n# We actually want: \"total_interest\": + total2.toPlainString() + ,\ns=re.sub(r'\"\\\\\"total_interest\\\\\":\\\\\"\"\\+total2\\.toPlainString\\(\\)\\+\"\\\\\"\"', '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()', s)\ns=s.replace('\"\\\\\"total_interest\\\\\":\\\\\"\"+total2.toPlainString()+\"\\\\\"\"',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()')\n# Finally, correct to numeric (no quotes) if present as the straightforward line from our intended code:\ns=s.replace('\"\\\\\"total_interest\\\\\":\\\\\"\"+total2.toPlainString()+\"\\\\\",\"+',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+')\n# If the source is exactly:\n#   \"\\\"total_interest\\\":\\\"\"+total2.toPlainString()+\"\\\",\"+\n# convert to:\n#   \"\\\"total_interest\\\":\"+total2.toPlainString()+\",\"+\ns=s.replace('\"\\\\\"total_interest\\\\\":\\\\\"\"+total2.toPlainString()+\"\\\\\",\"+',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+')\n# And now convert that to numeric (remove the wrapping quotes in the JSON itself)\ns=s.replace('\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+')\n# (Most reliable) do the plain-text replace of the original line we saw in the earlier full version:\ns=s.replace('\"\\\\\"total_interest\\\\\":\\\\\"\"+total2.toPlainString()+\"\\\\\",\"+',\n            '\"\\\\\"total_interest\\\\\":\"+total2.toPlainString()+\",\"+')\n# If present in the file (as shown in terminal output):\ns=s.replace('\\\"total_interest\\\":\\\"\"+total2.toPlainString()+\"\\\",',\n            '\\\"total_interest\\\":\"+total2.toPlainString()+\",')\n# Now the numeric form we actually want:\ns=s.replace('\\\"total_interest\\\":\"+total2.toPlainString()+\",',\n            '\\\"total_interest\\\":\"+total2.toPlainString()+\",')\n# If still string-form in unescaped form:\ns=s.replace('\"total_interest\":\"'+\"+total2.toPlainString()+\"+'\",',\n            '\"total_interest\":'+\"+total2.toPlainString()+\"+'\",')\n\np.write_text(s,'utf-8')\nprint('patched')\nPY\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "python - <<'PY'\nimport re\nfrom pathlib import Path\ns=Path('/app/src/BankBatchJob.java').read_text('utf-8')\n# Show the JSON construction area and adjusted line to confirm\nfor pat in [r'BigDecimal adj2 =.*', r'total_interest.*']:\n    m=re.search(pat,s)\n    print(pat, '=>', (m.group(0) if m else 'NOT FOUND'))\nPY\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "rm -rf /app/build/* /app/job.jar\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "javac -cp /opt/legacy-lib/h2-1.3.176.jar -d /app/build /app/src/BankBatchJob.java\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "cat > /app/manifest.mf <<'EOF'\nMain-Class: BankBatchJob\nEOF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "jar cfm /app/job.jar /app/manifest.mf -C /app/build .\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "ls -la /app/output\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' /app/output/interest.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' /app/output/exceptions.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "python - <<'PY'\nfrom pathlib import Path\np=Path('/app/output/stats.json')\nb=p.read_bytes()\nprint('stats.json endswith newline?', b[-1:]==b\"\\n\")\nprint('stats.json newline_count', b.count(b\"\\n\"))\nprint(b.decode('utf-8'))\nPY\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "python - <<'PY'\nfrom pathlib import Path\nfor f in ['/app/output/interest.csv','/app/output/exceptions.csv']:\n    b=Path(f).read_bytes()\n    print(f, 'last_byte', b[-1], 'newline_count', b.count(b\"\\n\"))\nPY\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "cp -a /app/output /app/output_run1\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "diff -u /app/output_run1/interest.csv /app/output/interest.csv || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "diff -u /app/output_run1/exceptions.csv /app/output/exceptions.csv || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "diff -u /app/output_run1/stats.json /app/output/stats.json || true\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

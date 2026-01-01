@@ -1,0 +1,10 @@
+{
+  "analysis": "We have confirmed that /app contains only the data directory and no source files, archives, or pre‑built JARs. The only Java‑related files on the system are the JDK samples and the H2 library. There is no indication of where the required BankBatchJob implementation resides. Without the Java source or a compiled JAR, we cannot compile or run the batch job as described.\n\nThe next logical step is to search the entire filesystem for any compiled class files or JARs that might contain a class named BankBatchJob, in case it was placed elsewhere (e.g., under /opt or /usr). If such a class is found, we could use it directly. If not, we must conclude that the necessary code is missing and cannot be completed.\n\nTherefore, we will search for any .class or .jar files that contain the name \"BankBatchJob\".",
+  "plan": "1. Use `find / -type f -name \"*BankBatchJob*\"` to locate any files with that name.\n2. Use `jar tf` on any JARs found to see if they contain the class.\n3. If nothing is found, report that the required implementation is absent.",
+  "commands": [
+    {
+      "keystrokes": "find / -type f -iname \"*bankbatchjob*\" 2>/dev/null\n",
+      "duration": 2.0
+    }
+  ]
+}

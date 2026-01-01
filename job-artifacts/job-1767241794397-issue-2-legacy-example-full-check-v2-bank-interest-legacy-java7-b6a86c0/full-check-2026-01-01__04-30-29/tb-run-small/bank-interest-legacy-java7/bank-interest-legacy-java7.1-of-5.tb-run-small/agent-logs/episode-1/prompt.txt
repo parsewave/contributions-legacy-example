@@ -1,0 +1,41 @@
+New Terminal Output:
+root@e50802b66863:/app# ls -Rla
+.:
+total 12
+drwxr-xr-x  3 root root 4096 Jan  1 04:33 .
+drwxr-xr-x 20 root root 4096 Jan  1 04:33 ..
+drwxr-xr-x  2 root root 4096 Jan  1 04:30 data
+
+./data:
+total 32
+drwxr-xr-x 2 root root 4096 Jan  1 04:30 .
+drwxr-xr-x 3 root root 4096 Jan  1 04:33 ..
+-rw-r--r-- 1 root root  392 Jan  1 04:30 accounts.csv
+-rw-r--r-- 1 root root   11 Jan  1 04:30 biz_date.txt
+-rw-r--r-- 1 root root  154 Jan  1 04:30 fee_rules.csv
+-rw-r--r-- 1 root root   14 Jan  1 04:30 fx_pivots.csv
+-rw-r--r-- 1 root root  499 Jan  1 04:30 fx_rates.csv
+-rw-r--r-- 1 root root  901 Jan  1 04:30 transactions.csv
+root@e50802b66863:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,79 @@
+{
+  "analysis": "The Java source write got corrupted: the heredoc appears to have started mid-file (the terminal output begins with code from the middle before the import statements). Compilation then failed with “Date is ambiguous” because the file imports both java.util.* and java.sql.*. As a result, /app/job.jar has no runnable BankBatchJob class and no outputs were produced. We need to (1) clean the source file so it starts at the first import, (2) fix imports to remove java.sql.Date ambiguity, (3) recompile/package/run, and (4) verify deterministic rerun outputs.",
+  "plan": "1) Inspect /app/src/BankBatchJob.java to confirm where the first proper `import` line begins.\n2) Rewrite the source file by stripping any leading garbage before the first import.\n3) Replace `import java.sql.*;` with explicit java.sql imports so java.util.Date is unambiguous.\n4) Clean build output, recompile with Java 7 target and H2 1.3 jar.\n5) Rebuild /app/job.jar and run it to generate outputs.\n6) Compute md5 of interest.csv, rerun, and confirm md5 matches to prove same-day reruns are deterministic.",
+  "commands": [
+    {
+      "keystrokes": "set -euo pipefail\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "wc -l /app/src/BankBatchJob.java || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "nl -ba /app/src/BankBatchJob.java | head -n 60\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "grep -n '^import ' /app/src/BankBatchJob.java | head -n 5 || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "first=$(grep -n '^import ' /app/src/BankBatchJob.java | head -n 1 | cut -d: -f1 || true)\nif [ -z \"${first}\" ]; then echo \"ERROR: no import line found\"; exit 1; fi\nif [ \"${first}\" != \"1\" ]; then tail -n +\"${first}\" /app/src/BankBatchJob.java > /app/src/BankBatchJob.java.clean && mv /app/src/BankBatchJob.java.clean /app/src/BankBatchJob.java; fi\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "perl -0777 -i -pe 's/import java\\.sql\\.\\*;/import java.sql.Connection;\\nimport java.sql.DriverManager;\\nimport java.sql.Statement;\\nimport java.sql.PreparedStatement;\\nimport java.sql.SQLException;/g' /app/src/BankBatchJob.java\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "grep -n '^import ' /app/src/BankBatchJob.java\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "rm -rf /app/build/classes && mkdir -p /app/build/classes\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "javac -source 1.7 -target 1.7 -cp /app/lib/h2.jar -d /app/build/classes /app/src/BankBatchJob.java\n",
+      "duration": 3.0
+    },
+    {
+      "keystrokes": "jar cfm /app/job.jar /app/build/manifest.mf -C /app/build/classes .\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "java -jar /app/job.jar\n",
+      "duration": 8.0
+    },
+    {
+      "keystrokes": "ls -la /app/output\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "md5sum /app/output/interest.csv | tee /app/output/.md5_first\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "java -jar /app/job.jar\n",
+      "duration": 8.0
+    },
+    {
+      "keystrokes": "md5sum /app/output/interest.csv | tee /app/output/.md5_second && diff -u /app/output/.md5_first /app/output/.md5_second\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "sed -n '1,120p' /app/output/interest.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' /app/output/exceptions.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "python3 - <<'PY'\nfrom pathlib import Path\np=Path('/app/output/stats.json')\nb=p.read_bytes()\nprint('stats.json len=',len(b))\nprint('stats.json endswith newline?', b.endswith(b\"\\n\"))\nprint(b.decode('utf-8'))\nPY\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+}

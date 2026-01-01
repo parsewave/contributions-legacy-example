@@ -1,0 +1,15 @@
+New Terminal Output:
+
+root@95fcff259f60:/app# mkdir -p /app/src
+root@95fcff259f60:/app# javac -source 1.7 -target 1.7 -cp /opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/h2-1.4.200.jar -d out $(find /app/src -name "*.ja
+va")
+javac: no source files
+Usage: javac <options> <source files>
+use -help for a list of possible options
+root@95fcff259f60:/app# echo "Main-Class: BankBatchJob" > /app/manifest.mf
+root@95fcff259f60:/app# jar cfm /app/job.jar /app/manifest.mf -C out .
+root@95fcff259f60:/app# java -cp /opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/h2-1.4.200.jar:/app/job.jar BankBatchJob
+Error: Could not find or load main class BankBatchJob
+root@95fcff259f60:/app# ls -l /app/output
+ls: cannot access '/app/output': No such file or directory
+root@95fcff259f60:/app#

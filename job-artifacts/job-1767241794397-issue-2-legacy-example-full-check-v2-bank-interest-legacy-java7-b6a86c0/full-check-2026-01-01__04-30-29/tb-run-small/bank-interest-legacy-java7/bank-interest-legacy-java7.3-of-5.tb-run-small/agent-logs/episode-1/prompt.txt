@@ -1,0 +1,4 @@
+Previous response had parsing errors:
+ERROR: Invalid JSON: Expecting ',' delimiter: line 10 column 737 (char 2424) | Content preview: '{\n  "analysis": "We are at the root of the /app directory with no visible files listed. The task req'...
+
+Please fix these issues and provide a proper JSON response.

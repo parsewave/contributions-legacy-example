@@ -1,0 +1,77 @@
+New Terminal Output:
+
+root@d16f2fa7194e:/app# grep -n "Date d =" -n /app/src/BankBatchJob.java | head
+609:            Date d = sdf.parse(yyyyMmDd);
+root@d16f2fa7194e:/app# sed -i 's/\bDate d =/java.util.Date d =/' /app/src/BankBatchJob.java
+root@d16f2fa7194e:/app# rm -rf /app/build/* /app/job.jar
+root@d16f2fa7194e:/app# javac -source 1.7 -target 1.7 -cp /opt/legacy-lib/h2-1.3.176.jar -d /app/build /app/src/BankBatchJob.java
+root@d16f2fa7194e:/app# cat > /app/build/MANIFEST.MF <<'MF'
+> Manifest-Version: 1.0
+> Main-Class: BankBatchJob
+> Class-Path: /opt/legacy-lib/h2-1.3.176.jar
+> MF
+root@d16f2fa7194e:/app# jar cfm /app/job.jar /app/build/MANIFEST.MF -C /app/build .
+root@d16f2fa7194e:/app# java -jar /app/job.jar
+root@d16f2fa7194e:/app# ls -la /app/output
+total 64
+drwxr-xr-x 2 root root  4096 Jan  1 05:16 .
+drwxr-xr-x 6 root root  4096 Jan  1 05:16 ..
+-rw-r--r-- 1 root root 36864 Jan  1 05:16 bankdb.h2.db
+-rw-r--r-- 1 root root   411 Jan  1 05:16 bankdb.trace.db
+-rw-r--r-- 1 root root   264 Jan  1 05:16 exceptions.csv
+-rw-r--r-- 1 root root   206 Jan  1 05:16 interest.csv
+-rw-r--r-- 1 root root   146 Jan  1 05:16 stats.json
+root@d16f2fa7194e:/app# echo '--- interest.csv'; cat /app/output/interest.csv; echo; echo '--- exceptions.csv'; cat /app/output/exceptions.csv; echo; echo '---
+stats.json'; cat /app/output/stats.json; echo
+--- interest.csv
+account_id,biz_date,eod_balance,apr,daily_interest
+A1001,2024-03-01,7965.47,0.012000,0.26
+A1002,2024-03-01,5127.11,0.009000,0.13
+A1003,2024-03-01,-0.80,0.020000,0.00
+A1004,2024-03-01,36500.00,0.010050,1.00
+
+--- exceptions.csv
+row_num,tx_id,reason
+2,T002,AFTER_BIZ_DATE
+3,T003,PENDING
+5,T004,DUPLICATE
+6,T005,REVERSED
+7,T006,REVERSED
+9,T008,REVERSAL_MISSING
+10,T009,REVERSED
+11,T010,REVERSED
+13,T012,AFTER_BIZ_DATE
+17,T016,ACCOUNT_MISSING
+18,T016,DUPLICATE
+19,T017,REVERSED
+20,T018,REVERSED
+
+--- stats.json
+{"business_date":"2024-03-01","accounts":4,"valid_txs":7,"skipped_txs":13,"total_interest":"1.39","report_md5":"d6e6bfa87102a7be797a462843f8a087"}
+root@d16f2fa7194e:/app# python3 - <<'PY'
+> import hashlib, pathlib, json
+> out = pathlib.Path('/app/output')
+> interest = (out/'interest.csv').read_bytes()
+> exceptions = (out/'exceptions.csv').read_bytes()
+> stats_b = (out/'stats.json').read_bytes()
+> print('interest.csv md5:', hashlib.md5(interest).hexdigest())
+> print('interest.csv endswith newline:', interest.endswith(b"\n"))
+> print('exceptions.csv endswith newline:', exceptions.endswith(b"\n"))
+> print('stats.json contains newline:', b"\n" in stats_b)
+> stats = json.loads(stats_b.decode('utf-8'))
+> print('stats.report_md5 matches:', stats.get('report_md5') == hashlib.md5(interest).hexdigest())
+> PY
+interest.csv md5: d6e6bfa87102a7be797a462843f8a087
+interest.csv endswith newline: True
+exceptions.csv endswith newline: True
+stats.json contains newline: False
+stats.report_md5 matches: True
+root@d16f2fa7194e:/app# md5sum /app/output/interest.csv /app/output/exceptions.csv /app/output/stats.json
+d6e6bfa87102a7be797a462843f8a087  /app/output/interest.csv
+7eca5973d04bd130038cf45ab81dd0f8  /app/output/exceptions.csv
+213e42d7a49b266c042569088ef95517  /app/output/stats.json
+root@d16f2fa7194e:/app# java -jar /app/job.jar && md5sum /app/output/interest.csv /app/output/exceptions.csv /app/output/stats.json
+d6e6bfa87102a7be797a462843f8a087  /app/output/interest.csv
+7eca5973d04bd130038cf45ab81dd0f8  /app/output/exceptions.csv
+213e42d7a49b266c042569088ef95517  /app/output/stats.json
+root@d16f2fa7194e:/app#

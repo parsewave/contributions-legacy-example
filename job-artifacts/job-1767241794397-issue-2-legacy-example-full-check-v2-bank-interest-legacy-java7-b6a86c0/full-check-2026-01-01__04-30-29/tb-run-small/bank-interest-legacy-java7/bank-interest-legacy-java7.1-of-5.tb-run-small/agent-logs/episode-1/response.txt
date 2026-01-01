@@ -1,0 +1,10 @@
+{
+  "analysis": "The /app directory only contains the data subdirectory with the required input CSV files. There are no source files, build scripts, or existing JARs visible. The task expects us to compile Java code (BankBatchJob) and package it into /app/job.jar, then run it. Since no source is present, it is likely that the source code is provided elsewhere, perhaps as a zip or tarball that we need to extract, or maybe it's embedded in a hidden directory. We should search the entire filesystem for any Java source files or a job.jar that might already exist.",
+  "plan": "1. Search the whole filesystem for files named *.java, *.jar, or containing the string 'BankBatchJob'.\n2. If we find source files, note their locations and proceed to compile.\n3. If a pre-built job.jar exists, we can skip compilation and run it directly.\n4. If nothing is found, we may need to create a simple placeholder implementation, but likely the source is present somewhere hidden.\nWe will start by using the find command to locate Java source files and any jar named job.jar.",
+  "commands": [
+    {
+      "keystrokes": "find / -type f \\( -name \"*.java\" -o -name \"*.jar\" -o -name \"*BankBatchJob*\" \\) 2>/dev/null\n",
+      "duration": 2.0
+    }
+  ]
+}

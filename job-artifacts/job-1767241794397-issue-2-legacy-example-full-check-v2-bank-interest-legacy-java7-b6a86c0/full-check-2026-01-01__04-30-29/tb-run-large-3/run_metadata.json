@@ -1,0 +1,30 @@
+{
+    "run_id": "tb-run-large-3-1",
+    "uuid": "ab33d1a4-92dd-438a-a46e-fb2821fdf33e",
+    "dataset_path": "/workspace/parsewave/contributions-legacy-example/contributor_tasks",
+    "dataset_name": null,
+    "dataset_version": null,
+    "output_path": "/workspace/parsewave/runs/full-check/full-check-2026-01-01__04-30-29",
+    "agent_name": "terminus-2",
+    "no_rebuild": false,
+    "cleanup": true,
+    "log_level": 20,
+    "task_ids": [
+        "bank-interest-legacy-java7"
+    ],
+    "exclude_task_ids": null,
+    "n_tasks": null,
+    "n_concurrent_trials": 1,
+    "n_attempts": 1,
+    "dataset_size": 1,
+    "accuracy": 0.0,
+    "model_name": "openrouter/openai/gpt-5.2",
+    "start_time": "2026-01-01T04:59:08.157767+00:00",
+    "end_time": "2026-01-01T05:09:28.569542+00:00",
+    "commit_hash": "5b816ce85bddd86a05a221f90f955eed3ab52601",
+    "username": "root",
+    "s3_bucket": null,
+    "agent_kwargs": null,
+    "pass_at_k": {},
+    "resumed_at": null
+}

@@ -1,0 +1,151 @@
+root@e50802b66863:/app# ls -Rla
+.:
+total 12
+drwxr-xr-x  3 root root 4096 Jan  1 04:33 .
+drwxr-xr-x 20 root root 4096 Jan  1 04:33 ..
+drwxr-xr-x  2 root root 4096 Jan  1 04:30 data
+
+./data:
+total 32
+drwxr-xr-x 2 root root 4096 Jan  1 04:30 .
+drwxr-xr-x 3 root root 4096 Jan  1 04:33 ..
+-rw-r--r-- 1 root root  392 Jan  1 04:30 accounts.csv
+-rw-r--r-- 1 root root   11 Jan  1 04:30 biz_date.txt
+-rw-r--r-- 1 root root  154 Jan  1 04:30 fee_rules.csv
+-rw-r--r-- 1 root root   14 Jan  1 04:30 fx_pivots.csv
+-rw-r--r-- 1 root root  499 Jan  1 04:30 fx_rates.csv
+-rw-r--r-- 1 root root  901 Jan  1 04:30 transactions.csv
+root@e50802b66863:/app# find / -type f \( -name "*.java" -o -name "*.jar" -o -name "*BankBatchJob*" \) 2>/dev/null
+/opt/legacy-lib/h2-1.3.176.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/forkjoin/mergesort/MergeDemo.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/forkjoin/mergesort/MergeSort.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/multicast/MulticastAddress.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/multicast/Reader.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/multicast/Sender.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/ChannelIO.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/MalformedRequestException.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/DispatcherN.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Dispatcher1.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/RequestServicer.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Request.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/URLDumper.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/ChannelIOSecure.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/N1.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/B1.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/StringContent.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Server.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/AcceptHandler.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Dispatcher.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/FileContent.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Reply.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Acceptor.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/BP.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/N2.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/RequestHandler.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/BN.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Sendable.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Content.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Handler.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/chatserver/NameReader.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/chatserver/Client.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/chatserver/ClientReader.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/chatserver/ChatServer.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/chatserver/MessageReader.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/chatserver/DataReader.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/file/DiskUsage.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/file/AclEdit.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/file/Xdd.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/file/FileType.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/file/WatchDir.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/file/Copy.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/file/Chmod.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/scripting/scriptpad/src/com/sun/sample/scriptpad/Main.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/test/com/sun/jmx/examples/scandir/config/XmlConfigUtilsTest.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/test/com/sun/jmx/examples/scandir/ScanManagerTest.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/test/com/sun/jmx/examples/scandir/DirectoryScannerTest.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/test/com/sun/jmx/examples/scandir/ScanDirConfigTest.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/test/com/sun/jmx/examples/scandir/TestUtils.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/ScanDirConfig.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/ScanDirConfigMXBean.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/ResultLogManager.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/config/ScanManagerConfig.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/config/ResultRecord.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/config/ResultLogConfig.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/config/FileMatch.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/config/XmlConfigUtils.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/config/DirectoryScannerConfig.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/ScanDirClient.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/DirectoryScanner.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/ScanManagerMXBean.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/DirectoryScannerMXBean.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/ScanDirAgent.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/ScanManager.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/jmx/jmx-scandir/src/com/sun/jmx/examples/scandir/ResultLogManagerMXBean.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/nio/zipfs/Demo.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/nio/zipfs/zipfs.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/management/MemoryMonitor/MemoryMonitor.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/management/JTop/JTop.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/management/VerboseGC/VerboseGC.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/management/FullThreadDump/FullThreadDump.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/scripting/jconsole-plugin/jconsole-plugin.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/NervousText/NervousText.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/DitherTest/DitherTest.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/ArcTest/ArcTest.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/Clock/Clock.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/SpreadSheet/SpreadSheet.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/GraphicsTest/AppletFrame.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/GraphicsTest/GraphicsTest.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/DrawTest/DrawTest.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/SimpleGraph/GraphApplet.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/MoleculeViewer/Matrix3D.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/MoleculeViewer/XYZApp.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/SortDemo/SortAlgorithm.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/SortDemo/SortItem.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/SortDemo/BidirBubbleSortAlgorithm.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/SortDemo/BubbleSortAlgorithm.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/SortDemo/QSortAlgorithm.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/Fractal/CLSFractal.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/Blink/Blink.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/CardTest/CardTest.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/WireFrame/Matrix3D.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/WireFrame/ThreeD.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/applets/BarChart/BarChart.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/SampleTree/SampleTree.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/Notepad/Notepad.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/TransparentRuler/TransparentRuler.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/Font2DTest/Font2DTest.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/Metalworks/Metalworks.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/TableExample/TableExample.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/SwingApplet/SwingApplet.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/FileChooserDemo/FileChooserDemo.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/CodePointIM/CodePointIM.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jvmti/mtrace/mtrace.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jvmti/minst/minst.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jvmti/heapTracker/heapTracker.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jpda/examples.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/charsets.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/ext/sunjce_provider.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/ext/sunpkcs11.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/ext/zipfs.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/ext/localedata.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/ext/dnsns.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/ext/sunec.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/management-agent.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/jsse.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/rt.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/jce.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/security/policy/limited/US_export_policy.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/security/policy/limited/local_policy.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/security/policy/unlimited/US_export_policy.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/security/policy/unlimited/local_policy.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/jre/lib/resources.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/dt.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/sa-jdi.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/tools.jar
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/jconsole.jar
+root@e50802b66863:/app# ls -laA /app
+total 4
+drwxr-xr-x 2 root root 4096 Jan  1 04:30 data
+root@e50802b66863:/app# find /app -type f \( -name "*.zip" -o -name "*.tar" -o -name "*.tgz" -o -name "*.tar.gz" \) 2>/dev/null
+root@e50802b66863:/app# find / -type f -iname "*bankbatchjob*" 2>/dev/null
+root@e50802b66863:/app#

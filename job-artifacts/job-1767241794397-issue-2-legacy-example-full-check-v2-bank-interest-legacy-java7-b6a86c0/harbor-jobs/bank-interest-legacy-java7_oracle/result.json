@@ -1,0 +1,31 @@
+{
+    "id": "ab3ee0a1-f037-4bce-afd7-8cced0707af4",
+    "started_at": "2026-01-01T04:30:45.246039",
+    "finished_at": "2026-01-01T04:31:26.534994",
+    "n_total_trials": 3,
+    "stats": {
+        "n_trials": 3,
+        "n_errors": 0,
+        "evals": {
+            "oracle__adhoc": {
+                "n_trials": 3,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 1.0
+                    }
+                ],
+                "reward_stats": {
+                    "reward": {
+                        "1.0": [
+                            "bank-interest-legacy-java7__YeBr7sa",
+                            "bank-interest-legacy-java7__kcZuiH8",
+                            "bank-interest-legacy-java7__TVw4oE4"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

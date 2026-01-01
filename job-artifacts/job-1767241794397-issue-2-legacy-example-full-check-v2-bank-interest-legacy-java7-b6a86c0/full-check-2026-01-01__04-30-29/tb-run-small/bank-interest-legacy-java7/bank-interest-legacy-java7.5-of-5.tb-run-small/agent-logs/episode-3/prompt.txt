@@ -1,0 +1,32 @@
+New Terminal Output:
+
+root@757c60dc43dd:/app# javac -version
+javac 1.7.0_352
+root@757c60dc43dd:/app# which javac
+/usr/local/bin/javac
+root@757c60dc43dd:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,54 @@
+Current terminal state:
+New Terminal Output:
+
+root@28a1d3931d7a:/app# rm -f /app/output/.md5_first /app/output/.md5_second /app/output/bankdb.trace.db /app/output/bankdb.lock.db /app/output/bankdb.temp.db 2
+>/dev/null || true
+root@28a1d3931d7a:/app# grep -n 'writeDb(biz' -n /app/src/BankBatchJob.java && grep -n 'writeDb(biz' -n /app/src/BankBatchJob.java | head
+122:    writeDb(biz, accts, txns, valid, skipped, md5);
+122:    writeDb(biz, accts, txns, valid, skipped, md5);
+root@28a1d3931d7a:/app# perl -i -pe 's/writeDb\(biz, accts, txns, valid, skipped, md5\);/writeDb(biz, accts, txns, valid, skipped, md5);\n    del("bankdb.trace.
+db");/g' /app/src/BankBatchJob.java
+root@28a1d3931d7a:/app# rm -rf /app/build/classes && mkdir -p /app/build/classes
+root@28a1d3931d7a:/app# javac -source 1.7 -target 1.7 -cp /app/lib/h2.jar -d /app/build/classes /app/src/BankBatchJob.java
+root@28a1d3931d7a:/app# jar cfm /app/job.jar /app/build/manifest.mf -C /app/build/classes .
+root@28a1d3931d7a:/app# java -jar /app/job.jar
+root@28a1d3931d7a:/app# ls -la /app/output
+total 60
+drwxr-xr-x 2 root root  4096 Jan  1 05:28 .
+drwxr-xr-x 7 root root  4096 Jan  1 05:25 ..
+-rw-r--r-- 1 root root 36864 Jan  1 05:28 bankdb.h2.db
+-rw-r--r-- 1 root root   264 Jan  1 05:28 exceptions.csv
+-rw-r--r-- 1 root root   206 Jan  1 05:28 interest.csv
+-rw-r--r-- 1 root root   144 Jan  1 05:28 stats.json
+root@28a1d3931d7a:/app# tail -c 1 /app/output/interest.csv | od -An -t u1; tail -c 1 /app/output/exceptions.csv | od -An -t u1; tail -c 1 /app/output/stats.json
+ | od -An -t u1
+  10
+  10
+ 125
+root@28a1d3931d7a:/app# python3 - <<'PY'
+> from pathlib import Path
+> b=Path('/app/output/stats.json').read_bytes()
+> print('stats.json endswith newline?', b.endswith(b"\n"))
+> print(b.decode('utf-8'))
+> PY
+stats.json endswith newline? False
+{"business_date":"2024-03-01","accounts":4,"valid_txs":7,"skipped_txs":13,"total_interest":1.39,"report_md5":"d6e6bfa87102a7be797a462843f8a087"}
+root@28a1d3931d7a:/app# java -cp /app/lib/h2.jar org.h2.tools.Shell -url 'jdbc:h2:/app/output/bankdb;MODE=DB2' -user sa -password '' -sql "SELECT COUNT(*) AS AC
+COUNTS FROM ACCOUNTS; SELECT COUNT(*) AS TXNS, MIN(ROW_NUM) AS MIN_ROW, MAX(ROW_NUM) AS MAX_ROW FROM TXNS; SELECT COUNT(*) AS AUDIT_ROWS FROM RUN_AUDIT; SELECT
+JDBC_URL,BIZ_DATE,ACCOUNTS,VALID_TXS,SKIPPED_TXS,REPORT_MD5 FROM RUN_AUDIT;"
+ACCOUNTS
+4
+(1 row, 1 ms)
+TXNS | MIN_ROW | MAX_ROW
+20   | 1       | 20
+(1 row, 0 ms)
+AUDIT_ROWS
+1
+(1 row, 0 ms)
+JDBC_URL                            | BIZ_DATE   | ACCOUNTS | VALID_TXS | SKIPPED_TXS | REPORT_MD5
+jdbc:h2:/app/output/bankdb;MODE=DB2 | 2024-03-01 | 4        | 7         | 13          | d6e6bfa87102a7be797a462843f8a087
+(1 row, 1 ms)
+root@28a1d3931d7a:/app#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

@@ -1,0 +1,66 @@
+New Terminal Output:
+
+root@28a1d3931d7a:/app# apt-get install -y wget
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following NEW packages will be installed:
+  wget
+0 upgraded, 1 newly installed, 0 to remove and 39 not upgraded.
+Need to get 937 kB of archives.
+After this operation, 3606 kB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bookworm/main amd64 wget amd64 1.21.3-1+deb12u1 [937 kB]
+Fetched 937 kB in 0s (7475 kB/s)
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package wget.
+(Reading database ... 7691 files and directories currently installed.)
+Preparing to unpack .../wget_1.21.3-1+deb12u1_amd64.deb ...
+Unpacking wget (1.21.3-1+deb12u1) ...
+Setting up wget (1.21.3-1+deb12u1) ...
+root@28a1d3931d7a:/app# mkdir -p /app/lib /app/src /app/build/classes
+root@28a1d3931d7a:/app# wget -q -O /app/lib/h2.jar https://repo1.maven.org/maven2/com/h2database/h2/1.3.176/h2-1.3.176.jar
+root@28a1d3931d7a:/app# ls -la /app/lib/h2.jar && (java -cp /app/lib/h2.jar org.h2.tools.Server -? >/dev/null 2>&1; echo "h2 jar OK")
+-rw-r--r-- 1 root root 1659879 Apr  5  2014 /app/lib/h2.jar
+h2 jar OK
+root@28a1d3931d7a:/app# javac -source 1.7 -target 1.7 -cp /app/lib/h2.jar -d /app/build/classes /app/src/BankBatchJob.java
+javac: file not found: /app/src/BankBatchJob.java
+Usage: javac <options> <source files>
+use -help for a list of possible options
+root@28a1d3931d7a:/app# cat > /app/build/manifest.mf <<'EOF'
+> Manifest-Version: 1.0
+> Main-Class: BankBatchJob
+> Class-Path: lib/h2.jar
+> EOF
+root@28a1d3931d7a:/app# jar cfm /app/job.jar /app/build/manifest.mf -C /app/build/classes .
+root@28a1d3931d7a:/app# java -jar /app/job.jar
+Error: Could not find or load main class BankBatchJob
+root@28a1d3931d7a:/app# ls -la /app/output
+total 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:18 .
+drwxr-xr-x 7 root root 4096 Jan  1 05:21 ..
+root@28a1d3931d7a:/app# sed -n '1,120p' /app/output/interest.csv
+sed: can't read /app/output/interest.csv: No such file or directory
+root@28a1d3931d7a:/app# sed -n '1,200p' /app/output/exceptions.csv
+sed: can't read /app/output/exceptions.csv: No such file or directory
+root@28a1d3931d7a:/app# python3 - <<'PY'
+> from pathlib import Path
+> p=Path('/app/output/stats.json')
+> b=p.read_bytes()
+> print('stats.json bytes len=',len(b),' lastbyte=',b[-1:])
+> print(b.decode('utf-8'))
+> PY
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+  File "/usr/local/lib/python3.13/pathlib/_abc.py", line 625, in read_bytes
+    with self.open(mode='rb') as f:
+         ~~~~~~~~~^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/pathlib/_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/app/output/stats.json'
+root@28a1d3931d7a:/app# tail -c 1 /app/output/interest.csv | od -An -t u1 && tail -c 1 /app/output/exceptions.csv | od -An -t u1 && tail -c 1 /app/output/stats.
+json | od -An -t u1
+tail: cannot open '/app/output/interest.csv' for reading: No such file or directory
+tail: cannot open '/app/output/exceptions.csv' for reading: No such file or directory
+tail: cannot open '/app/output/stats.json' for reading: No such file or directory
+root@28a1d3931d7a:/app#

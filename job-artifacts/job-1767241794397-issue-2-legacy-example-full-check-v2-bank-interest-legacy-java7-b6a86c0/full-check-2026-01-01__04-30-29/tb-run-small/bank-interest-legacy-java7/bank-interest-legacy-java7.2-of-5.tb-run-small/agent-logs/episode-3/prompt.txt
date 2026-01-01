@@ -1,0 +1,41 @@
+New Terminal Output:
+root@95fcff259f60:/app# ls -R .
+.:
+data
+
+./data:
+accounts.csv  biz_date.txt  fee_rules.csv  fx_pivots.csv  fx_rates.csv  transactions.csv
+root@95fcff259f60:/app# mkdir -p out
+root@95fcff259f60:/app# javac -source 1.7 -target 1.7 -d out $(find . -name "*.java")
+javac: no source files
+Usage: javac <options> <source files>
+use -help for a list of possible options
+root@95fcff259f60:/app# jar cf /app/job.jar -C out .
+root@95fcff259f60:/app# java -jar /app/job.jar
+no main manifest attribute, in /app/job.jar
+root@95fcff259f60:/app# ls -l /app/output
+ls: cannot access '/app/output': No such file or directory
+root@95fcff259f60:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

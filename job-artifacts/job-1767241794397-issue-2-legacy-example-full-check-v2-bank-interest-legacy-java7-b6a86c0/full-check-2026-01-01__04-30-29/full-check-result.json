@@ -1,0 +1,575 @@
+{
+  "task_id": "bank-interest-legacy-java7",
+  "tasks_dir": "/workspace/parsewave/contributions-legacy-example/contributor_tasks",
+  "timestamp": "2026-01-01 05:31:12",
+  "basic_check": {
+    "result_type": "tb_positive",
+    "duration": 0.010841608047485352,
+    "return_code": 0,
+    "original_result": {
+      "errors": [],
+      "warnings": [],
+      "task_size_mb": 0.08
+    }
+  },
+  "ai_detect": {
+    "result_type": "tb_positive",
+    "duration": 0.09327077865600586,
+    "return_code": 0,
+    "original_result": {
+      "task_id": "bank-interest-legacy-java7",
+      "task_path": "/workspace/parsewave/contributions-legacy-example/contributor_tasks/bank-interest-legacy-java7",
+      "files_analyzed": [
+        "task.yaml (instruction field)"
+      ],
+      "documents": [
+        {
+          "predicted_class": "human",
+          "confidence_score": 0.4750420115273985,
+          "confidence_category": "low",
+          "average_generated_prob": 0.4,
+          "completely_generated_prob": 0.37511007943369423,
+          "document_classification": "HUMAN_ONLY",
+          "result_message": "Our detector is highly uncertain about this document. The writing style and content are not particularly AI-like.",
+          "language": "en",
+          "version": "2025-12-18-base"
+        }
+      ]
+    }
+  },
+  "similarity_check": {
+    "result_type": "tb_negative",
+    "duration": 2.3183562755584717,
+    "return_code": 1,
+    "original_result": {
+      "passed": false,
+      "duration": 2.3183562755584717,
+      "check_name": "similarity",
+      "message": "Similarity check FAILED: max_similarity=100.00% (threshold=80%)",
+      "details": {
+        "passed": false,
+        "max_similarity": 1,
+        "threshold": 0.8,
+        "top_matches": [
+          {
+            "index": 8484,
+            "instruction_preview": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\n  Inputs are in /app/data:\n  - a",
+            "instruction_full": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\n  Inputs are in /app/data:\n  - accounts.csv\n  - transactions.csv\n  - biz_date.txt\n  - fx_rates.csv\n  - fx_pivots.csv\n  - fee_rules.csv\n\n  Outputs are in /app/output:\n  - interest.csv, LF + trailing newline.\n    Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n    apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n  - exceptions.csv, LF + trailing newline.\n    Title: row_num, tx_id, and reason.\n    Row_num is 1-based data row.\n  - stats.json is single-line JSON without newlines.\n    Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n    report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n  - bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n    There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\n  Use these reasons in file order:\n  - REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n  - REVERSAL_MISSING\n  - FX_MISSING (before FX)\n  - AFTER_BIZ_DATE\n  - status!=POSTED (use status)\n  - DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\n  For FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\n  Fees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\n  Interest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\n  Don't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+            "similarity": 1,
+            "tfidf_similarity": 1,
+            "fuzzy_similarity": 1,
+            "keyword_similarity": 1,
+            "ngram_similarity": 1,
+            "source": "database"
+          },
+          {
+            "index": 8485,
+            "instruction_preview": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accou",
+            "instruction_full": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+            "similarity": 1,
+            "tfidf_similarity": 1,
+            "fuzzy_similarity": 1,
+            "keyword_similarity": 1,
+            "ngram_similarity": 1,
+            "source": "database"
+          },
+          {
+            "index": 8466,
+            "instruction_preview": "There is a batch of interest for legacy Java 7 every night. Run BankBatchJob by going to /app/job.jar. If you run it again on the same day, the results should be the same, and RUN_AUDIT will still be ",
+            "instruction_full": "There is a batch of interest for legacy Java 7 every night. Run BankBatchJob by going to /app/job.jar. If you run it again on the same day, the results should be the same, and RUN_AUDIT will still be one row (the audit/control row for the run).\n\n  Inputs in /app/data:\n  - accounts.csv (account_id, opened_at, start_balance, base_apr, promo_apr, promo_days, tier_threshold, tier_apr, currency, fee_plan)\n  - transactions.csv (tx_id, account_id, effective_date, amount, currency, status, and reversal_of)\n  - biz_date.txt\n  - fx_rates.csv (rate_date, from_ccy, to_ccy, rate; certain pairs might not be there)\n  - fee_rules.csv (fee_plan, applies_to, flat_fee, pct_fee, min_fee, and max_fee)\n\n  Outputs in /app/output:\n  - interest.csv (LF newline, trailing newline; header account_id,biz_date,eod_balance,apr,daily_interest; sorted by account_id; 2dp balance/interest, 6dp apr)\n  - exceptions.csv (LF newline, trailing newline; header row_num, tx_id, reason; sorted by row_num)\n  - stats.json (a small JSON file with no newlines; keys include biz_date, accounts, valid_txs, skipped_txs, total_interest, and report_md5; total_interest 2dp string = daily_interest + HALF_EVEN; report_md5 is the hex of the bytes in interest.csv).\n  - bankdb.h2.db has ACCOUNTS and TXNS (TXNS.row_num 1..N) and one RUN_AUDIT row containing jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\n  Rules: A valid tx must have an effective_date that is less than or equal to the biz_date, a status of POSTED, a first tx_id, no reversal_of, and an FX rate (the latest rate_date must be less than or equal to the effective_date; if there is only a reverse pair, use 1/rate). Order of reasons: REVERSED, REVERSAL_MISSING, FX_MISSING, AFTER_BIZ_DATE, status!=POSTED (use the status string), and DUPLICATE. Change to the currency of the account, then charge a fixed fee plus an absolute percentage of the amount, with a minimum and maximum amount. This applies to DEBIT, CREDIT, and ALL. eod_balance = start_balance + sum(valid amounts). daily_interest = max(eod_balance,0)*apr/365 HALF_EVEN. If eod_balance is greater than or equal to tier_threshold, then apr = base_apr + tier. If promo_days is greater than 0 and (biz_date-opened_at) is less than promo_days (opened_at day 0), add promo_apr too.\n\n  Please don't change /app/data. H2 1.3 DB2 user sa without a password. The JDBC URL is one string that has both MODE=DB2 and /app/output/bankdb in it. Only compile Java 7 bytecode.",
+            "similarity": 0.6259140576665919,
+            "tfidf_similarity": 0.6485317723548101,
+            "fuzzy_similarity": 0.05702970297029703,
+            "keyword_similarity": 0.4084507042253521,
+            "ngram_similarity": 0.049926578560939794,
+            "source": "database"
+          },
+          {
+            "index": 8455,
+            "instruction_preview": "There is a nightly interest batch available for older versions of Java 7. Run BankBatchJob from /app/job.jar. Rerunning on the same date produces the same results and RUN_AUDIT stays one row.\n\n  Input",
+            "instruction_full": "There is a nightly interest batch available for older versions of Java 7. Run BankBatchJob from /app/job.jar. Rerunning on the same date produces the same results and RUN_AUDIT stays one row.\n\n  Input files located in /app/data: accounts.csv (account_id,opened_at,start_balance,base_apr,promo_apr,promo_days,tier_threshold,tier_apr,currency,fee_plan), transactions.csv (tx_id,account_id,effective_date,amount,currency,status,reversal_of), biz_date.txt, fx_rates.csv (rate_date,from_ccy,to_ccy,rate), fee_rules.csv (fee_plan,applies_to,flat_fee,pct_fee,min_fee,max_fee).\n\n  Output files (/app/output): interest.csv (LF newline; header account_id,biz_date,eod_balance,apr,daily_interest; sorted by account_id; 2dp balance/interest, 6dp apr), exceptions.csv (header row_num,tx_id,reason; sorted by row_num), stats.json (compact JSON, no newline; keys biz_date,accounts,valid_txs,skipped_txs,total_interest,report_md5; total_interest 2dp string = sum of daily_interest then HALF_EVEN; report_md5 hex of interest.csv bytes). Make /app/output/bankdb.h2.db, load TXNS and ACCOUNTS (TXNS.row_num 1..N), and add one RUN_AUDIT row (jdbc_url,biz_date,accounts,valid_txs,skipped_txs,report_md5).\n\n  Rules: valid tx requires effective_date<=biz_date, status POSTED, not duplicate after first, not reversal_of (record both as REVERSED), and FX rate exists (latest rate_date<=effective_date; otherwise FX_MISSING). Convert to currency, then apply fee: flat+abs* pct, clamp min/max; apply when applies_to is DEBIT/CREDIT/ALL; subtract fee. eod_balance = start_balance + sum(valid amounts). daily_interest = max(eod_balance,0)*apr/365 rounded HALF_EVEN. apr = base_apr + tier if eod_balance>=tier_threshold + promo if promo_days>0 and (biz_date-opened_at)<promo_days (opened_at day 0).\n\n\n  Notes on implementation: Please refrain from making any changes to the /app/data directory. The user sa has a blank password for H2 1.3 DB2. It is a single literal with MODE=DB2 and /app/output/bankdb that makes up the JDBC URL. The only bytecode that is compiled is Java 7.",
+            "similarity": 0.5000382224236991,
+            "tfidf_similarity": 0.5191304233819917,
+            "fuzzy_similarity": 0.04520990312163617,
+            "keyword_similarity": 0.2894736842105263,
+            "ngram_similarity": 0.017064846416382253,
+            "source": "database"
+          },
+          {
+            "index": 8448,
+            "instruction_preview": "There is a nightly interest batch for legacy Java 7. Install the main class BankBatchJob in the /app/job.jar file, and then execute the following command: java -cp \"/app/job.jar:/opt/legacy-lib/*\" Ban",
+            "instruction_full": "There is a nightly interest batch for legacy Java 7. Install the main class BankBatchJob in the /app/job.jar file, and then execute the following command: java -cp \"/app/job.jar:/opt/legacy-lib/*\" BankBatchJob\n  Nothing should be altered in the /app/data directory. The JDBC URL must include MODE=DB2 as a literal substring within a single URL string literal (no concatenation is required). This is required in order to use H2 1.3 in DB2 mode. Additionally, create the file /app/output/bankdb.h2.db, load the tables ACCOUNTS and TXNS (the row_num for TXNS begins at 1 in the file order), and insert one RUN_AUDIT row (jdbc_url,biz_date,accounts,valid_txs,skipped_txs,report_md5). Only Java 7 bytecode should be compiled.\n\n  The following files are used as inputs: /app/data/accounts.csv, /app/data/transactions.csv (tx_id,account_id,effective_date,amount,status,reversal_of), and /app/data/biz_date.txt (yyyy-MM-dd).\n  /app/output/interest.csv should be the output (UTF-8, LF, trailing newline; sorted by account_id; header account_id,biz_date,eod_balance,apr,daily_interest; 2dp balances/interest, 6dp apr), /app/output/exceptions.csv (LF, trailing newline; header row_num,tx_id,reason; sorted by row_num), /app/output/stats.json (compact JSON, no trailing newline; keys biz_date,accounts,valid_txs,skipped_txs,total_interest,report_md5; report_md5=md5 of interest.csv bytes).\n\n  eod_balance is equal to start_balance plus sum(valid amount where effective_date is less than or equal to biz_date). invalid (write to exceptions.csv): the following: DUPLICATE tx_id after first, AFTER_BIZ_DATE, status!=POSTED (reason=status), reversal_of set (record both rows REVERSED), or REVERSAL_MISSING are the conditions that the transaction must meet. row_num is the 1-based data row number. Daily interest uses HALF_EVEN, while apr adds tiers and promotions.",
+            "similarity": 0.45862067382208643,
+            "tfidf_similarity": 0.47583112376470055,
+            "fuzzy_similarity": 0.04720161834120027,
+            "keyword_similarity": 0.27848101265822783,
+            "ngram_similarity": 0.006745362563237774,
+            "source": "database"
+          }
+        ],
+        "corpus_size": 8515
+      }
+    }
+  },
+  "oracle": {
+    "result_type": "tb_positive",
+    "duration": 57.77522277832031,
+    "return_code": 0,
+    "accuracy": 1.0,
+    "original_result": {
+      "id": "ab3ee0a1-f037-4bce-afd7-8cced0707af4",
+      "started_at": "2026-01-01T04:30:45.246039",
+      "finished_at": "2026-01-01T04:31:26.534994",
+      "n_total_trials": 3,
+      "stats": {
+        "n_trials": 3,
+        "n_errors": 0,
+        "evals": {
+          "oracle__adhoc": {
+            "n_trials": 3,
+            "n_errors": 0,
+            "metrics": [
+              {
+                "mean": 1.0
+              }
+            ],
+            "reward_stats": {
+              "reward": {
+                "1.0": [
+                  "bank-interest-legacy-java7__YeBr7sa",
+                  "bank-interest-legacy-java7__kcZuiH8",
+                  "bank-interest-legacy-java7__TVw4oE4"
+                ]
+              }
+            },
+            "exception_stats": {}
+          }
+        }
+      }
+    }
+  },
+  "nop": {
+    "result_type": "tb_positive",
+    "duration": 96.94126224517822,
+    "return_code": 0,
+    "accuracy": 0.0,
+    "original_result": {
+      "id": "dd060808-af33-4290-93fd-46cbad8b8a69",
+      "started_at": "2026-01-01T04:30:45.245771",
+      "finished_at": "2026-01-01T04:32:05.747560",
+      "n_total_trials": 1,
+      "stats": {
+        "n_trials": 1,
+        "n_errors": 1,
+        "evals": {
+          "nop__adhoc": {
+            "n_trials": 0,
+            "n_errors": 1,
+            "metrics": [
+              {
+                "mean": 0.0
+              }
+            ],
+            "reward_stats": {},
+            "exception_stats": {
+              "RewardFileNotFoundError": [
+                "bank-interest-legacy-java7__aPSfvEL"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "tb_check": {
+    "result_type": "tb_positive",
+    "duration": 50.95359754562378,
+    "return_code": 0,
+    "original_result": {
+      "behavior_in_task_description": {
+        "explanation": "All behaviors enforced by tests are explicitly described: building /app/job.jar with Java 7 bytecode, deterministic reruns, exact output files/columns/formatting and rounding rules, FX and fee logic, database tables and RUN_AUDIT row, JDBC URL literal requirements (single literal with MODE=DB2 and /app/output/bankdb, used at runtime), not modifying /app/data.",
+        "outcome": "pass"
+      },
+      "behavior_in_tests": {
+        "explanation": "Tests check every described behavior: Java 7 class major=51, presence/uniqueness of JDBC URL literal and actual runtime connection via agent, exact CSV/JSON contents including newline behavior and sorting, md5 of report, deterministic re-run, DB tables with row_num 1..N and single RUN_AUDIT row with required fields, and inputs unchanged before/after. FX, fees, APR/interest rounding logic are recomputed in Python for equality.",
+        "outcome": "pass"
+      },
+      "informative_test_docstrings": {
+        "explanation": "The sole test has a docstring summarizing it runs the job end-to-end and validates outputs and runtime constraints, which is sufficiently informative for scope.",
+        "outcome": "pass"
+      },
+      "anti_cheating_measures": {
+        "explanation": "Strong measures: input files\u2019 MD5s checked before/after; runtime JDBC usage verified via a Java agent; JDBC URL must be a single literal present once and match the runtime URL; outputs recomputed from inputs; bytecode version enforced. These make trivial cheating difficult.",
+        "outcome": "pass"
+      },
+      "structured_data_schema": {
+        "explanation": "task.yaml specifies exact output filenames, CSV column headers, formats, rounding, JSON fields, and DB tables/columns (including RUN_AUDIT) clearly.",
+        "outcome": "pass"
+      },
+      "pinned_dependencies": {
+        "explanation": "Python dependency pytest is version-pinned (8.4.2). Java H2 jar fetched by URL with SHA256 pin. Apt packages are not pinned, which is acceptable per guidance.",
+        "outcome": "pass"
+      },
+      "typos": {
+        "explanation": "No apparent typos in filenames, headers, or variable names. Paths and column names match between task.yaml, solution, and tests.",
+        "outcome": "pass"
+      },
+      "hardcoded_solution": {
+        "explanation": "Solution compiles and runs Java code that reads inputs, computes results, and writes outputs/DB; it does not echo hardcoded final answers.",
+        "outcome": "pass"
+      },
+      "file_reference_mentioned": {
+        "explanation": "task.yaml explicitly mentions all required outputs in /app/output and the requirement to put BankBatchJob in /app/job.jar.",
+        "outcome": "pass"
+      }
+    }
+  },
+  "tb_run_small": {
+    "result_type": "tb_negative",
+    "duration": 278.2818937301636,
+    "return_code": 0,
+    "accuracy": 0.0,
+    "agent": "terminus-2",
+    "model": "openrouter/openai/gpt-oss-120b:exacto",
+    "original_result": {
+      "id": "57149579-855e-4f5b-a80f-d407b4e3668c",
+      "results": [
+        {
+          "id": "70b1c27c-6c9f-4bc2-8de6-dac4fa3768fd",
+          "trial_name": "bank-interest-legacy-java7.4-of-5.tb-run-small",
+          "task_id": "bank-interest-legacy-java7",
+          "instruction": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_outputs_via_java_validator": "failed"
+          },
+          "recording_path": "tb-run-small/bank-interest-legacy-java7/bank-interest-legacy-java7.4-of-5.tb-run-small/sessions/agent.cast",
+          "total_input_tokens": 18466,
+          "total_output_tokens": 1863,
+          "n_commands": 4,
+          "trial_started_at": "2026-01-01T04:33:03.341969+00:00",
+          "trial_ended_at": "2026-01-01T04:33:59.888120+00:00",
+          "agent_started_at": "2026-01-01T04:33:11.371701+00:00",
+          "agent_ended_at": "2026-01-01T04:33:44.438400+00:00",
+          "test_started_at": "2026-01-01T04:33:47.937567+00:00",
+          "test_ended_at": "2026-01-01T04:33:48.498821+00:00"
+        },
+        {
+          "id": "ce7f63c5-c21f-48a5-94b9-7aa8eaee12b5",
+          "trial_name": "bank-interest-legacy-java7.5-of-5.tb-run-small",
+          "task_id": "bank-interest-legacy-java7",
+          "instruction": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_outputs_via_java_validator": "failed"
+          },
+          "recording_path": "tb-run-small/bank-interest-legacy-java7/bank-interest-legacy-java7.5-of-5.tb-run-small/sessions/agent.cast",
+          "total_input_tokens": 74666,
+          "total_output_tokens": 7180,
+          "n_commands": 26,
+          "trial_started_at": "2026-01-01T04:33:03.343055+00:00",
+          "trial_ended_at": "2026-01-01T04:35:17.046137+00:00",
+          "agent_started_at": "2026-01-01T04:33:12.243961+00:00",
+          "agent_ended_at": "2026-01-01T04:35:00.226657+00:00",
+          "test_started_at": "2026-01-01T04:35:03.768185+00:00",
+          "test_ended_at": "2026-01-01T04:35:05.705313+00:00"
+        },
+        {
+          "id": "a4cfe29d-d84d-46e1-b46c-ec43d53e9fc5",
+          "trial_name": "bank-interest-legacy-java7.1-of-5.tb-run-small",
+          "task_id": "bank-interest-legacy-java7",
+          "instruction": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_outputs_via_java_validator": "failed"
+          },
+          "recording_path": "tb-run-small/bank-interest-legacy-java7/bank-interest-legacy-java7.1-of-5.tb-run-small/sessions/agent.cast",
+          "total_input_tokens": 319067,
+          "total_output_tokens": 5937,
+          "n_commands": 5,
+          "trial_started_at": "2026-01-01T04:33:03.333000+00:00",
+          "trial_ended_at": "2026-01-01T04:35:38.013797+00:00",
+          "agent_started_at": "2026-01-01T04:33:11.285010+00:00",
+          "agent_ended_at": "2026-01-01T04:35:22.416351+00:00",
+          "test_started_at": "2026-01-01T04:35:26.043803+00:00",
+          "test_ended_at": "2026-01-01T04:35:26.564275+00:00"
+        },
+        {
+          "id": "b1b9aa74-a13f-4509-a4b1-fe7d79fe0f62",
+          "trial_name": "bank-interest-legacy-java7.3-of-5.tb-run-small",
+          "task_id": "bank-interest-legacy-java7",
+          "instruction": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_outputs_via_java_validator": "failed"
+          },
+          "recording_path": "tb-run-small/bank-interest-legacy-java7/bank-interest-legacy-java7.3-of-5.tb-run-small/sessions/agent.cast",
+          "total_input_tokens": 64081,
+          "total_output_tokens": 6543,
+          "n_commands": 39,
+          "trial_started_at": "2026-01-01T04:33:03.339642+00:00",
+          "trial_ended_at": "2026-01-01T04:35:56.479233+00:00",
+          "agent_started_at": "2026-01-01T04:33:11.385324+00:00",
+          "agent_ended_at": "2026-01-01T04:35:39.710141+00:00",
+          "test_started_at": "2026-01-01T04:35:43.322679+00:00",
+          "test_ended_at": "2026-01-01T04:35:45.199759+00:00"
+        },
+        {
+          "id": "6ba50b7c-f259-43da-b55c-22653093019d",
+          "trial_name": "bank-interest-legacy-java7.2-of-5.tb-run-small",
+          "task_id": "bank-interest-legacy-java7",
+          "instruction": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_outputs_via_java_validator": "failed"
+          },
+          "recording_path": "tb-run-small/bank-interest-legacy-java7/bank-interest-legacy-java7.2-of-5.tb-run-small/sessions/agent.cast",
+          "total_input_tokens": 173206,
+          "total_output_tokens": 17566,
+          "n_commands": 90,
+          "trial_started_at": "2026-01-01T04:33:03.332613+00:00",
+          "trial_ended_at": "2026-01-01T04:37:37.848690+00:00",
+          "agent_started_at": "2026-01-01T04:33:10.796029+00:00",
+          "agent_ended_at": "2026-01-01T04:37:20.920320+00:00",
+          "test_started_at": "2026-01-01T04:37:24.499769+00:00",
+          "test_ended_at": "2026-01-01T04:37:26.302236+00:00"
+        }
+      ],
+      "pass_at_k": {
+        "2": 0.0,
+        "4": 0.0,
+        "5": 0.0
+      },
+      "n_resolved": 0,
+      "n_unresolved": 5,
+      "resolved_ids": [],
+      "unresolved_ids": [
+        "bank-interest-legacy-java7",
+        "bank-interest-legacy-java7",
+        "bank-interest-legacy-java7",
+        "bank-interest-legacy-java7",
+        "bank-interest-legacy-java7"
+      ],
+      "accuracy": 0.0
+    }
+  },
+  "tb_run_large": {
+    "result_type": "tb_system_error",
+    "duration": 1286.4340732097626,
+    "return_code": 1,
+    "accuracy": 0.0,
+    "agent": "claude-code",
+    "model": "anthropic/claude-opus-4-5-20251101",
+    "skipped": false,
+    "original_result": {
+      "id": "4a6d1a6d-9326-493f-be3f-817af469e276",
+      "results": [
+        {
+          "id": "aa8fcaa2-83bc-415a-b10e-8a9f2809bbea",
+          "trial_name": "bank-interest-legacy-java7.1-of-3.tb-run-large",
+          "task_id": "bank-interest-legacy-java7",
+          "instruction": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_outputs_via_java_validator": "failed"
+          },
+          "recording_path": "tb-run-large/bank-interest-legacy-java7/bank-interest-legacy-java7.1-of-1.tb-run-large/sessions/agent.cast",
+          "total_input_tokens": 0,
+          "total_output_tokens": 0,
+          "n_commands": 45,
+          "trial_started_at": "2026-01-01T04:37:41.530014+00:00",
+          "trial_ended_at": "2026-01-01T04:44:34.060372+00:00",
+          "agent_started_at": "2026-01-01T04:37:47.855138+00:00",
+          "agent_ended_at": "2026-01-01T04:44:17.025355+00:00",
+          "test_started_at": "2026-01-01T04:44:20.533127+00:00",
+          "test_ended_at": "2026-01-01T04:44:22.383244+00:00"
+        },
+        {
+          "id": "5e7256f6-c18b-4e48-a7f0-7950aa0d4d28",
+          "trial_name": "bank-interest-legacy-java7.2-of-3.tb-run-large",
+          "task_id": "bank-interest-legacy-java7",
+          "instruction": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_outputs_via_java_validator": "failed"
+          },
+          "recording_path": "tb-run-large/bank-interest-legacy-java7/bank-interest-legacy-java7.1-of-1.tb-run-large/sessions/agent.cast",
+          "total_input_tokens": 0,
+          "total_output_tokens": 0,
+          "n_commands": 40,
+          "trial_started_at": "2026-01-01T04:44:38.000320+00:00",
+          "trial_ended_at": "2026-01-01T04:51:31.401135+00:00",
+          "agent_started_at": "2026-01-01T04:44:44.133907+00:00",
+          "agent_ended_at": "2026-01-01T04:51:14.252618+00:00",
+          "test_started_at": "2026-01-01T04:51:17.737041+00:00",
+          "test_ended_at": "2026-01-01T04:51:19.732626+00:00"
+        },
+        {
+          "id": "16f3510e-9044-4930-b6cf-1c4d74a40904",
+          "trial_name": "bank-interest-legacy-java7.3-of-3.tb-run-large",
+          "task_id": "bank-interest-legacy-java7",
+          "instruction": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_outputs_via_java_validator": "failed"
+          },
+          "recording_path": "tb-run-large/bank-interest-legacy-java7/bank-interest-legacy-java7.1-of-1.tb-run-large/sessions/agent.cast",
+          "total_input_tokens": 0,
+          "total_output_tokens": 0,
+          "n_commands": 40,
+          "trial_started_at": "2026-01-01T04:51:35.031153+00:00",
+          "trial_ended_at": "2026-01-01T04:59:04.321859+00:00",
+          "agent_started_at": "2026-01-01T04:51:41.029863+00:00",
+          "agent_ended_at": "2026-01-01T04:58:47.294394+00:00",
+          "test_started_at": "2026-01-01T04:58:50.811782+00:00",
+          "test_ended_at": "2026-01-01T04:58:52.702581+00:00"
+        }
+      ],
+      "pass_at_k": {
+        "1": 0.0
+      },
+      "n_resolved": 0,
+      "n_unresolved": 3,
+      "resolved_ids": [],
+      "unresolved_ids": [
+        "aa8fcaa2-83bc-415a-b10e-8a9f2809bbea",
+        "5e7256f6-c18b-4e48-a7f0-7950aa0d4d28",
+        "16f3510e-9044-4930-b6cf-1c4d74a40904"
+      ],
+      "accuracy": 0.0,
+      "stop_on_first_success": true,
+      "attempts_run": 3,
+      "stopped_early": false
+    }
+  },
+  "tb_run_large_3": {
+    "result_type": "tb_negative",
+    "duration": 1818.4223234653473,
+    "return_code": 1,
+    "agent": "terminus-2",
+    "model": "openrouter/openai/gpt-5.2",
+    "skipped": false,
+    "original_result": {
+      "id": "520f83df-8a19-4c6b-b57c-3f49ab31ff4a",
+      "results": [
+        {
+          "id": "19783564-3ba3-4e8a-b5eb-014c35e6e3ca",
+          "trial_name": "bank-interest-legacy-java7.1-of-3.tb-run-large-3",
+          "task_id": "bank-interest-legacy-java7",
+          "instruction": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_outputs_via_java_validator": "failed"
+          },
+          "recording_path": "tb-run-large-3/bank-interest-legacy-java7/bank-interest-legacy-java7.1-of-1.tb-run-large-3/sessions/agent.cast",
+          "total_input_tokens": 206615,
+          "total_output_tokens": 29775,
+          "n_commands": 101,
+          "trial_started_at": "2026-01-01T04:59:08.163163+00:00",
+          "trial_ended_at": "2026-01-01T05:09:28.562334+00:00",
+          "agent_started_at": "2026-01-01T04:59:13.898444+00:00",
+          "agent_ended_at": "2026-01-01T05:09:11.733928+00:00",
+          "test_started_at": "2026-01-01T05:09:15.293180+00:00",
+          "test_ended_at": "2026-01-01T05:09:17.100102+00:00"
+        },
+        {
+          "id": "46b19e70-07bd-4d43-be6c-e903faed9dd0",
+          "trial_name": "bank-interest-legacy-java7.2-of-3.tb-run-large-3",
+          "task_id": "bank-interest-legacy-java7",
+          "instruction": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+          "is_resolved": false,
+          "failure_mode": "unset",
+          "parser_results": {
+            "test_outputs_via_java_validator": "failed"
+          },
+          "recording_path": "tb-run-large-3/bank-interest-legacy-java7/bank-interest-legacy-java7.1-of-1.tb-run-large-3/sessions/agent.cast",
+          "total_input_tokens": 105468,
+          "total_output_tokens": 21068,
+          "n_commands": 78,
+          "trial_started_at": "2026-01-01T05:09:32.366249+00:00",
+          "trial_ended_at": "2026-01-01T05:18:13.350676+00:00",
+          "agent_started_at": "2026-01-01T05:09:38.097892+00:00",
+          "agent_ended_at": "2026-01-01T05:17:56.389429+00:00",
+          "test_started_at": "2026-01-01T05:18:00.043360+00:00",
+          "test_ended_at": "2026-01-01T05:18:02.050099+00:00"
+        },
+        {
+          "id": "29c50799-3459-4d6f-a519-f01585c690cd",
+          "trial_name": "bank-interest-legacy-java7.3-of-3.tb-run-large-3",
+          "task_id": "bank-interest-legacy-java7",
+          "instruction": "Old nightly batch for Java 7. Put BankBatchJob in /app/job.jar, compile to Java 7 bytecode, and run it. Running it again on the same day should give the same results.\n\nInputs are in /app/data:\n- accounts.csv\n- transactions.csv\n- biz_date.txt\n- fx_rates.csv\n- fx_pivots.csv\n- fee_rules.csv\n\nOutputs are in /app/output:\n- interest.csv, LF + trailing newline.\n  Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest.\n  apr 6dp, eod_balance, and daily_interest 2dp, sorted by account_id.\n- exceptions.csv, LF + trailing newline.\n  Title: row_num, tx_id, and reason.\n  Row_num is 1-based data row.\n- stats.json is single-line JSON without newlines.\n  Business date, accounts, valid_txs, skipped_txs, total_interest, and report_md5.\n  report_md5 is md5 of interest.csv bytes. total_interest=2dp.\n- bankdb.h2.db H2 database with ACCOUNTS and TXNS (row_num 1..N).\n  There is one row in RUN_AUDIT: jdbc_url, biz_date, accounts, valid_txs, skipped_txs, and report_md5.\n\nUse these reasons in file order:\n- REVERSED (both rows if reversal_of points to any tx_id in file, even if referenced row appears later)\n- REVERSAL_MISSING\n- FX_MISSING (before FX)\n- AFTER_BIZ_DATE\n- status!=POSTED (use status)\n- DUPLICATE (any tx_id after first appearance, even if first row was invalid)\n\nFor FX, use latest rate_date <= effective_date. If direct and reverse exist, choose the newer one; if tied, use direct. reverse 1/rate (HALF_EVEN 10dp). If no direct/reverse, try fx_pivots.csv in order: solve each leg the same way, multiply, round HALF_EVEN 10dp (skip pivots equal to from/to). The first pivot wins; if not, FX_MISSING.\nFees: First, change currency to account's. fee = flat fee + percentage fee * abs(amount), rounded to nearest half-even 2dp and limited to [min_fee,max_fee]. adjusted = amount - fee, rounded Half-even 2dp. This applies to DEBIT, CREDIT, and ALL fee plans. eod_balance = start_balance + sum(valid adjusted), rounded to two decimal places. If eod_balance is greater than or equal to tier_threshold, APR = base_apr + tier_apr + promo_apr (if promo_days > 0 and days_since_opened_at < promo_days; opened_at = day 0).\nInterest uses principal = max(eod_balance,0). daily_interest_raw = principal * apr/365 (HALF_EVEN 10dp). interest.csv rounds daily_interest_raw to two decimal places. total_interest is sum(daily_interest_raw, keep 10dp) rounded to 2dp.\n\nDon't touch /app/data. H2 1.3 DB2 mode; user sa has a blank password. JDBC URL must be a single literal string that starts with \"jdbc:h2:\" and has \"MODE=DB2\" and \"/app/output/bankdb\" in it. Use at runtime is required. Java 7-only bytecode",
+          "is_resolved": false,
+          "failure_mode": "agent_timeout",
+          "parser_results": {
+            "test_outputs_via_java_validator": "failed"
+          },
+          "recording_path": "tb-run-large-3/bank-interest-legacy-java7/bank-interest-legacy-java7.1-of-1.tb-run-large-3/sessions/agent.cast",
+          "total_input_tokens": 0,
+          "total_output_tokens": 0,
+          "n_commands": 91,
+          "trial_started_at": "2026-01-01T05:18:17.032778+00:00",
+          "trial_ended_at": "2026-01-01T05:29:22.883246+00:00",
+          "agent_started_at": "2026-01-01T05:18:22.693272+00:00",
+          "agent_ended_at": "2026-01-01T05:29:06.094101+00:00",
+          "test_started_at": "2026-01-01T05:29:09.660656+00:00",
+          "test_ended_at": "2026-01-01T05:29:11.553542+00:00"
+        }
+      ],
+      "pass_at_k": {
+        "1": 0.0
+      },
+      "n_resolved": 0,
+      "n_unresolved": 3,
+      "resolved_ids": [],
+      "unresolved_ids": [
+        "19783564-3ba3-4e8a-b5eb-014c35e6e3ca",
+        "46b19e70-07bd-4d43-be6c-e903faed9dd0",
+        "29c50799-3459-4d6f-a519-f01585c690cd"
+      ],
+      "accuracy": 0.0,
+      "stop_on_first_success": true,
+      "attempts_run": 3,
+      "stopped_early": false
+    }
+  },
+  "tb_debug_small": {
+    "result_type": "tb_negative",
+    "duration": 28.60412049293518,
+    "return_code": 0,
+    "skipped": false,
+    "original_result": {
+      "outcome": "FAIL",
+      "explanation": "Trials that built and ran the job mostly passed runtime constraints (Java 7 bytecode, JDBC literal/usage, idempotence). The consistent failure was interest.csv mismatch: tests expect exact header names 'account_id,biz_date,eod_balance,apr,daily_interest', while the task instructions only describe columns in human-friendly terms ('Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest') without specifying exact header strings, casing, or snake_case. This is a hardcoded test expectation not precisely specified in the task. Therefore, the failures are due to insufficient instructions rather than normal agent limitations."
+    }
+  },
+  "tb_debug_large": {
+    "result_type": "tb_positive",
+    "duration": 34.81959795951843,
+    "return_code": 0,
+    "skipped": false,
+    "original_result": {
+      "outcome": "PASS",
+      "explanation": "All three trials fail on the same precise check: exceptions.csv content mismatch. The task instructions are highly specific, including file names, formats, rounding rules, FX resolution logic, fee calculations, interest computation, and even the exact reason-precedence order for exceptions (REVERSED, REVERSAL_MISSING, FX_MISSING, AFTER_BIZ_DATE, status!=POSTED with status value, DUPLICATE). They also explicitly require Java 7 bytecode, a single literal JDBC URL including MODE=DB2 and /app/output/bankdb, runtime usage of that URL, and deterministic re-run outputs. The tests enforce these explicitly stated requirements and the job passes those meta-constraints; only exceptions.csv content differs. Given the detailed instructions for exception reasons and the consistent failure pattern, this points to an implementation error (e.g., reason precedence, duplicate handling, or ordering) rather than insufficient or ambiguous task instructions. Therefore, the failures are due to agent implementation limitations, not missing specifications."
+    }
+  },
+  "tb_debug_large_3": {
+    "result_type": "tb_negative",
+    "duration": 108.7106294631958,
+    "return_code": 0,
+    "skipped": false,
+    "original_result": {
+      "outcome": "FAIL",
+      "explanation": "Tests enforce specific stats.json schema details that are not explicitly specified in task.yaml. The failures show the test expects the key name 'biz_date' (trial 2) and total_interest to be a JSON string with 2dp (trial 1), but the instructions only say 'stats.json is single-line JSON' with fields including 'Business date' and 'total_interest=2dp'; they do not mandate exact key names or that total_interest must be a string vs number. Multiple trials consistently fail on stats.json format differences, indicating implicit/underdocumented requirements. Therefore the task instructions are insufficient for the tested expectations."
+    }
+  },
+  "overall_success": false
+}

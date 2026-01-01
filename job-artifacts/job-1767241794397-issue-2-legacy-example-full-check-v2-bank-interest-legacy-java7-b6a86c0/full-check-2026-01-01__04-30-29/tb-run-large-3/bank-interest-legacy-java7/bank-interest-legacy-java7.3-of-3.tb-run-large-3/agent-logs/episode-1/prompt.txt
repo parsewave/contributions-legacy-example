@@ -1,0 +1,41 @@
+New Terminal Output:
+root@28a1d3931d7a:/app# cd /app
+root@28a1d3931d7a:/app# ls -la
+total 12
+drwxr-xr-x  3 root root 4096 Jan  1 04:33 .
+drwxr-xr-x 20 root root 4096 Jan  1 05:18 ..
+drwxr-xr-x  2 root root 4096 Jan  1 04:30 data
+root@28a1d3931d7a:/app# ls -la /app/data
+total 32
+drwxr-xr-x 2 root root 4096 Jan  1 04:30 .
+drwxr-xr-x 3 root root 4096 Jan  1 04:33 ..
+-rw-r--r-- 1 root root  392 Jan  1 04:30 accounts.csv
+-rw-r--r-- 1 root root   11 Jan  1 04:30 biz_date.txt
+-rw-r--r-- 1 root root  154 Jan  1 04:30 fee_rules.csv
+-rw-r--r-- 1 root root   14 Jan  1 04:30 fx_pivots.csv
+-rw-r--r-- 1 root root  499 Jan  1 04:30 fx_rates.csv
+-rw-r--r-- 1 root root  901 Jan  1 04:30 transactions.csv
+root@28a1d3931d7a:/app# ls -la /app/output
+ls: cannot access '/app/output': No such file or directory
+root@28a1d3931d7a:/app# find /app -maxdepth 3 -type f \( -name "*.java" -o -name "pom.xml" -o -name "build.gradle" -o -name "*.jar" \) -print
+root@28a1d3931d7a:/app# java -version
+openjdk version "1.7.0_352"
+OpenJDK Runtime Environment (Zulu 7.56.0.11-CA-linux64) (build 1.7.0_352-b01)
+OpenJDK 64-Bit Server VM (Zulu 7.56.0.11-CA-linux64) (build 24.352-b01, mixed mode)
+root@28a1d3931d7a:/app# javac -version
+javac 1.7.0_352
+root@28a1d3931d7a:/app# python3 - <<'PY'
+> import sys,glob
+> paths=glob.glob('/usr/share/java/*.jar')+glob.glob('/usr/share/**/*.jar',recursive=True)
+> for p in paths:
+>     if 'h2' in p.lower():
+>         print(p)
+> PY
+root@28a1d3931d7a:/app#
+
+
+
+
+
+
+

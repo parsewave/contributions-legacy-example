@@ -1,0 +1,40 @@
+root@534c3e9c095c:/app# ls -R
+.:
+data
+
+./data:
+accounts.csv  biz_date.txt  fee_rules.csv  fx_pivots.csv  fx_rates.csv  transactions.csv
+root@534c3e9c095c:/app# ls -l
+total 4
+drwxr-xr-x 2 root root 4096 Jan  1 04:30 data
+root@534c3e9c095c:/app# ls -la
+total 12
+drwxr-xr-x  3 root root 4096 Jan  1 04:33 .
+drwxr-xr-x 20 root root 4096 Jan  1 04:33 ..
+drwxr-xr-x  2 root root 4096 Jan  1 04:30 data
+root@534c3e9c095c:/app# find / -type f \( -name '*BankBatchJob*.java' -o -name 'job.jar' \) 2>/dev/null
+root@534c3e9c095c:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

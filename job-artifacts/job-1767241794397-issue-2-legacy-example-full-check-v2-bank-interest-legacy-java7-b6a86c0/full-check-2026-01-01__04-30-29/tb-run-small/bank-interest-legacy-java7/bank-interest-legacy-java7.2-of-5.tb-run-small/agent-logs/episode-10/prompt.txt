@@ -1,0 +1,22 @@
+New Terminal Output:
+
+root@95fcff259f60:/app# ls -l /opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/h2-1.4.200.jar
+ls: cannot access '/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/h2-1.4.200.jar': No such file or directory
+root@95fcff259f60:/app# java -cp /opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/h2-1.4.200.jar:/app/job.jar BankBatchJob
+Exception in thread "main" java.lang.ClassNotFoundException: org.h2.Driver
+        at java.net.URLClassLoader$1.run(URLClassLoader.java:365)
+        at java.net.URLClassLoader$1.run(URLClassLoader.java:349)
+        at java.security.AccessController.doPrivileged(Native Method)
+        at java.net.URLClassLoader.findClass(URLClassLoader.java:348)
+        at java.lang.ClassLoader.loadClass(ClassLoader.java:430)
+        at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:329)
+        at java.lang.ClassLoader.loadClass(ClassLoader.java:363)
+        at java.lang.Class.forName0(Native Method)
+        at java.lang.Class.forName(Class.java:195)
+        at BankBatchJob.main(BankBatchJob.java:28)
+root@95fcff259f60:/app# ls -l /app/output
+total 12
+-rw-r--r-- 1 root root 21 Jan  1 04:36 exceptions.csv
+-rw-r--r-- 1 root root 60 Jan  1 04:36 interest.csv
+-rw-r--r-- 1 root root  3 Jan  1 04:36 stats.json
+root@95fcff259f60:/app#

@@ -1,0 +1,1219 @@
+[?2004hroot@38af6b5d9dd5:/app# asciinema rec --stdin /logs/agent.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@38af6b5d9dd5:/app# clear
+[?2004l[H[J[3J[?2004hroot@38af6b5d9dd5:/app# ls -la /app
+[?2004ltotal 12
+drwxr-xr-x  3 root root 4096 Jan  1 04:33 .
+drwxr-xr-x 20 root root 4096 Jan  1 04:59 ..
+drwxr-xr-x  2 root root 4096 Jan  1 04:30 data
+[?2004hroot@38af6b5d9dd5:/app# find /app -maxdepth 3 -type f -print
+[?2004l/app/data/fee_rules.csv
+/app/data/fx_pivots.csv
+/app/data/transactions.csv
+/app/data/fx_rates.csv
+/app/data/biz_date.txt
+/app/data/accounts.csv
+[?2004hroot@38af6b5d9dd5:/app# java -version
+[?2004lopenjdk version "1.7.0_352"
+OpenJDK Runtime Environment (Zulu 7.56.0.11-CA-linux64) (build 1.7.0_352-b01)
+OpenJDK 64-Bit Server VM (Zulu 7.56.0.11-CA-linux64) (build 24.352-b01, mixed mode)
+[?2004hroot@38af6b5d9dd5:/app# javac -version
+[?2004lls -la /app/data
+javac 1.7.0_352
+[?2004hroot@38af6b5d9dd5:/app# ls -la /app/data
+[?2004ltotal 32
+drwxr-xr-x 2 root root 4096 Jan  1 04:30 .
+drwxr-xr-x 3 root root 4096 Jan  1 04:33 ..
+-rw-r--r-- 1 root root  392 Jan  1 04:30 accounts.csv
+-rw-r--r-- 1 root root   11 Jan  1 04:30 biz_date.txt
+-rw-r--r-- 1 root root  154 Jan  1 04:30 fee_rules.csv
+-rw-r--r-- 1 root root   14 Jan  1 04:30 fx_pivots.csv
+-rw-r--r-- 1 root root  499 Jan  1 04:30 fx_rates.csv
+-rw-r--r-- 1 root root  901 Jan  1 04:30 transactions.csv
+[?2004hroot@38af6b5d9dd5:/app# for f in /app/data/accounts.csv /app/data/transactions.csv /app/data/biz_date.txt /app/data/fx_rates.csv /app/data/fx_pivots.csv /app/data/fee_rules.csv; do echo "=== $f ==="; sed -n '1,5p' "$f"; echo; done
+[?2004l=== /app/data/accounts.csv ===
+account_id,opened_at,start_balance,base_apr,promo_apr,promo_days,tier_threshold,tier_apr,currency,fee_plan
+A1001,2024-02-01,10000.00,0.01000,0.00500,29,5000.00,0.00200,USD,PLAN_A
+A1002,2020-01-01,5000.00,0.00800,0.00000,0,5000.00,0.00100,USD,PLAN_B
+A1003,2023-12-01,-10.00,0.02000,0.00000,0,10000.00,0.00500,EUR,PLAN_A
+A1004,2023-01-01,36500.00,0.01005,0.00000,0,999999.00,0.00000,USD,PLAN_C
+
+=== /app/data/transactions.csv ===
+tx_id,account_id,effective_date,amount,currency,status,reversal_of
+T001,A1001,2024-03-01,-2000.00,USD,POSTED,
+T002,A1001,2024-03-02,-500.00,EUR,POSTED,
+T003,A1001,2024-02-28,100.00,USD,PENDING,
+T004,A1002,2024-02-15,50.00,USD,POSTED,
+
+=== /app/data/biz_date.txt ===
+2024-03-01
+
+=== /app/data/fx_rates.csv ===
+rate_date,from_ccy,to_ccy,rate
+2024-01-01,USD,EUR,0.9000
+2024-01-01,EUR,USD,1.1111
+2024-02-01,USD,EUR,0.9100
+2024-02-01,EUR,USD,1.0989
+
+=== /app/data/fx_pivots.csv ===
+pivot
+GBP
+EUR
+
+=== /app/data/fee_rules.csv ===
+fee_plan,applies_to,flat_fee,pct_fee,min_fee,max_fee
+PLAN_A,DEBIT,0.50,0.005,0.25,5.00
+PLAN_B,ALL,0.10,0.002,0.10,2.00
+PLAN_C,CREDIT,0.25,0.001,0.25,1.00
+
+[?2004hroot@38af6b5d9dd5:/app# ls -la /app/output || true
+[?2004lls: cannot access '/app/output': No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# find / -name 'h2*.jar' 2>/dev/null | head
+[?2004l/opt/legacy-lib/h2-1.3.176.jar
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/data/transactions.csv
+[?2004ltx_id,account_id,effective_date,amount,currency,status,reversal_of
+T001,A1001,2024-03-01,-2000.00,USD,POSTED,
+T002,A1001,2024-03-02,-500.00,EUR,POSTED,
+T003,A1001,2024-02-28,100.00,USD,PENDING,
+T004,A1002,2024-02-15,50.00,USD,POSTED,
+T004,A1002,2024-02-15,50.00,USD,POSTED,
+T005,A1002,2024-02-16,-20.00,USD,POSTED,
+T006,A1002,2024-02-20,20.00,USD,POSTED,T005
+T007,A1003,2024-03-01,10.00,USD,POSTED,
+T008,A1003,2024-03-01,-10.00,EUR,POSTED,NOPE
+T009,A1004,2024-01-15,1000.00,EUR,POSTED,
+T010,A1004,2024-03-01,-1000.00,USD,POSTED,T009
+T011,A1002,2024-03-01,5.00,USD,POSTED,
+T012,A1002,2024-03-05,5.00,USD,POSTED,
+T013,A1001,2024-02-10,30.00,GBP,POSTED,
+T014,A1001,2024-03-01,-10000.00,JPY,POSTED,
+T015,A1002,2024-03-01,100.00,CAD,POSTED,
+T016,A9999,2024-03-01,25.00,USD,POSTED,
+T016,A1001,2024-03-01,25.00,USD,POSTED,
+T017,A1003,2024-03-01,-15.00,USD,POSTED,T018
+T018,A1003,2024-03-01,15.00,USD,POSTED,
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/data/accounts.csv
+[?2004laccount_id,opened_at,start_balance,base_apr,promo_apr,promo_days,tier_threshold,tier_apr,currency,fee_plan
+A1001,2024-02-01,10000.00,0.01000,0.00500,29,5000.00,0.00200,USD,PLAN_A
+A1002,2020-01-01,5000.00,0.00800,0.00000,0,5000.00,0.00100,USD,PLAN_B
+A1003,2023-12-01,-10.00,0.02000,0.00000,0,10000.00,0.00500,EUR,PLAN_A
+A1004,2023-01-01,36500.00,0.01005,0.00000,0,999999.00,0.00000,USD,PLAN_C
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/data/fx_rates.csv
+[?2004lrate_date,from_ccy,to_ccy,rate
+2024-01-01,USD,EUR,0.9000
+2024-01-01,EUR,USD,1.1111
+2024-02-01,USD,EUR,0.9100
+2024-02-01,EUR,USD,1.0989
+2024-03-01,USD,EUR,0.9200
+2024-03-01,EUR,USD,1.0870
+2024-02-01,JPY,EUR,0.0065
+2024-03-01,JPY,EUR,0.0066
+2024-02-01,USD,GBP,0.7900
+2024-03-01,USD,GBP,0.8000
+2024-02-01,GBP,JPY,190.00
+2024-03-01,GBP,JPY,188.00
+2024-02-01,JPY,USD,0.0067
+2024-03-01,USD,JPY,150.00
+2024-02-01,CAD,GBP,0.5800
+2024-03-01,GBP,CAD,1.7200
+2024-02-01,CAD,EUR,0.6700
+2024-03-01,EUR,CAD,1.4900
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/data/fx_pivots.csv
+[?2004lpivot
+GBP
+EUR
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/data/fee_rules.csv
+[?2004lfee_plan,applies_to,flat_fee,pct_fee,min_fee,max_fee
+PLAN_A,DEBIT,0.50,0.005,0.25,5.00
+PLAN_B,ALL,0.10,0.002,0.10,2.00
+PLAN_C,CREDIT,0.25,0.001,0.25,1.00
+[?2004hroot@38af6b5d9dd5:/app# mkdir -p /app/src /app/build /app/output
+[?2004l[?2004hroot@38af6b5d9dd5:/app# javac -cp /opt/legacy-lib/h2-1.3.176.jar -d /app/build /app/src/BankBatchJob.java
+[?2004ljavac: file not found: /app/src/BankBatchJob.java
+Usage: javac <options> <source files>
+use -help for a list of possible options
+[?2004hroot@38af6b5d9dd5:/app# cat > /app/manifest.mf <<'EOF'
+[?2004l[?2004h> Main-Class: BankBatchJob
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@38af6b5d9dd5:/app# jar cfm /app/job.jar /app/manifest.mf -C /app/build .
+[?2004l[?2004hroot@38af6b5d9dd5:/app# java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob
+[?2004lError: Could not find or load main class BankBatchJob
+[?2004hroot@38af6b5d9dd5:/app# ls -la /app/output
+[?2004ltotal 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:03 .
+drwxr-xr-x 6 root root 4096 Jan  1 05:03 ..
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/interest.csv
+[?2004lsed: can't read /app/output/interest.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/exceptions.csv
+[?2004lsed: can't read /app/output/exceptions.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# wc -l /app/output/interest.csv /app/output/exceptions.csv; echo '---'; cat /app/output/stats.json; echo
+[?2004lwc: /app/output/interest.csv: No such file or directory
+wc: /app/output/exceptions.csv: No such file or directory
+0 total
+---
+cat: /app/output/stats.json: No such file or directory
+
+[?2004hroot@38af6b5d9dd5:/app# md5sum /app/output/interest.csv
+[?2004lmd5sum: /app/output/interest.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# cp -a /app/output /app/output_run1
+[?2004l[?2004hroot@38af6b5d9dd5:/app# java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob
+[?2004lError: Could not find or load main class BankBatchJob
+[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/interest.csv /app/output/interest.csv || true
+[?2004ldiff: /app/output_run1/interest.csv: No such file or directory
+diff: /app/output/interest.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/exceptions.csv /app/output/exceptions.csv || true
+[?2004ldiff: /app/output_run1/exceptions.csv: No such file or directory
+diff: /app/output/exceptions.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/stats.json /app/output/stats.json || true
+[?2004ldiff: /app/output_run1/stats.json: No such file or directory
+diff: /app/output/stats.json: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# ls -la /app/job.jar; jar tf /app/job.jar | head
+[?2004l-rw-r--r-- 1 root root 369 Jan  1 05:03 /app/job.jar
+META-INF/
+META-INF/MANIFEST.MF
+[?2004hroot@38af6b5d9dd5:/app# rm -rf /app/build /app/src /app/output /app/output_run1 /app/job.jar /app/manifest.mf
+[?2004l[?2004hroot@38af6b5d9dd5:/app# mkdir -p /app/src /app/build /app/output
+[?2004l[?2004hroot@38af6b5d9dd5:/app# javac -cp /opt/legacy-lib/h2-1.3.176.jar -d /app/build /app/src/BankBatchJob.java
+[?2004ljavac: file not found: /app/src/BankBatchJob.java
+Usage: javac <options> <source files>
+use -help for a list of possible options
+[?2004hroot@38af6b5d9dd5:/app# cat > /app/manifest.mf <<'EOF'
+[?2004l[?2004h> Main-Class: BankBatchJob
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@38af6b5d9dd5:/app# jar cfm /app/job.jar /app/manifest.mf -C /app/build .
+[?2004l[?2004hroot@38af6b5d9dd5:/app# java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob
+[?2004lError: Could not find or load main class BankBatchJob
+[?2004hroot@38af6b5d9dd5:/app# ls -la /app/output
+[?2004ltotal 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:04 .
+drwxr-xr-x 6 root root 4096 Jan  1 05:04 ..
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/interest.csv
+[?2004lsed: can't read /app/output/interest.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/exceptions.csv
+[?2004lsed: can't read /app/output/exceptions.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# python - <<'PY'
+[?2004l[?2004h> import hashlib
+[?2004l[?2004h> p='/app/output/interest.csv'
+[?2004l[?2004h> with open(p,'rb') as f: b=f.read()
+[?2004l[?2004h> print('interest_md5', hashlib.md5(b).hexdigest())
+[?2004l[?2004h> PY
+[?2004lTraceback (most recent call last):
+  File [35m"<stdin>"[0m, line [35m3[0m, in [35m<module>[0m
+[1;35mFileNotFoundError[0m: [35m[Errno 2] No such file or directory: '/app/output/interest.csv'[0m
+[?2004hroot@38af6b5d9dd5:/app# cp -a /app/output /app/output_run1
+[?2004l[?2004hroot@38af6b5d9dd5:/app# java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob
+[?2004lError: Could not find or load main class BankBatchJob
+[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/interest.csv /app/output/interest.csv || true
+[?2004ldiff: /app/output_run1/interest.csv: No such file or directory
+diff: /app/output/interest.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/exceptions.csv /app/output/exceptions.csv || true
+[?2004ldiff: /app/output_run1/exceptions.csv: No such file or directory
+diff: /app/output/exceptions.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/stats.json /app/output/stats.json || true
+[?2004ldiff: /app/output_run1/stats.json: No such file or directory
+diff: /app/output/stats.json: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# ls -la /app/job.jar; jar tf /app/job.jar | head -50
+[?2004l-rw-r--r-- 1 root root 369 Jan  1 05:04 /app/job.jar
+META-INF/
+META-INF/MANIFEST.MF
+[?2004hroot@38af6b5d9dd5:/app# ls -la /app/src /app/build /app/output
+[?2004l/app/build:
+total 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:04 .
+drwxr-xr-x 7 root root 4096 Jan  1 05:04 ..
+
+/app/output:
+total 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:04 .
+drwxr-xr-x 7 root root 4096 Jan  1 05:04 ..
+
+/app/src:
+total 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:04 .
+drwxr-xr-x 7 root root 4096 Jan  1 05:04 ..
+[?2004hroot@38af6b5d9dd5:/app# cat > /app/src/BankBatchJob.java <<'EOF'
+[?2004l[?2004h> import java.io.*;
+[?2004l[?2004h> import java.math.*;
+[?2004l[?2004h> import java.nio.charset.Charset;
+[?2004l[?2004h> import java.security.*;
+[?2004l[?2004h> import java.sql.*;
+[?2004l[?2004h> import java.text.*;
+[?2004l;
+  }
+
+  private static List<String[]> readCsv(File f) throws Exception {
+    ArrayList<String[]> rows = new ArrayList<String[]>();
+    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), UTF8));
+    try {
+      String line;
+      while((line=br.readLine())!=null) rows.add(split(line));
+    } finally { br.close(); }
+    return rows;
+  }
+
+  private static Map<String,Integer> hdr(String[] h){
+    HashMap<String,Integer> m = new HashMap<String,Integer>();
+    for(int i=0;i<h.length;i++) m.put(h[i], Integer.valueOf(i));
+    return m;
+  }
+
+  private static String col(String[] r, Map<String,Integer> m, String k){
+    Integer i = m.get(k);
+    if(i==null) return "";
+    int n=i.intValue();
+    return (n>=0 && n<r.length) ? r[n] : "";
+  }
+
+  private static BigDecimal bd2(String s){ return new BigDecimal(s).setScale(2, RM); }
+  private static BigDecimal bd(String s){ return new BigDecimal(s); }
+
+  private static int toDay(String yyyyMmDd) throws Exception {
+    Date d = DF.parse(yyyyMmDd);
+    Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    c.setTime(d);
+    c.set(Calendar.HOUR_OF_DAY,0); c.set(Calendar.MINUTE,0); c.set(Calendar.SECOND,[?2004h> import java.util.*;
+[?2004l[?2004h> 
+[?2004l[?2004h> public class BankBatchJob {
+[?2004l[?2004h>   private static final String JDBC_URL = "jdbc:h2:/app/output/bankdb;MODE=DB2";
+[?2004l[?2004h>   private static final Charset UTF8 = Charset.forName("UTF-8");
+[?2004l[?2004h>   private static final RoundingMode RM = RoundingMode.HALF_EVEN;
+[?2004l[?2004h>   private static final BigDecimal BD0 = new BigDecimal("0");
+[?2004l [?2004h>   private static final BigDecimal BD365 = new BigDecimal("365");
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static final File DATA_DIR = new File("/app/data");
+[?2004l[?2004h>   private static final File OUT_DIR = new File("/app/output");
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static final File ACCOUNTS_CSV = new File(DATA_DIR, "accounts.csv");
+[?2004l[?2004h>   private static final File TXNS_CSV = new File(DATA_DIR, "transactions.csv");
+[?2004l)[?2004h>   private static final File BIZ_DATE_TXT = new File(DATA_DIR, "biz_date.txt");
+[?2004l[?2004h>   private static final File FX_RATES_CSV = new File(DATA_DIR, "fx_rates.csv");
+[?2004l[?2004h>   private static final File FX_PIVOTS_CSV = new File(DATA_DIR, "fx_pivots.csv");
+[?2004l[?2004h>   private static final File FEE_RULES_CSV = new File(DATA_DIR, "fee_rules.csv");
+[?2004l[?2004h> 
+[?2004l [?2004h>   private static final File INTEREST_CSV = new File(OUT_DIR, "interest.csv");
+[?2004l[?2004h>   private static final File EXCEPTIONS_CSV = new File(OUT_DIR, "exceptions.csv");
+[?2004l[?2004h>   private static final File STATS_JSON = new File(OUT_DIR, "stats.json");
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd");
+[?2004l[?2004h>   static {
+[?2004l[?2004h>     DF.setLenient(false);
+[?2004l[?2004h>     DF.setTimeZone(TimeZone.getTimeZone("UTC"));
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   static class Account {
+[?2004l[?2004h>     String id, ccy, feePlan;
+[?2004l[?2004h>     int openedDay;
+[?2004l[?2004h>     BigDecimal start2, baseApr, promoApr, tierThr2, tierApr;
+[?2004l[?2004h>     int promoDays;
+[?2004l[?2004h>   }
+[?2004l[?2004h>   static class Txn {
+[?2004l[?2004h>     int rowNum, effDay;
+[?2004l[?2004h>     String txId, acctId, effStr, ccy, status, reversalOf;
+[?2004l[?2004h>     BigDecimal amt2;
+[?2004l[?2004h>   }
+[?2004l[?2004h>   static class FeeRule {
+[?2004l[?2004h>     String plan, applies;
+[?2004l[?2004h>     BigDecimal flat2, pct, min2, max2;
+[?2004l[?2004h>   }
+[?2004l[?2004h>   static class FxRate {
+[?2004l[?2004h>     int day;
+[?2004l[?2004h>     String from, to;
+[?2004l[?2004h>     BigDecimal rate;
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static void del(File f){ if(f.exists()) f.delete(); }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static void cleanOutput() throws Exception {
+[?2004l[?2004h>     if(!OUT_DIR.exists() && !OUT_DIR.mkdirs()) throw new IOException("cannot create " + OUT_DIR);
+[?2004l[?2004h>     del(INTEREST_CSV); del(EXCEPTIONS_CSV); del(STATS_JSON);
+[?2004l[?2004h>     del(new File(OUT_DIR, "bankdb.h2.db"));
+[?2004l[?2004h>     del(new File(OUT_DIR, "bankdb.trace.db"));
+[?2004l[?2004h>     del(new File(OUT_DIR, "bankdb.lock.db"));
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static String read1(File f) throws Exception {
+[?2004l[?2004h>     BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), UTF8));
+[?2004l[?2004h>     try { String s = br.readLine(); return s==null?"":s.trim(); } finally { br.close(); }
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static String[] split(String line){
+[?2004l[?2004h>     ArrayList<String> parts = new ArrayList<String>();
+[?2004l[?2004h>     int s=0;
+[?2004l[?2004h>     for(int i=0;i<line.length();i++) if(line.charAt(i)==','){ parts.add(line.substring(s,i)); s=i+1; }
+[?2004l[?2004h>     parts.add(line.substring(s));
+[?2004l[?2004h>     String[] out = new String[parts.size()];
+[?2004l[?2004h>     for(int i=0;i<parts.size();i++) out[i]=parts.get(i);
+[?2004l[?2004h>     return out;
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static List<String[]> readCsv(File f) throws Exception {
+[?2004l[?2004h>     ArrayList<String[]> rows = new ArrayList<String[]>();
+[?2004l[?2004h>     BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), UTF8));
+[?2004l[?2004h>     try {
+[?2004l[?2004h>       String line;
+[?2004l[?2004h>       while((line=br.readLine())!=null) rows.add(split(line));
+[?2004l[?2004h>     } finally { br.close(); }
+[?2004l[?2004h>     return rows;
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static Map<String,Integer> hdr(String[] h){
+[?2004l[?2004h>     HashMap<String,Integer> m = new HashMap<String,Integer>();
+[?2004l[?2004h>     for(int i=0;i<h.length;i++) m.put(h[i], Integer.valueOf(i));
+[?2004l[?2004h>     return m;
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static String col(String[] r, Map<String,Integer> m, String k){
+[?2004l[?2004h>     Integer i = m.get(k);
+[?2004l[?2004h>     if(i==null) return "";
+[?2004l[?2004h>     int n=i.intValue();
+[?2004l[?2004h>     return (n>=0 && n<r.length) ? r[n] : "";
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static BigDecimal bd2(String s){ return new BigDecimal(s).setScale(2, RM); }
+[?2004l[?2004h>   private static BigDecimal bd(String s){ return new BigDecimal(s); }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static int toDay(String yyyyMmDd) throws Exception {
+[?2004l[?2004h>     Date d = DF.parse(yyyyMmDd);
+[?2004l[?2004h>     Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+[?2004l[?2004h>     c.setTime(d);
+[?2004l[?2004h>     c.set(Calendar.HOUR_OF_DAY,0); c.set(Calendar.MINUTE,0); c.set(Calendar.SECOND,0); c.set(Calendar.MILLISECOND,0);
+[?2004l[?2004h>     return (int)(c.getTimeInMillis()/86400000L);
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static byte[] readAll(File f) throws Exception {
+[?2004l[?2004h>     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+[?2004l[?2004h>     InputStream in = new FileInputStream(f);
+[?2004l[?2004h>     try {
+[?2004l[?2004h>       byte[] buf = new byte[8192];
+[?2004l[?2004h>       int n;
+[?2004l[?2004h>       while((n=in.read(buf))!=-1) baos.write(buf,0,n);
+[?2004l[?2004h>     } finally { in.close(); }
+[?2004l[?2004h>     return baos.toByteArray();
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static String md5(byte[] b) throws Exception {
+[?2004l[?2004h>     MessageDigest md = MessageDigest.getInstance("MD5");
+[?2004l[?2004h>     md.update(b);
+[?2004l[?2004h>     byte[] d = md.digest();
+[?2004l[?2004h>     StringBuilder sb = new StringBuilder();
+[?2004l[?2004h>     for(int i=0;i<d.length;i++){
+[?2004l[?2004h>       int x=d[i]&0xff;
+[?2004l[?2004h>       if(x<16) sb.append('0');
+[?2004l[?2004h>       sb.append(Integer.toHexString(x));
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return sb.toString();
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static void writeUtf8(File f, String s) throws Exception {
+[?2004l[?2004h>     Writer w = new OutputStreamWriter(new FileOutputStream(f), UTF8);
+[?2004l[?2004h>     try { w.write(s); } finally { w.close(); }
+[?2004l[?2004h>   }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@38af6b5d9dd5:/app# cat >> /app/src/BankBatchJob.java <<'EOF'
+[?2004l[?2004h>   private static Map<String,Account> loadAccounts() throws Exception {
+[?2004l[?2004h>     List<String[]> rows = readCsv(ACCOUNTS_CSV);
+[?2004l[?2004h>     Map<String,Integer> h = hdr(rows.get(0));
+[?2004l[?2004h>     HashMap<String,Account> out = new HashMap<String,Account>();
+[?2004l[?2004h>     for(int i=1;i<rows.size();i++){
+[?2004l[?2004h>       String[] r=rows.get(i);
+[?2004l[?2004h>       Account a=new Account();
+[?2004l[?2004h>       a.id=col(r,h,"account_id");
+[?2004l[?2004h>       a.openedDay=toDay(col(r,h,"opened_at"));
+[?2004l[?2004h>       a.start2=bd2(col(r,h,"start_balance"));
+[?2004l[?2004h>       a.baseApr=bd(col(r,h,"base_apr"));
+[?2004l[?2004h>       a.promoApr=bd(col(r,h,"promo_apr"));
+[?2004l[?2004h>       a.promoDays=Integer.parseInt(col(r,h,"promo_days"));
+[?2004l[?2004h>       a.tierThr2=bd2(col(r,h,"tier_threshold"));
+[?2004l[?2004h>       a.tierApr=bd(col(r,h,"tier_apr"));
+[?2004l[?2004h>       a.ccy=col(r,h,"currency");
+[?2004l[?2004h>       a.feePlan=col(r,h,"fee_plan");
+[?2004l[?2004h>       out.put(a.id,a);
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return out;
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static List<Txn> loadTxns() throws Exception {
+[?2004l[?2004h>     List<String[]> rows = readCsv(TXNS_CSV);
+[?2004l[?2004h>     Map<String,Integer> h = hdr(rows.get(0));
+[?2004l[?2004h>     ArrayList<Txn> out = new ArrayList<Txn>();
+[?2004l[?2004h>     for(int i=1;i<rows.size();i++){
+[?2004l[?2004h>       String[] r=rows.get(i);
+[?2004l[?2004h>       Txn t=new Txn();
+[?2004l[?2004h>       t.rowNum=i;
+[?2004l[?2004h>       t.txId=col(r,h,"tx_id");
+[?2004l[?2004h>       t.acctId=col(r,h,"account_id");
+[?2004l[?2004h>       t.effStr=col(r,h,"effective_date");
+[?2004l[?2004h>       t.effDay=toDay(t.effStr);
+[?2004l[?2004h>       t.amt2=bd2(col(r,h,"amount"));
+[?2004l[?2004h>       t.ccy=col(r,h,"currency");
+[?2004l[?2004h>       t.status=col(r,h,"status");
+[?2004l[?2004h>       t.reversalOf=col(r,h,"reversal_of");
+[?2004l[?2004h>       if(t.reversalOf==null) t.reversalOf="";
+[?2004l[?2004h>       out.add(t);
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return out;
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static Map<String,FeeRule> loadFees() throws Exception {
+[?2004l[?2004h>     List<String[]> rows = readCsv(FEE_RULES_CSV);
+[?2004l[?2004h>     Map<String,Integer> h = hdr(rows.get(0));
+[?2004l[?2004h>     HashMap<String,FeeRule> out = new HashMap<String,FeeRule>();
+[?2004l[?2004h>     for(int i=1;i<rows.size();i++){
+[?2004l[?2004h>       String[] r=rows.get(i);
+[?2004l[?2004h>       FeeRule fr=new FeeRule();
+[?2004l[?2004h>       fr.plan=col(r,h,"fee_plan");
+[?2004l[?2004h>       fr.applies=col(r,h,"applies_to");
+[?2004l[?2004h>       fr.flat2=bd2(col(r,h,"flat_fee"));
+[?2004l[?2004h>       fr.pct=bd(col(r,h,"pct_fee"));
+[?2004l[?2004h>       fr.min2=bd2(col(r,h,"min_fee"));
+[?2004l[?2004h>       fr.max2=bd2(col(r,h,"max_fee"));
+[?2004l[?2004h>       out.put(fr.plan, fr);
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return out;
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static List<FxRate> loadFxRates() throws Exception {
+[?2004l[?2004h>     List<String[]> rows = readCsv(FX_RATES_CSV);
+[?2004l[?2004h>     Map<String,Integer> h = hdr(rows.get(0));
+[?2004l[?2004h>     ArrayList<FxRate> out = new ArrayList<FxRate>();
+[?2004l[?2004h>     for(int i=1;i<rows.size();i++){
+[?2004l[?2004h>       String[] r=rows.get(i);
+[?2004l[?2004h>       FxRate x=new FxRate();
+[?2004l[?2004h>       x.day=toDay(col(r,h,"rate_date"));
+[?2004l[?2004h>       x.from=col(r,h,"from_ccy");
+[?2004l[?2004h>       x.to=col(r,h,"to_ccy");
+[?2004l[?2004h>       x.rate=bd(col(r,h,"rate"));
+[?2004l[?2004h>       out.add(x);
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return out;
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static List<String> loadPivots() throws Exception {
+[?2004l[?2004h>     List<String[]> rows = readCsv(FX_PIVOTS_CSV);
+[?2004l[?2004h>     ArrayList<String> out = new ArrayList<String>();
+[?2004l[?2004h>     for(int i=1;i<rows.size();i++){
+[?2004l[?2004h>       if(rows.get(i).length==0) continue;
+[?2004l[?2004h>       String p=rows.get(i)[0];
+[?2004l[?2004h>       if(p!=null) p=p.trim();
+[?2004l[?2004h>       if(p!=null && p.length()>0) out.add(p);
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return out;
+[?2004l[?2004h>   }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@38af6b5d9dd5:/app# cat >> /app/src/BankBatchJob.java <<'EOF'
+[?2004l[?2004h>   private static String pair(String f,String t){ return f+"|"+t; }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static FxRate latestLE(Map<String,List<FxRate>> byPair, String from, String to, int effDay){
+[?2004l[?2004h>     List<FxRate> lst = byPair.get(pair(from,to));
+[?2004l[?2004h>     if(lst==null) return null;
+[?2004l[?2004h>     FxRate best=null;
+[?2004l[?2004h>     for(int i=0;i<lst.size();i++){
+[?2004l[?2004h>       FxRate r=lst.get(i);
+[?2004l([?2004h>       if(r.day<=effDay) best=r; else break;
+[?2004l[?2004h>     }
+[?2004lf[?2004h>     return best;
+[?2004lver[?2004h>   }
+[?2004l[?2004h> 
+[?2004lf[?2004h>   private static BigDecimal resolveDirectOrReverse(Map<String,List<FxRate>> byPair, String from, String to, int effDay){
+[?2004l[?2004h>     if(from.equals(to)) return BigDecimal.ONE.setScale(10, RM);
+[?2004l[?2004h>     FxRate direct = latestLE(byPair, from, to, effDay);
+[?2004l[?2004h>     FxRate reverse = latestLE(byPair, to, from, effDay);
+[?2004lb[?2004h>     if(direct==null && reverse==null) return null;
+[?2004l.[?2004h> 
+[?2004l[?2004h>     boolean useDirect;
+[?2004l[?2004h>     if(direct!=null && reverse!=null){
+[?2004l[?2004h>       if(direct.day>reverse.day) useDirect=true;
+[?2004l [?2004h>       else if(direct.day<reverse.day) useDirect=false;
+[?2004l [?2004h>       else useDirect=true; // tie => direct
+[?2004l[?2004h>     } else useDirect = (direct!=null);
+[?2004l[?2004h> 
+[?2004l[?2004h>     if(useDirect) return direct.rate.setScale(10, RM);
+[?2004l[?2004h>     return BigDecimal.ONE.divide(reverse.rate, 10, RM);
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static BigDecimal resolveFx(Map<String,List<FxRate>> byPair, List<String> pivots, String from, String to, int effDay){
+[?2004l[?2004h>     BigDecimal r = resolveDirectOrReverse(byPair, from, to, effDay);
+[?2004l[?2004h>     if(r!=null) return r;
+[?2004l[?2004h>     for(int i=0;i<pivots.size();i++){
+[?2004l[?2004h>       String p=pivots.get(i);
+[?2004l[?2004h>       if(p.equals(from) || p.equals(to)) continue;
+[?2004l[?2004h>       BigDecimal a = resolveDirectOrReverse(byPair, from, p, effDay);
+[?2004l[?2004h>       if(a==null) continue;
+[?2004l[?2004h>       BigDecimal b = resolveDirectOrReverse(byPair, p, to, effDay);
+[?2004l[?2004h>       if(b==null) continue;
+[?2004l[?2004h>       return a.multiply(b).setScale(10, RM);
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return null;
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static void safeExec(Statement st, String sql){ try{ st.execute(sql);}catch(SQLException e){} }
+[?2004l[?2004h> 
+[?2004l[?2004h>   private static void buildDb(Map<String,Account> accts, List<Txn> txns,
+[?2004l[?2004h>                               String bizDate, int accounts, int valid, int skipped, String reportMd5) throws Exception {
+[?2004l[?2004h>     Class.forName("org.h2.Driver");
+[?2004l[?2004h>     Connection c = DriverManager.getConnection(JDBC_URL, "sa", "");
+[?2004l[?2004h>     try{
+[?2004l[?2004h>       c.setAutoCommit(false);
+[?2004l[?2004h>       Statement st=c.createStatement();
+[?2004l[?2004h>       try{
+[?2004l[?2004h>         safeExec(st,"DROP TABLE RUN_AUDIT");
+[?2004l[?2004h>         safeExec(st,"DROP TABLE TXNS");
+[?2004l[?2004h>         safeExec(st,"DROP TABLE ACCOUNTS");
+[?2004l[?2004h>         st.execute("CREATE TABLE ACCOUNTS(ACCOUNT_ID VARCHAR(64) PRIMARY KEY,OPENED_AT VARCHAR(10),START_BALANCE DECIMAL(18,2),BASE_APR DECIMAL(18,10),PROMO_APR DECIMAL(18,10),PROMO_DAYS INT,TIER_THRESHOLD DECIMAL(18,2),TIER_APR DECIMAL(18,10),CURRENCY VARCHAR(8),FEE_PLAN VARCHAR(32))");
+[?2004l[?2004h>         st.execute("CREATE TABLE TXNS(ROW_NUM INT PRIMARY KEY,TX_ID VARCHAR(64),ACCOUNT_ID VARCHAR(64),EFFECTIVE_DATE VARCHAR(10),AMOUNT DECIMAL(18,2),CURRENCY VARCHAR(8),STATUS VARCHAR(16),REVERSAL_OF VARCHAR(64))");
+[?2004l[?2004h>         st.execute("CREATE TABLE RUN_AUDIT(JDBC_URL VARCHAR(255),BIZ_DATE VARCHAR(10),ACCOUNTS INT,VALID_TXS INT,SKIPPED_TXS INT,REPORT_MD5 VARCHAR(64))");
+[?2004l[?2004h>       } finally { st.close(); }
+[?2004l[?2004h> 
+[?2004l[?2004h>       PreparedStatement pa=c.prepareStatement("INSERT INTO ACCOUNTS(ACCOUNT_ID,OPENED_AT,START_BALANCE,BASE_APR,PROMO_APR,PROMO_DAYS,TIER_THRESHOLD,TIER_APR,CURRENCY,FEE_PLAN) VALUES(?,?,?,?,?,?,?,?,?,?)");
+[?2004l[?2004h>       try{
+[?2004l[?2004h>         ArrayList<String> ids=new ArrayList<String>(accts.keySet());
+[?2004l[?2004h>         Collections.sort(ids);
+[?2004l[?2004h>         for(int i=0;i<ids.size();i++){
+[?2004l[?2004h>           Account a=accts.get(ids.get(i));
+[?2004l[?2004h>           pa.setString(1,a.id);
+[?2004l[?2004h>           pa.setString(2, DF.format(new Date(((long)a.openedDay)*86400000L)));
+[?2004l[?2004h>           pa.setBigDecimal(3,a.start2);
+[?2004l[?2004h>           pa.setBigDecimal(4,a.baseApr);
+[?2004l[?2004h>           pa.setBigDecimal(5,a.promoApr);
+[?2004l[?2004h>           pa.setInt(6,a.promoDays);
+[?2004l[?2004h>           pa.setBigDecimal(7,a.tierThr2);
+[?2004l[?2004h>           pa.setBigDecimal(8,a.tierApr);
+[?2004l[?2004h>           pa.setString(9,a.ccy);
+[?2004l[?2004h>           pa.setString(10,a.feePlan);
+[?2004l[?2004h>           pa.executeUpdate();
+[?2004l[?2004h>         }
+[?2004l[?2004h>       } finally { pa.close(); }
+[?2004l[?2004h> 
+[?2004l[?2004h>       PreparedStatement pt=c.prepareStatement("INSERT INTO TXNS(ROW_NUM,TX_ID,ACCOUNT_ID,EFFECTIVE_DATE,AMOUNT,CURRENCY,STATUS,REVERSAL_OF) VALUES(?,?,?,?,?,?,?,?)");
+[?2004l[?2004h>       try{
+[?2004l[?2004h>         for(int i=0;i<txns.size();i++){
+[?2004l[?2004h>           Txn t=txns.get(i);
+[?2004l[?2004h>           pt.setInt(1,t.rowNum);
+[?2004l[?2004h>           pt.setString(2,t.txId);
+[?2004l[?2004h>           pt.setString(3,t.acctId);
+[?2004l[?2004h>           pt.setString(4,t.effStr);
+[?2004l[?2004h>           pt.setBigDecimal(5,t.amt2);
+[?2004l[?2004h>           pt.setString(6,t.ccy);
+[?2004l[?2004h>           pt.setString(7,t.status);
+[?2004l[?2004h>           pt.setString(8,t.reversalOf==null?"":t.reversalOf);
+[?2004l[?2004h>           pt.executeUpdate();
+[?2004l[?2004h>         }
+[?2004l[?2004h>       } finally { pt.close(); }
+[?2004l[?2004h> 
+[?2004l[?2004h>       PreparedStatement pr=c.prepareStatement("INSERT INTO RUN_AUDIT(JDBC_URL,BIZ_DATE,ACCOUNTS,VALID_TXS,SKIPPED_TXS,REPORT_MD5) VALUES(?,?,?,?,?,?)");
+[?2004l[?2004h>       try{
+[?2004l[?2004h>         pr.setString(1,JDBC_URL);
+[?2004l[?2004h>         pr.setString(2,bizDate);
+[?2004l[?2004h>         pr.setInt(3,accounts);
+[?2004l[?2004h>         pr.setInt(4,valid);
+[?2004l[?2004h>         pr.setInt(5,skipped);
+[?2004l[?2004h>         pr.setString(6,reportMd5);
+[?2004l[?2004h>         pr.executeUpdate();
+[?2004l[?2004h>       } finally { pr.close(); }
+[?2004l[?2004h> 
+[?2004l[?2004h>       c.commit();
+[?2004l[?2004h>     } finally {
+[?2004l[?2004h>       try{ c.close(); }catch(Exception e){}
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@38af6b5d9dd5:/app# cat >> /app/src/BankBatchJob.java <<'EOF'
+[?2004l.day-b.day; }});
+    }
+
+    HashSet<String> txIdsInFile = new HashSet<String>();
+    for(int i=0;i<txns.size();i++) txIdsInFile.add(txns.get(i).txId);
+
+    // REVERSED: both rows if reversal_of points to any tx_id in file
+    HashSet<String> reversed = new HashSet<String>();
+    for(int i=0;i<txns.size();i++){
+      Txn t=txns.get(i);
+      if(t.reversalOf!=null && t.reversalOf.length()>0 && txIdsInFile.contains(t.reversalOf)){
+        reversed.add(t.txId);
+        reversed.add(t.reversalOf);
+      }
+    }
+
+    HashSet<String> seen = new HashSet<String>();
+    ArrayList<String[]> exc = new ArrayList<String[]>();
+    HashMap<String,BigDecimal> sumAdj2 = new HashMap<String,BigDecimal>();
+    int valid=0, skipped=0;
+
+    for(int i=0;i<txns.size();i++){
+      Txn t=txns.get(i);
+      String reason=null;
+
+      if(reversed.contains(t.txId)) reason="REVERSED";
+      else if(t.reversalOf!=null && t.reversalOf.length()>0 && !txIdsInFile.contains(t.reversalOf)) reason="REVERSAL_MISSING";
+      else {
+        Account a=accts.get(t.acctId);
+        if(a==null) reason="FX_MISSING";
+        else if(!t.ccy.equals(a.ccy)){
+          BigDecimal rate=resolveFx(byPair,pivots,t.ccy,a.ccy,t.effDay);
+          if(rate==null) reason="FX_MISSING";
+        }
+      }
+      if(reason==null && t.effDay>bizDay) reason="AFTER_BIZ_DATE";
+      if(reason==null && !"POSTED".equals(t.status)) reason=t.status;
+      if(reason==null && seen.contains(t.txId)) reason="DUPLICATE";
+
+      if(!seen.contains(t.txId)) seen.add(t.txId);
+
+      if(reason!=null){
+        skipped++;
+        exc.add(new String[]{String.valueOf(t.rowNum), t.txId, reason});
+        continue;
+      }
+
+      Account a=accts.get(t.acctId);
+      BigDecimal amtAcct10;
+      if(t.ccy.equals(a.ccy)) amtAcct10=t.amt2.setScale(10,RM);
+      else {
+        BigDecimal rate=resolveFx(byPair,pivots,t.ccy,a.ccy,t.effDay);
+        amtAcct10=t.amt2.setScale(10,RM).multiply(rate).setScale(10,RM);
+      }
+
+      FeeRule fr=fees.get(a.feePlan);
+      BigDecimal fee2=BD0.setScale(2,RM);
+      if(fr!=null){
+        boolean isDebit=amtAcct10.signum()<0;
+        boolean isCredit=amtAcct10.signum()>0;
+        boolean applies = "ALL".equals(fr.applies) || ("DEBIT".equals(fr.applies)&&isDebit) || ("CREDIT".equals(fr.applies)&&isCredit);
+        if(applies){
+          BigDecimal raw10 = fr.flat2.setScale(10,RM).add(fr.pct.multiply(amtAcct10.abs())).setScale(10,RM);
+          BigDecimal f2 = raw10.setScale(2,RM);
+          if(f2.compareTo(fr.min2)<0) f2=fr.min2;
+          if(f2.compareTo(fr.max2)>0) f2=fr.max2;
+          fee2=f2.setScale(2,RM);
+        }
+      }
+
+      BigDecimal adj2 = amtAcct10.setScale(2,RM).subtract(fee2).setScale(2,RM);
+      BigDecimal prev=sumAdj2.get(a.id);
+      if(prev==null) prev=BD0.setScale(2,RM);
+      sumAdj2.put(a.id, prev.add(adj2).setScale(2,RM));
+      valid++;
+    }
+
+    ArrayList<String> acctIds=new ArrayList<String>(accts.keySet());
+    Collections.sort(acctIds);
+
+    StringBuilder interest=new StringBuilder();
+    interest.append("account_id,biz_date,eod_balance,apr,daily_interest\n");
+    BigDecimal totalRaw[?2004h>   public static void main(String[] args) throws Exception {
+[?2004l[?2004h>     cleanOutput();
+[?2004l[?2004h>     String bizDate = read1(BIZ_DATE_TXT);
+[?2004lm[?2004h>     int bizDay = toDay(bizDate);
+[?2004l[?2004h> 
+[?2004l=[?2004h>     Map<String,Account> accts = loadAccounts();
+[?2004l[?2004h>     List<Txn> txns = loadTxns();
+[?2004l,[?2004h>     Map<String,FeeRule> fees = loadFees();
+[?2004l[?2004h>     List<FxRate> fxRates = loadFxRates();
+[?2004l[?2004h>     List<String> pivots = loadPivots();
+[?2004l[?2004h> 
+[?2004l[?2004h>     // index fx rates by pair, sorted by day
+[?2004l [?2004h>     HashMap<String,List<FxRate>> byPair = new HashMap<String,List<FxRate>>();
+[?2004l[?2004h>     for(int i=0;i<fxRates.size();i++){
+[?2004l[?2004h>       FxRate r=fxRates.get(i);
+[?2004l[?2004h>       String k=pair(r.from,r.to);
+[?2004l[?2004h>       List<FxRate> lst=byPair.get(k);
+[?2004le[?2004h>       if(lst==null){ lst=new ArrayList<FxRate>(); byPair.put(k,lst); }
+[?2004l[?2004h>       lst.add(r);
+[?2004l[?2004h>     }
+[?2004lale(10[?2004h>     for(Iterator<Map.Entry<String,List<FxRate>>> it=byPair.entrySet().iterator(); it.hasNext(); ){
+[?2004l [?2004h>       Map.Entry<String,List<FxRate>> e=it.next();
+[?2004l[?2004h>       Collections.sort(e.getValue(), new Comparator<FxRate>(){ public int compare(FxRate a, FxRate b){ return a.day-b.day; }});
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004ld[?2004h>     HashSet<String> txIdsInFile = new HashSet<String>();
+[?2004l[?2004h>     for(int i=0;i<txns.size();i++) txIdsInFile.add(txns.get(i).txId);
+[?2004l[?2004h> 
+[?2004l[?2004h>     // REVERSED: both rows if reversal_of points to any tx_id in file
+[?2004lp[?2004h>     HashSet<String> reversed = new HashSet<String>();
+[?2004l[?2004h>     for(int i=0;i<txns.size();i++){
+[?2004l[?2004h>       Txn t=txns.get(i);
+[?2004l[?2004h>       if(t.reversalOf!=null && t.reversalOf.length()>0 && txIdsInFile.contains(t.reversalOf)){
+[?2004l[?2004h>         reversed.add(t.txId);
+[?2004l[?2004h>         reversed.add(t.reversalOf);
+[?2004l[?2004h>       }
+[?2004lV))[?2004h>     }
+[?2004l[?2004h> 
+[?2004lB[?2004h>     HashSet<String> seen = new HashSet<String>();
+[?2004l  [?2004h>     ArrayList<String[]> exc = new ArrayList<String[]>();
+[?2004l[?2004h>     HashMap<String,BigDecimal> sumAdj2 = new HashMap<String,BigDecimal>();
+[?2004l[?2004h>     int valid=0, skipped=0;
+[?2004l[?2004h> 
+[?2004li[?2004h>     for(int i=0;i<txns.size();i++){
+[?2004l[?2004h>       Txn t=txns.get(i);
+[?2004l[?2004h>       String reason=null;
+[?2004l[?2004h> 
+[?2004ld[?2004h>       if(reversed.contains(t.txId)) reason="REVERSED";
+[?2004l[?2004h>       else if(t.reversalOf!=null && t.reversalOf.length()>0 && !txIdsInFile.contains(t.reversalOf)) reason="REVERSAL_MISSING";
+[?2004l[?2004h>       else {
+[?2004l[?2004h>         Account a=accts.get(t.acctId);
+[?2004l[?2004h>         if(a==null) reason="FX_MISSING";
+[?2004l[?2004h>         else if(!t.ccy.equals(a.ccy)){
+[?2004l[?2004h>           BigDecimal rate=resolveFx(byPair,pivots,t.ccy,a.ccy,t.effDay);
+[?2004l[?2004h>           if(rate==null) reason="FX_MISSING";
+[?2004l[?2004h>         }
+[?2004l[?2004h>       }
+[?2004l[?2004h>       if(reason==null && t.effDay>bizDay) reason="AFTER_BIZ_DATE";
+[?2004l[?2004h>       if(reason==null && !"POSTED".equals(t.status)) reason=t.status;
+[?2004l[?2004h>       if(reason==null && seen.contains(t.txId)) reason="DUPLICATE";
+[?2004l[?2004h> 
+[?2004l[?2004h>       if(!seen.contains(t.txId)) seen.add(t.txId);
+[?2004l[?2004h> 
+[?2004l[?2004h>       if(reason!=null){
+[?2004l[?2004h>         skipped++;
+[?2004l[?2004h>         exc.add(new String[]{String.valueOf(t.rowNum), t.txId, reason});
+[?2004l[?2004h>         continue;
+[?2004l[?2004h>       }
+[?2004l[?2004h> 
+[?2004l[?2004h>       Account a=accts.get(t.acctId);
+[?2004l[?2004h>       BigDecimal amtAcct10;
+[?2004l[?2004h>       if(t.ccy.equals(a.ccy)) amtAcct10=t.amt2.setScale(10,RM);
+[?2004l[?2004h>       else {
+[?2004l[?2004h>         BigDecimal rate=resolveFx(byPair,pivots,t.ccy,a.ccy,t.effDay);
+[?2004l[?2004h>         amtAcct10=t.amt2.setScale(10,RM).multiply(rate).setScale(10,RM);
+[?2004l[?2004h>       }
+[?2004l[?2004h> 
+[?2004l[?2004h>       FeeRule fr=fees.get(a.feePlan);
+[?2004l[?2004h>       BigDecimal fee2=BD0.setScale(2,RM);
+[?2004l[?2004h>       if(fr!=null){
+[?2004l[?2004h>         boolean isDebit=amtAcct10.signum()<0;
+[?2004l[?2004h>         boolean isCredit=amtAcct10.signum()>0;
+[?2004l[?2004h>         boolean applies = "ALL".equals(fr.applies) || ("DEBIT".equals(fr.applies)&&isDebit) || ("CREDIT".equals(fr.applies)&&isCredit);
+[?2004l[?2004h>         if(applies){
+[?2004l[?2004h>           BigDecimal raw10 = fr.flat2.setScale(10,RM).add(fr.pct.multiply(amtAcct10.abs())).setScale(10,RM);
+[?2004l[?2004h>           BigDecimal f2 = raw10.setScale(2,RM);
+[?2004l[?2004h>           if(f2.compareTo(fr.min2)<0) f2=fr.min2;
+[?2004l[?2004h>           if(f2.compareTo(fr.max2)>0) f2=fr.max2;
+[?2004l[?2004h>           fee2=f2.setScale(2,RM);
+[?2004l[?2004h>         }
+[?2004l[?2004h>       }
+[?2004l[?2004h> 
+[?2004l[?2004h>       BigDecimal adj2 = amtAcct10.setScale(2,RM).subtract(fee2).setScale(2,RM);
+[?2004l[?2004h>       BigDecimal prev=sumAdj2.get(a.id);
+[?2004l[?2004h>       if(prev==null) prev=BD0.setScale(2,RM);
+[?2004l[?2004h>       sumAdj2.put(a.id, prev.add(adj2).setScale(2,RM));
+[?2004l[?2004h>       valid++;
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     ArrayList<String> acctIds=new ArrayList<String>(accts.keySet());
+[?2004l[?2004h>     Collections.sort(acctIds);
+[?2004l[?2004h> 
+[?2004l[?2004h>     StringBuilder interest=new StringBuilder();
+[?2004l[?2004h>     interest.append("account_id,biz_date,eod_balance,apr,daily_interest\n");
+[?2004l[?2004h>     BigDecimal totalRaw10=BD0.setScale(10,RM);
+[?2004l[?2004h> 
+[?2004l[?2004h>     for(int i=0;i<acctIds.size();i++){
+[?2004l[?2004h>       Account a=accts.get(acctIds.get(i));
+[?2004l[?2004h>       BigDecimal adj=sumAdj2.get(a.id); if(adj==null) adj=BD0.setScale(2,RM);
+[?2004l[?2004h>       BigDecimal eod2=a.start2.add(adj).setScale(2,RM);
+[?2004l[?2004h> 
+[?2004l[?2004h>       int daysSince = bizDay - a.openedDay;
+[?2004l[?2004h>       boolean promo = a.promoDays>0 && daysSince < a.promoDays;
+[?2004l[?2004h>       boolean tier = eod2.compareTo(a.tierThr2) >= 0;
+[?2004l[?2004h> 
+[?2004l[?2004h>       BigDecimal apr=a.baseApr;
+[?2004l[?2004h>       if(tier) apr=apr.add(a.tierApr);
+[?2004l[?2004h>       if(promo) apr=apr.add(a.promoApr);
+[?2004l[?2004h>       BigDecimal apr6=apr.setScale(6,RM);
+[?2004l[?2004h> 
+[?2004l[?2004h>       BigDecimal principal2 = eod2.compareTo(BD0)>0 ? eod2 : BD0.setScale(2,RM);
+[?2004l[?2004h>       BigDecimal dailyRaw10 = principal2.setScale(10,RM).multiply(apr.setScale(10,RM)).setScale(10,RM).divide(BD365,10,RM);
+[?2004l[?2004h>       BigDecimal daily2 = dailyRaw10.setScale(2,RM);
+[?2004l[?2004h>       totalRaw10 = totalRaw10.add(dailyRaw10).setScale(10,RM);
+[?2004l[?2004h> 
+[?2004l[?2004h>       interest.append(a.id).append(',').append(bizDate).append(',')
+[?2004l[?2004h>         .append(eod2.toPlainString()).append(',').append(apr6.toPlainString()).append(',')
+[?2004l[?2004h>         .append(daily2.toPlainString()).append("\n");
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     writeUtf8(INTEREST_CSV, interest.toString());
+[?2004l[?2004h> 
+[?2004l[?2004h>     StringBuilder ex=new StringBuilder();
+[?2004l[?2004h>     ex.append("row_num,tx_id,reason\n");
+[?2004l[?2004h>     for(int i=0;i<exc.size();i++){
+[?2004l[?2004h>       String[] e=exc.get(i);
+[?2004l[?2004h>       ex.append(e[0]).append(',').append(e[1]).append(',').append(e[2]).append("\n");
+[?2004l[?2004h>     }
+[?2004l[?2004h>     writeUtf8(EXCEPTIONS_CSV, ex.toString());
+[?2004l[?2004h> 
+[?2004l[?2004h>     String reportMd5 = md5(readAll(INTEREST_CSV));
+[?2004l[?2004h>     BigDecimal total2 = totalRaw10.setScale(2,RM);
+[?2004l[?2004h> 
+[?2004l[?2004h>     String json = "{"+
+[?2004l[?2004h>       "\"biz_date\":\""+bizDate+"\","+
+[?2004l[?2004h>       "\"accounts\":"+accts.size()+","+
+[?2004l[?2004h>       "\"valid_txs\":"+valid+","+
+[?2004l[?2004h>       "\"skipped_txs\":"+skipped+","+
+[?2004l[?2004h>       "\"total_interest\":\""+total2.toPlainString()+"\","+
+[?2004l[?2004h>       "\"report_md5\":\""+reportMd5+"\""+
+[?2004l[?2004h>       "}";
+[?2004l[?2004h>     writeUtf8(STATS_JSON, json);
+[?2004l[?2004h> 
+[?2004l[?2004h>     buildDb(accts, txns, bizDate, accts.size(), valid, skipped, reportMd5);
+[?2004l[?2004h>   }
+[?2004l[?2004h> }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@38af6b5d9dd5:/app# ls -la /app/src/BankBatchJob.java; wc -l /app/src/BankBatchJob.java | cat
+[?2004l-rw-r--r-- 1 root root 19314 Jan  1 05:06 /app/src/BankBatchJob.java
+503 /app/src/BankBatchJob.java
+[?2004hroot@38af6b5d9dd5:/app# javac -cp /opt/legacy-lib/h2-1.3.176.jar -d /app/build /app/src/BankBatchJob.java
+[?2004l/app/src/BankBatchJob.java:109: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+    Date d = DF.parse(yyyyMmDd);
+    ^
+/app/src/BankBatchJob.java:303: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+          pa.setString(2, DF.format(new Date(((long)a.openedDay)*86400000L)));
+                                        ^
+2 errors
+[?2004hroot@38af6b5d9dd5:/app# cat > /app/manifest.mf <<'EOF'
+[?2004l[?2004h> Main-Class: BankBatchJob
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@38af6b5d9dd5:/app# jar cfm /app/job.jar /app/manifest.mf -C /app/build .
+[?2004l[?2004hroot@38af6b5d9dd5:/app# java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob
+[?2004lError: Could not find or load main class BankBatchJob
+[?2004hroot@38af6b5d9dd5:/app# ls -la /app/output
+[?2004ltotal 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:04 .
+drwxr-xr-x 7 root root 4096 Jan  1 05:04 ..
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/interest.csv
+[?2004lsed: can't read /app/output/interest.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/exceptions.csv
+[?2004lsed: can't read /app/output/exceptions.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# wc -l /app/output/interest.csv /app/output/exceptions.csv; echo '---'; (python - <<'PY'
+[?2004l[?2004h> import pathlib
+[?2004l[?2004h> p=pathlib.Path('/app/output/stats.json')
+[?2004l[?2004h> b=p.read_bytes()
+[?2004l[?2004h> print('stats.json bytes',len(b))
+[?2004l[?2004h> print(b.decode('utf-8'))
+[?2004l[?2004h> PY
+[?2004l[?2004h> )
+[?2004lwc: /app/output/interest.csv: No such file or directory
+wc: /app/output/exceptions.csv: No such file or directory
+0 total
+---
+Traceback (most recent call last):
+  File [35m"<stdin>"[0m, line [35m3[0m, in [35m<module>[0m
+  File [35m"/usr/local/lib/python3.13/pathlib/_abc.py"[0m, line [35m625[0m, in [35mread_bytes[0m
+    with [31mself.open[0m[1;31m(mode='rb')[0m as f:
+         [31m~~~~~~~~~[0m[1;31m^^^^^^^^^^^[0m
+  File [35m"/usr/local/lib/python3.13/pathlib/_local.py"[0m, line [35m537[0m, in [35mopen[0m
+    return [31mio.open[0m[1;31m(self, mode, buffering, encoding, errors, newline)[0m
+           [31m~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[1;35mFileNotFoundError[0m: [35m[Errno 2] No such file or directory: '/app/output/stats.json'[0m
+[?2004hroot@38af6b5d9dd5:/app# grep -n 'Date d =\|new Date(\|BigDecimal adj2 =\|total_interest' /app/src/BankBatchJob.java | head -50
+[?2004l109:    Date d = DF.parse(yyyyMmDd);
+303:          pa.setString(2, DF.format(new Date(((long)a.openedDay)*86400000L)));
+440:      BigDecimal adj2 = amtAcct10.setScale(2,RM).subtract(fee2).setScale(2,RM);
+496:      "\"total_interest\":\""+total2.toPlainString()+"\","+
+[?2004hroot@38af6b5d9dd5:/app# perl -pi -e 's/\bDate d =/java.util.Date d =/g; s/new Date\(/new java.util.Date(/g' /app/src/BankBatchJob.java
+[?2004l[?2004hroot@38af6b5d9dd5:/app# python - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> p=Path('/app/src/BankBatchJob.java')
+[?2004l[?2004h> s=p.read_text('utf-8')
+[?2004l[?2004h> s=s.replace('BigDecimal adj2 = amtAcct10.setScale(2,RM).subtract(fee2).setScale(2,RM);',
+[?2004ld now convert that to numeric (remove the wrapping quotes in the JSON itself)
+s=s.replace('"\\"total_interest\\":"+total2.toPlainString()+","+',
+            '"\\"total_interest\\":"+total2.toPlainString()+","+')
+# (Most reliable) do the plain-text replace of the original line we saw in the earlier full version:
+s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+            '"\\"total_interest\\":"+total2.toPlainString()+","+')
+# If present in the file (as shown in terminal output):
+s=s.replace('\"total_interest\":\""+total2.toPlainString()+"\",',
+            '\"total_interest\":"+total2.toPlainString()+",')
+# Now the numeric form we actually want:
+s=s.replace('\"total_interest\":"+total2.toPlainString()+",',
+            '\"total_interest\":"+total2.toPlainString()+",')
+# If still string-form in unescaped form:
+s=s.replace('"total_interest":"'+"+total2.toPlainString()+"+'",',
+            '"total_interest":'+"+total2.toPlainString()+"+'",')
+
+p.write_text(s,'utf-8')
+print('patched')
+PY
+[?2004h>             'BigDecimal adj2 = amtAcct10.subtract(fee2).setScale(2,RM);')
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+[?2004l[?2004h> # Now remove the extra quotes around total_interest (make it a number)
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":"+total2.toPlainString()+","+',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+[?2004l[?2004h> # The line above keeps the quotes; fix precisely for numeric:
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":"+total2.toPlainString()+","+',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+[?2004l[?2004h> # If the code is exactly as expected, do an exact replace:
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+[?2004l[?2004h> # Fallback: replace the actual source snippet seen earlier:
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+[?2004l[?2004h> # Final targeted replace based on the plain Java snippet:
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+[?2004l[?2004h> # If it was written without the extra escaping (common):
+[?2004l[?2004h> s=s.replace('"total_interest":"'+"+total2.toPlainString()+"+'",'+"+",
+[?2004l[?2004h>             '"total_interest":'+"+total2.toPlainString()+"+'",'+"+",
+[?2004l[?2004h>            )
+[?2004l[?2004h> # Safer: just do a direct replace of the exact line fragment
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+[?2004l[?2004h> # If still not replaced, do a regex replace
+[?2004l[?2004h> import re
+[?2004l[?2004h> s=re.sub(r'"\\"total_interest\\":\\""\+total2\.toPlainString\(\)\+"\\","\+','"\\"total_interest\\":"+total2.toPlainString()+","+',s)
+[?2004l[?2004h> # Now remove the quotes around the numeric value in JSON construction
+[?2004l[?2004h> s=re.sub(r'"\\"total_interest\\":\\""\+total2\.toPlainString\(\)\+"\\","\+','"\\"total_interest\\":"+total2.toPlainString()+","+',s)
+[?2004l[?2004h> # We actually want: "total_interest": + total2.toPlainString() + ,
+[?2004l[?2004h> s=re.sub(r'"\\"total_interest\\":\\""\+total2\.toPlainString\(\)\+"\\""', '"\\"total_interest\\":"+total2.toPlainString()', s)
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\""',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()')
+[?2004l[?2004h> # Finally, correct to numeric (no quotes) if present as the straightforward line from our intended code:
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+[?2004l[?2004h> # If the source is exactly:
+[?2004l[?2004h> #   "\"total_interest\":\""+total2.toPlainString()+"\","+
+[?2004l[?2004h> # convert to:
+[?2004l[?2004h> #   "\"total_interest\":"+total2.toPlainString()+","+
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+[?2004l[?2004h> # And now convert that to numeric (remove the wrapping quotes in the JSON itself)
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":"+total2.toPlainString()+","+',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+[?2004l[?2004h> # (Most reliable) do the plain-text replace of the original line we saw in the earlier full version:
+[?2004l[?2004h> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+[?2004l[?2004h>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+[?2004l[?2004h> # If present in the file (as shown in terminal output):
+[?2004l[?2004h> s=s.replace('\"total_interest\":\""+total2.toPlainString()+"\",',
+[?2004l[?2004h>             '\"total_interest\":"+total2.toPlainString()+",')
+[?2004l[?2004h> # Now the numeric form we actually want:
+[?2004l[?2004h> s=s.replace('\"total_interest\":"+total2.toPlainString()+",',
+[?2004l[?2004h>             '\"total_interest\":"+total2.toPlainString()+",')
+[?2004l[?2004h> # If still string-form in unescaped form:
+[?2004l[?2004h> s=s.replace('"total_interest":"'+"+total2.toPlainString()+"+'",',
+[?2004l[?2004h>             '"total_interest":'+"+total2.toPlainString()+"+'",')
+[?2004l[?2004h> 
+[?2004l[?2004h> p.write_text(s,'utf-8')
+[?2004l[?2004h> print('patched')
+[?2004l[?2004h> PY
+[?2004lpatched
+[?2004hroot@38af6b5d9dd5:/app# python - <<'PY'
+[?2004l[?2004h> import re
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> s=Path('/app/src/BankBatchJob.java').read_text('utf-8')
+[?2004l[?2004h> # Show the JSON construction area and adjusted line to confirm
+[?2004l[?2004h> for pat in [r'BigDecimal adj2 =.*', r'total_interest.*']:
+[?2004l[?2004h>     m=re.search(pat,s)
+[?2004l[?2004h>     print(pat, '=>', (m.group(0) if m else 'NOT FOUND'))
+[?2004l[?2004h> PY
+[?2004lBigDecimal adj2 =.* => BigDecimal adj2 = amtAcct10.subtract(fee2).setScale(2,RM);
+total_interest.* => total_interest\":"+total2.toPlainString()+","+
+[?2004hroot@38af6b5d9dd5:/app# rm -rf /app/build/* /app/job.jar
+[?2004l[?2004hroot@38af6b5d9dd5:/app# javac -cp /opt/legacy-lib/h2-1.3.176.jar -d /app/build /app/src/BankBatchJob.java
+[?2004l[?2004hroot@38af6b5d9dd5:/app# cat > /app/manifest.mf <<'EOF'
+[?2004l[?2004h> Main-Class: BankBatchJob
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@38af6b5d9dd5:/app# jar cfm /app/job.jar /app/manifest.mf -C /app/build .
+[?2004l[?2004hroot@38af6b5d9dd5:/app# java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob
+[?2004l[?2004hroot@38af6b5d9dd5:/app# ls -la /app/output
+[?2004ltotal 64
+drwxr-xr-x 2 root root  4096 Jan  1 05:07 .
+drwxr-xr-x 7 root root  4096 Jan  1 05:07 ..
+-rw-r--r-- 1 root root 36864 Jan  1 05:07 bankdb.h2.db
+-rw-r--r-- 1 root root   411 Jan  1 05:07 bankdb.trace.db
+-rw-r--r-- 1 root root   259 Jan  1 05:07 exceptions.csv
+-rw-r--r-- 1 root root   206 Jan  1 05:07 interest.csv
+-rw-r--r-- 1 root root   139 Jan  1 05:07 stats.json
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/interest.csv
+[?2004laccount_id,biz_date,eod_balance,apr,daily_interest
+A1001,2024-03-01,7965.47,0.012000,0.26
+A1002,2024-03-01,5127.11,0.009000,0.13
+A1003,2024-03-01,-0.80,0.020000,0.00
+A1004,2024-03-01,36500.00,0.010050,1.00
+[?2004hroot@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/exceptions.csv
+[?2004lrow_num,tx_id,reason
+2,T002,AFTER_BIZ_DATE
+3,T003,PENDING
+5,T004,DUPLICATE
+6,T005,REVERSED
+7,T006,REVERSED
+9,T008,REVERSAL_MISSING
+10,T009,REVERSED
+11,T010,REVERSED
+13,T012,AFTER_BIZ_DATE
+17,T016,FX_MISSING
+18,T016,DUPLICATE
+19,T017,REVERSED
+20,T018,REVERSED
+[?2004hroot@38af6b5d9dd5:/app# python - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> p=Path('/app/output/stats.json')
+[?2004l[?2004h> b=p.read_bytes()
+[?2004l[?2004h> print('stats.json endswith newline?', b[-1:]==b"\n")
+[?2004l[?2004h> print('stats.json newline_count', b.count(b"\n"))
+[?2004l[?2004h> print(b.decode('utf-8'))
+[?2004l[?2004h> PY
+[?2004lstats.json endswith newline? False
+stats.json newline_count 0
+{"biz_date":"2024-03-01","accounts":4,"valid_txs":7,"skipped_txs":13,"total_interest":1.39,"report_md5":"d6e6bfa87102a7be797a462843f8a087"}
+[?2004hroot@38af6b5d9dd5:/app# python - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> for f in ['/app/output/interest.csv','/app/output/exceptions.csv']:
+[?2004l[?2004h>     b=Path(f).read_bytes()
+[?2004l[?2004h>     print(f, 'last_byte', b[-1], 'newline_count', b.count(b"\n"))
+[?2004l[?2004h> PY
+[?2004l/app/output/interest.csv last_byte 10 newline_count 5
+/app/output/exceptions.csv last_byte 10 newline_count 14
+[?2004hroot@38af6b5d9dd5:/app# cp -a /app/output /app/output_run1
+[?2004l[?2004hroot@38af6b5d9dd5:/app# java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob
+[?2004l[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/interest.csv /app/output/interest.csv || true
+[?2004ldiff: /app/output_run1/interest.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/exceptions.csv /app/output/exceptions.csv || true
+[?2004ldiff: /app/output_run1/exceptions.csv: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/stats.json /app/output/stats.json || true
+[?2004ldiff: /app/output_run1/stats.json: No such file or directory
+[?2004hroot@38af6b5d9dd5:/app# grep -n 'buildDb\(accts' -n /app/src/BankBatchJob.java
+[?2004lgrep: Unmatched ( or \(
+[?2004hroot@38af6b5d9dd5:/app# perl -0777 -pi -e 's/buildDb\(accts, txns, bizDate, accts\.size\(\), valid, skipped, reportMd5\);\n\s*\}/buildDb(accts, txns, bizDate, accts.size(), valid, skipped, reportMd5);\n    del(new File(OUT_DIR, "bankdb.trace.db"));\n    del(new File(OUT_DIR, "bankdb.lock.db"));\n  }/s' /app/src/BankBatchJob.java
+[?2004l[?2004hroot@38af6b5d9dd5:/app# tail -n 25 /app/src/BankBatchJob.java
+[?2004l    ex.append("row_num,tx_id,reason\n");
+    for(int i=0;i<exc.size();i++){
+      String[] e=exc.get(i);
+      ex.append(e[0]).append(',').append(e[1]).append(',').append(e[2]).append("\n");
+    }
+    writeUtf8(EXCEPTIONS_CSV, ex.toString());
+
+    String reportMd5 = md5(readAll(INTEREST_CSV));
+    BigDecimal total2 = totalRaw10.setScale(2,RM);
+
+    String json = "{"+
+      "\"biz_date\":\""+bizDate+"\","+
+      "\"accounts\":"+accts.size()+","+
+      "\"valid_txs\":"+valid+","+
+      "\"skipped_txs\":"+skipped+","+
+      "\"total_interest\":"+total2.toPlainString()+","+
+      "\"report_md5\":\""+reportMd5+"\""+
+      "}";
+    writeUtf8(STATS_JSON, json);
+
+    buildDb(accts, txns, bizDate, accts.size(), valid, skipped, reportMd5);
+    del(new File(OUT_DIR, "bankdb.trace.db"));
+    del(new File(OUT_DIR, "bankdb.lock.db"));
+  }
+}
+[?2004hroot@38af6b5d9dd5:/app# rm -rf /app/build/* /app/job.jar /app/manifest.mf
+[?2004l[?2004hroot@38af6b5d9dd5:/app# javac -cp /opt/legacy-lib/h2-1.3.176.jar -d /app/build /app/src/BankBatchJob.java
+[?2004l[?2004hroot@38af6b5d9dd5:/app# cat > /app/manifest.mf <<'EOF'
+[?2004l[?2004h> Main-Class: BankBatchJob
+[?2004l[?2004h> Class-Path: /opt/legacy-lib/h2-1.3.176.jar
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@38af6b5d9dd5:/app# jar cfm /app/job.jar /app/manifest.mf -C /app/build .
+[?2004l[?2004hroot@38af6b5d9dd5:/app# java -jar /app/job.jar
+[?2004l[?2004hroot@38af6b5d9dd5:/app# ls -la /app/output
+[?2004ltotal 60
+drwxr-xr-x 2 root root  4096 Jan  1 05:08 .
+drwxr-xr-x 7 root root  4096 Jan  1 05:08 ..
+-rw-r--r-- 1 root root 36864 Jan  1 05:08 bankdb.h2.db
+-rw-r--r-- 1 root root   259 Jan  1 05:08 exceptions.csv
+-rw-r--r-- 1 root root   206 Jan  1 05:08 interest.csv
+-rw-r--r-- 1 root root   139 Jan  1 05:08 stats.json
+[?2004hroot@38af6b5d9dd5:/app# rm -rf /app/output_run1 && mkdir -p /app/output_run1 && cp -a /app/output/* /app/output_run1/
+[?2004l[?2004hroot@38af6b5d9dd5:/app# md5sum /app/output_run1/interest.csv /app/output_run1/exceptions.csv /app/output_run1/stats.json | cat
+[?2004ld6e6bfa87102a7be797a462843f8a087  /app/output_run1/interest.csv
+c831611db871e55efef11a7ba6592e51  /app/output_run1/exceptions.csv
+741a9e6d2f16e968b3448bd99bcd7a44  /app/output_run1/stats.json
+[?2004hroot@38af6b5d9dd5:/app# java -jar /app/job.jar
+[?2004l[?2004hroot@38af6b5d9dd5:/app# md5sum /app/output/interest.csv /app/output/exceptions.csv /app/output/stats.json | cat
+[?2004ld6e6bfa87102a7be797a462843f8a087  /app/output/interest.csv
+c831611db871e55efef11a7ba6592e51  /app/output/exceptions.csv
+741a9e6d2f16e968b3448bd99bcd7a44  /app/output/stats.json
+[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/interest.csv /app/output/interest.csv || true
+[?2004l[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/exceptions.csv /app/output/exceptions.csv || true
+[?2004l[?2004hroot@38af6b5d9dd5:/app# diff -u /app/output_run1/stats.json /app/output/stats.json || true
+[?2004l[?2004hroot@38af6b5d9dd5:/app# python - <<'PY'
+[?2004l[?2004h> import subprocess, re
+[?2004l[?2004h> # verify Java 7 bytecode major version (should be 51)
+[?2004l[?2004h> out=subprocess.check_output(['javap','-verbose','-classpath','/app/job.jar','BankBatchJob']).decode('utf-8','ignore')
+[?2004l[?2004h> m=re.search(r'major version: (\d+)', out)
+[?2004l[?2004h> print('major_version', m.group(1) if m else 'N/A')
+[?2004l[?2004h> PY
+[?2004lTraceback (most recent call last):
+  File [35m"<stdin>"[0m, line [35m3[0m, in [35m<module>[0m
+  File [35m"/usr/local/lib/python3.13/subprocess.py"[0m, line [35m472[0m, in [35mcheck_output[0m
+    return [31mrun[0m[1;31m(*popenargs, stdout=PIPE, timeout=timeout, check=True,[0m
+           [31m~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+               [1;31m**kwargs)[0m.stdout
+               [1;31m^^^^^^^^^[0m
+  File [35m"/usr/local/lib/python3.13/subprocess.py"[0m, line [35m554[0m, in [35mrun[0m
+    with [31mPopen[0m[1;31m(*popenargs, **kwargs)[0m as process:
+         [31m~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"/usr/local/lib/python3.13/subprocess.py"[0m, line [35m1036[0m, in [35m__init__[0m
+    [31mself._execute_child[0m[1;31m(args, executable, preexec_fn, close_fds,[0m
+    [31m~~~~~~~~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+                        [1;31mpass_fds, cwd, env,[0m
+                        [1;31m^^^^^^^^^^^^^^^^^^^[0m
+    ...<5 lines>...
+                        [1;31mgid, gids, uid, umask,[0m
+                        [1;31m^^^^^^^^^^^^^^^^^^^^^^[0m
+                        [1;31mstart_new_session, process_group)[0m
+                        [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"/usr/local/lib/python3.13/subprocess.py"[0m, line [35m1966[0m, in [35m_execute_child[0m
+    raise child_exception_type(errno_num, err_msg, err_filename)
+[1;35mFileNotFoundError[0m: [35m[Errno 2] No such file or directory: 'javap'[0m
+[?2004hroot@38af6b5d9dd5:/app# ls -la /app/job.jar; jar tf /app/job.jar | head -50
+[?2004l-rw-r--r-- 1 root root 12437 Jan  1 05:08 /app/job.jar
+META-INF/
+META-INF/MANIFEST.MF
+BankBatchJob$FxRate.class
+BankBatchJob$Account.class
+BankBatchJob$1.class
+BankBatchJob.class
+BankBatchJob$FeeRule.class
+BankBatchJob$Txn.class
+[?2004hroot@38af6b5d9dd5:/app# python - <<'PY'
+[?2004l[?2004h> import zipfile, struct
+[?2004l[?2004h> z=zipfile.ZipFile('/app/job.jar')
+[?2004l[?2004h> b=z.read('BankBatchJob.class')
+[?2004l[?2004h> # ClassFile: magic u4, minor u2, major u2
+[?2004l[?2004h> magic, minor, major = struct.unpack('>IHH', b[:8])
+[?2004l[?2004h> print('magic', hex(magic), 'minor', minor, 'major', major)
+[?2004l[?2004h> PY
+[?2004lmagic 0xcafebabe minor 0 major 51
+[?2004hroot@38af6b5d9dd5:/app# java -cp /opt/legacy-lib/h2-1.3.176.jar org.h2.tools.Shell -url "jdbc:h2:/app/output/bankdb;MODE=DB2" -user sa -password "" -sql "SELECT COUNT(*) AS ACCOUNTS FROM ACCOUNTS; SELECT MIN(ROW_NUM) AS MIN_ROW, MAX(ROW_NUM) AS MAX_ROW, COUNT(*) AS TXNS FROM TXNS; SELECT COUNT(*) AS RUNS FROM RUN_AUDIT; SELECT JDBC_URL,BIZ_DATE,ACCOUNTS,VALID_TXS,SKIPPED_TXS,REPORT_MD5 FROM RUN_AUDIT;"
+[?2004lACCOUNTS
+4
+(1 row, 1 ms)
+MIN_ROW | MAX_ROW | TXNS
+1       | 20      | 20
+(1 row, 1 ms)
+RUNS
+1
+(1 row, 0 ms)
+JDBC_URL                            | BIZ_DATE   | ACCOUNTS | VALID_TXS | SKIPPED_TXS | REPORT_MD5
+jdbc:h2:/app/output/bankdb;MODE=DB2 | 2024-03-01 | 4        | 7         | 13          | d6e6bfa87102a7be797a462843f8a087
+(1 row, 1 ms)
+[?2004hroot@38af6b5d9dd5:/app# python - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> for f in ['interest.csv','exceptions.csv','stats.json','bankdb.h2.db']:
+[?2004l[?2004h>     p=Path('/app/output')/f
+[?2004l[?2004h>     print(f, 'exists', p.exists(), 'size', p.stat().st_size if p.exists() else None)
+[?2004l[?2004h> # newline rules
+[?2004l[?2004h> b=(Path('/app/output')/'stats.json').read_bytes()
+[?2004l[?2004h> print('stats.json newline_count', b.count(b'\n'))
+[?2004l[?2004h> for f in ['interest.csv','exceptions.csv']:
+[?2004l[?2004h>     b=(Path('/app/output')/f).read_bytes()
+[?2004l[?2004h> print('interest.csv endswith LF', (Path('/app/output')/'interest.csv').read_bytes()[-1:]==b'\n')
+[?2004l[?2004h> print('exceptions.csv endswith LF', (Path('/app/output')/'exceptions.csv').read_bytes()[-1:]==b'\n')
+[?2004l[?2004h> PY
+[?2004linterest.csv exists True size 206
+exceptions.csv exists True size 259
+stats.json exists True size 139
+bankdb.h2.db exists True size 36864
+stats.json newline_count 0
+interest.csv endswith LF True
+exceptions.csv endswith LF True
+[?2004hroot@38af6b5d9dd5:/app# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/agent.cast[0m
+[?2004hroot@38af6b5d9dd5:/app# 

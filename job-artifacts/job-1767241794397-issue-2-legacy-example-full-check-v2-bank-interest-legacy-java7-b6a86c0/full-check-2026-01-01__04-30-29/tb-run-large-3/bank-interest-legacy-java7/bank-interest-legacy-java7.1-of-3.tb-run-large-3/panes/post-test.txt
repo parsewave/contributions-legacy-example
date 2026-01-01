@@ -1,0 +1,110 @@
+root@38af6b5d9dd5:/app# bash /tests/run-tests.sh; tmux wait -S done
+===================================================================== test session starts ======================================================================
+platform linux -- Python 3.13.1, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /tests
+collected 1 item
+
+../tests/test_outputs.py::test_outputs_via_java_validator FAILED                                                                                         [100%]
+
+=========================================================================== FAILURES ===========================================================================
+_______________________________________________________________ test_outputs_via_java_validator ________________________________________________________________
+
+    def test_outputs_via_java_validator():
+        """Runs the job end-to-end and validates outputs + key runtime constraints."""
+        out_dir = Path("/app/output")
+        if out_dir.exists():
+            shutil.rmtree(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        data_files = {
+            "/app/data/accounts.csv": "505829c96c9fa568cf70abf7c52247d5",
+            "/app/data/transactions.csv": "ad100f16f2e9b52929da8eca55b3edad",
+            "/app/data/biz_date.txt": "4a58c5b49dafc91047e9f999ede44581",
+            "/app/data/fx_rates.csv": "d351af4cc717a6d8d9353f53d8616c05",
+            "/app/data/fx_pivots.csv": "31e9e031a576af3d943424f47d9f9390",
+            "/app/data/fee_rules.csv": "a2a8a66a3db722b2f4a051612c8e8bd7",
+        }
+        for path, expected_md5 in data_files.items():
+            got = hashlib.md5(Path(path).read_bytes()).hexdigest()
+            assert got == expected_md5, f"input modified before run: {path}"
+        job_jar = Path("/app/job.jar")
+        assert job_jar.exists(), "/app/job.jar is missing"
+        assert job_jar.stat().st_size > 0, "/app/job.jar is empty"
+        with zipfile.ZipFile(job_jar, "r") as zf:
+            class_entries = [n for n in zf.namelist() if n.endswith(".class")]
+            assert class_entries, "/app/job.jar has no class files"
+            class_bytes = []
+            for entry in class_entries:
+                raw = zf.read(entry)
+                assert raw[:4] == b"\xCA\xFE\xBA\xBE", "invalid class file in /app/job.jar"
+                major = int.from_bytes(raw[6:8], "big")
+                assert major == 51, f"/app/job.jar must be Java 7 bytecode (major=51), got {major}"
+                class_bytes.append(raw)
+            literals = []
+            for blob in class_bytes:
+                literals.extend(_classfile_utf8_strings(blob))
+            jdbc_literals = [
+                s for s in literals
+                if s.startswith("jdbc:h2:") and "/app/output/bankdb" in s and "MODE=DB2" in s
+            ]
+            assert jdbc_literals, "jar must include a JDBC URL literal with /app/output/bankdb and MODE=DB2"
+            assert len(set(jdbc_literals)) == 1, "jar must include exactly one JDBC URL literal value"
+            assert len(jdbc_literals) == 1, "jar must include the JDBC URL literal only once"
+        agent_build = Path("/tmp/jdbc_probe_agent")
+        if agent_build.exists():
+            shutil.rmtree(agent_build)
+        agent_build.mkdir(parents=True, exist_ok=True)
+        agent_jar = _build_jdbc_probe_agent(agent_build)
+        legacy_cp = "/opt/legacy-lib/*"
+        env = os.environ.copy()
+
+        def run_job(marker_path: Path) -> None:
+            env["JAVA_TOOL_OPTIONS"] = f"-javaagent:{agent_jar}={marker_path}"
+            subprocess.check_call(["java", "-cp", f"{job_jar}:{legacy_cp}", "BankBatchJob"], cwd="/app", env=env)
+            marker_text = marker_path.read_text(encoding="utf-8") if marker_path.exists() else ""
+            marker_lines = marker_text.splitlines()
+            url = marker_lines[0] if len(marker_lines) > 0 else ""
+            user = marker_lines[1] if len(marker_lines) > 1 else ""
+            password = marker_lines[2] if len(marker_lines) > 2 else ""
+            assert url.startswith("jdbc:h2:"), "job must open an H2 JDBC connection at runtime"
+            assert "MODE=DB2" in url, "opened JDBC URL must include MODE=DB2"
+            assert "/app/output/bankdb" in url, "opened JDBC URL must use the /app/output/bankdb database file"
+            assert url in jdbc_literals, "opened JDBC URL must match a single literal in the jar"
+            assert user == "sa", "H2 connection user must be 'sa'"
+            assert password == "", "H2 connection password must be empty"
+        run_job(agent_build / f"marker_{secrets.token_hex(8)}.txt")
+        first_interest = Path("/app/output/interest.csv").read_bytes()
+        first_ex = Path("/app/output/exceptions.csv").read_bytes()
+        first_stats = Path("/app/output/stats.json").read_bytes()
+        run_job(agent_build / f"marker_{secrets.token_hex(8)}.txt")
+        assert Path("/app/output/interest.csv").read_bytes() == first_interest, "interest.csv must be identical across re-runs"
+        assert Path("/app/output/exceptions.csv").read_bytes() == first_ex, "exceptions.csv must be identical across re-runs"
+        assert Path("/app/output/stats.json").read_bytes() == first_stats, "stats.json must be identical across re-runs"
+        (
+            expected_interest,
+            expected_exceptions,
+            expected_stats,
+            expected_valid,
+            expected_skipped,
+            expected_biz,
+            expected_accounts,
+            expected_report_md5,
+        ) = _compute_expected()
+        assert Path("/app/output/interest.csv").read_text(encoding="utf-8") == expected_interest, "interest.csv mismatch"
+        assert Path("/app/output/exceptions.csv").read_text(encoding="utf-8") == expected_exceptions, "exceptions.csv mismatch"
+>       assert Path("/app/output/stats.json").read_text(encoding="utf-8") == expected_stats, "stats.json mismatch"
+E       AssertionError: stats.json mismatch
+E       assert '{"biz_date":...62843f8a087"}' == '{"biz_date":...62843f8a087"}'
+E
+E         - {"biz_date":"2024-03-01","accounts":4,"valid_txs":7,"skipped_txs":13,"total_interest":"1.39","report_md5":"d6e6bfa87102a7be797a462843f8a087"}
+E         ?                                                                                       -    -
+E         + {"biz_date":"2024-03-01","accounts":4,"valid_txs":7,"skipped_txs":13,"total_interest":1.39,"report_md5":"d6e6bfa87102a7be797a462843f8a087"}
+
+/tests/test_outputs.py:416: AssertionError
+--------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -javaagent:/tmp/jdbc_probe_agent/jdbc-probe-agent.jar=/tmp/jdbc_probe_agent/marker_366f358a502bd539.txt
+Picked up JAVA_TOOL_OPTIONS: -javaagent:/tmp/jdbc_probe_agent/jdbc-probe-agent.jar=/tmp/jdbc_probe_agent/marker_a44c0739dd694570.txt
+=================================================================== short test summary info ====================================================================
+FAILED ../tests/test_outputs.py::test_outputs_via_java_validator - AssertionError: stats.json mismatch
+====================================================================== 1 failed in 1.40s =======================================================================
+root@38af6b5d9dd5:/app#

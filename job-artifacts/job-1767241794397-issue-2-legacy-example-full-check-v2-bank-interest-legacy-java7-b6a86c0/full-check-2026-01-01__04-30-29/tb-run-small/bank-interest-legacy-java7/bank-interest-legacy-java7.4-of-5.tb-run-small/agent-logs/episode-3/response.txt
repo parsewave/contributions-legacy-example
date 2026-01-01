@@ -1,0 +1,11 @@
+{
+  "analysis": "The /app directory only contains the 'data' subdirectory and no Java source files, build scripts, or a job.jar. To compile and run the BankBatchJob we need the Java source (or a compiled jar) which is currently missing. The next step is to check for any hidden files or directories that might contain the source code or jar, by listing all entries including those starting with a dot.",
+  "plan": "Run 'ls -la' in /app to display hidden files and verify if any source code or pre‑compiled jar is present.",
+  "commands": [
+    {
+      "keystrokes": "ls -la\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

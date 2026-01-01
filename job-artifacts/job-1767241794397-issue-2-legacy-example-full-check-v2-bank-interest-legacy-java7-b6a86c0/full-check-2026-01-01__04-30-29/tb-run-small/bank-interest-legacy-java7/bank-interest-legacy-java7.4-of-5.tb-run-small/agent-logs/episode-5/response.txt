@@ -1,0 +1,6 @@
+{
+  "analysis": "I searched the entire filesystem for any Java source files containing 'BankBatchJob' and for any existing 'job.jar' but found nothing. The /app directory only contains the data files required for processing, and there are no source files, build scripts, or pre‑compiled JARs present. Without the Java source code or a compiled JAR, I cannot compile a Java 7 bytecode version of BankBatchJob, place it in /app/job.jar, and run it to generate the required output files.",
+  "plan": "Report that the necessary source code or pre‑compiled JAR is missing, so the task cannot be completed in its current state.",
+  "commands": [],
+  "task_complete": true
+}

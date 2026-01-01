@@ -1,0 +1,75 @@
+{
+  "analysis": "The job now compiles and runs, producing all required outputs plus an extra H2 trace file (bankdb.trace.db). stats.json is correctly single-line with no newline, and CSVs end with LF. Determinism check failed because the backup copy was made as a directory copy (likely /app/output_run1/output/...) so the diff paths were wrong. We should (1) stop producing extra trace output by deleting bankdb.trace.db after DB creation, (2) rebuild job.jar manifest to include H2 in Class-Path so `java -jar /app/job.jar` works, and (3) redo the determinism check with a correct file copy layout.",
+  "plan": "1) Patch BankBatchJob.java to delete bankdb.trace.db (and lock) after building the DB.\n2) Recompile and rebuild /app/job.jar with a manifest that includes both Main-Class and Class-Path pointing to /opt/legacy-lib/h2-1.3.176.jar.\n3) Run via `java -jar /app/job.jar` to validate runtime.\n4) Perform determinism check: copy output files into /app/output_run1, rerun, then diff and md5sum.",
+  "commands": [
+    {
+      "keystrokes": "grep -n 'buildDb\\(accts' -n /app/src/BankBatchJob.java\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "perl -0777 -pi -e 's/buildDb\\(accts, txns, bizDate, accts\\.size\\(\\), valid, skipped, reportMd5\\);\\n\\s*\\}/buildDb(accts, txns, bizDate, accts.size(), valid, skipped, reportMd5);\\n    del(new File(OUT_DIR, \"bankdb.trace.db\"));\\n    del(new File(OUT_DIR, \"bankdb.lock.db\"));\\n  }/s' /app/src/BankBatchJob.java\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "tail -n 25 /app/src/BankBatchJob.java\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "rm -rf /app/build/* /app/job.jar /app/manifest.mf\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "javac -cp /opt/legacy-lib/h2-1.3.176.jar -d /app/build /app/src/BankBatchJob.java\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "cat > /app/manifest.mf <<'EOF'\nMain-Class: BankBatchJob\nClass-Path: /opt/legacy-lib/h2-1.3.176.jar\nEOF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "jar cfm /app/job.jar /app/manifest.mf -C /app/build .\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "java -jar /app/job.jar\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "ls -la /app/output\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "rm -rf /app/output_run1 && mkdir -p /app/output_run1 && cp -a /app/output/* /app/output_run1/\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "md5sum /app/output_run1/interest.csv /app/output_run1/exceptions.csv /app/output_run1/stats.json | cat\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "java -jar /app/job.jar\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "md5sum /app/output/interest.csv /app/output/exceptions.csv /app/output/stats.json | cat\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "diff -u /app/output_run1/interest.csv /app/output/interest.csv || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "diff -u /app/output_run1/exceptions.csv /app/output/exceptions.csv || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "diff -u /app/output_run1/stats.json /app/output/stats.json || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "python - <<'PY'\nimport subprocess, re\n# verify Java 7 bytecode major version (should be 51)\nout=subprocess.check_output(['javap','-verbose','-classpath','/app/job.jar','BankBatchJob']).decode('utf-8','ignore')\nm=re.search(r'major version: (\\d+)', out)\nprint('major_version', m.group(1) if m else 'N/A')\nPY\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+}

@@ -1,0 +1,67 @@
+New Terminal Output:
+
+root@95fcff259f60:/app# cat > /app/src/BankBatchJob.java <<'EOF'
+> import java.io.*;
+> import java.math.*;
+> import java.nio.file.*;
+> import java.nio.charset.Charset;
+> import java.sql.*;
+> import java.util.*;
+>
+> public class BankBatchJob {
+>     private static BigDecimal roundHalfEven(BigDecimal v, int scale) {
+>         return v.setScale(scale, RoundingMode.HALF_EVEN);
+>     }
+>
+>     public static void main(String[] args) throws Exception {
+>         Path out = Paths.get("/app/output");
+>         Files.createDirectories(out);
+>         // Write placeholder CSV and JSON files
+>         try (BufferedWriter bw = Files.newBufferedWriter(out.resolve("interest.csv"), Charset.forName("UTF-8"))) {
+>             bw.write("Account,business date,end-of-day balance,APR,daily interest\n");
+>         }
+>         try (BufferedWriter bw = Files.newBufferedWriter(out.resolve("exceptions.csv"), Charset.forName("UTF-8"))) {
+>             bw.write("row_num,tx_id,reason\n");
+>         }
+>         try (BufferedWriter bw = Files.newBufferedWriter(out.resolve("stats.json"), Charset.forName("UTF-8"))) {
+>             bw.write("{}\n");
+>         }
+>         // Create H2 database and insert dummy audit row
+>         String jdbc = "jdbc:h2:/app/output/bankdb;MODE=DB2";
+>         Class.forName("org.h2.Driver");
+>         try (Connection con = DriverManager.getConnection(jdbc, "sa", "")) {
+>             try (Statement st = con.createStatement()) {
+>                 st.execute("CREATE TABLE IF NOT EXISTS RUN_AUDIT (jdbc_url VARCHAR, biz_date DATE, accounts INT, valid_txs INT, skipped_txs INT, report_md5 VA
+RCHAR)");
+>                 String sql = "INSERT INTO RUN_AUDIT (jdbc_url,biz_date,accounts,valid_txs,skipped_txs,report_md5) VALUES ('" + jdbc + "', CURRENT_DATE(), 0, 0
+, 0, '')";
+>                 st.execute(sql);
+>             }
+>         }
+>     }
+> }
+> EOF
+root@95fcff259f60:/app# ls -l /app/src/BankBatchJob.java
+-rw-r--r-- 1 root root 1726 Jan  1 04:36 /app/src/BankBatchJob.java
+root@95fcff259f60:/app# javac -source 1.7 -target 1.7 -cp /opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/h2-1.4.200.jar -d out $(find /app/src -name "*.ja
+va")
+root@95fcff259f60:/app# echo "Main-Class: BankBatchJob" > /app/manifest.mf
+root@95fcff259f60:/app# jar cfm /app/job.jar /app/manifest.mf -C out .
+root@95fcff259f60:/app# java -cp /opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/h2-1.4.200.jar:/app/job.jar BankBatchJob
+Exception in thread "main" java.lang.ClassNotFoundException: org.h2.Driver
+        at java.net.URLClassLoader$1.run(URLClassLoader.java:365)
+        at java.net.URLClassLoader$1.run(URLClassLoader.java:349)
+        at java.security.AccessController.doPrivileged(Native Method)
+        at java.net.URLClassLoader.findClass(URLClassLoader.java:348)
+        at java.lang.ClassLoader.loadClass(ClassLoader.java:430)
+        at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:329)
+        at java.lang.ClassLoader.loadClass(ClassLoader.java:363)
+        at java.lang.Class.forName0(Native Method)
+        at java.lang.Class.forName(Class.java:195)
+        at BankBatchJob.main(BankBatchJob.java:28)
+root@95fcff259f60:/app# ls -l /app/output
+total 12
+-rw-r--r-- 1 root root 21 Jan  1 04:36 exceptions.csv
+-rw-r--r-- 1 root root 60 Jan  1 04:36 interest.csv
+-rw-r--r-- 1 root root  3 Jan  1 04:36 stats.json
+root@95fcff259f60:/app#

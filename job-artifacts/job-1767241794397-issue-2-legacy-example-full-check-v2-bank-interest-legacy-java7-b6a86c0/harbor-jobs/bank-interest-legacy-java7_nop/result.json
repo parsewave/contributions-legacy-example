@@ -1,0 +1,27 @@
+{
+    "id": "dd060808-af33-4290-93fd-46cbad8b8a69",
+    "started_at": "2026-01-01T04:30:45.245771",
+    "finished_at": "2026-01-01T04:32:05.747560",
+    "n_total_trials": 1,
+    "stats": {
+        "n_trials": 1,
+        "n_errors": 1,
+        "evals": {
+            "nop__adhoc": {
+                "n_trials": 0,
+                "n_errors": 1,
+                "metrics": [
+                    {
+                        "mean": 0.0
+                    }
+                ],
+                "reward_stats": {},
+                "exception_stats": {
+                    "RewardFileNotFoundError": [
+                        "bank-interest-legacy-java7__aPSfvEL"
+                    ]
+                }
+            }
+        }
+    }
+}

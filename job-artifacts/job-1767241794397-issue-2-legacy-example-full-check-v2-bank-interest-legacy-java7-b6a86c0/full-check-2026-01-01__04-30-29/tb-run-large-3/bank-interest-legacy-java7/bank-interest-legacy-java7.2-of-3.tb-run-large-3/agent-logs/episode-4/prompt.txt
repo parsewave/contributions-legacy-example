@@ -1,0 +1,239 @@
+New Terminal Output:
+
+root@d16f2fa7194e:/app# rm -rf /app/build/* /app/job.jar /app/src/BankBatchJob.java
+root@d16f2fa7194e:/app# mkdir -p /app/src /app/build /app/output
+root@d16f2fa7194e:/app# cat > /app/src/BankBatchJob.java <<'JAVA'
+> import java.io.*;
+> import java.math.*;
+> import java.nio.charset.Charset;
+> import java.security.MessageDigest;
+> import java.sql.*;
+> import java.text.ParseException;
+> import java.text.SimpleDateFormat;
+> import java.util.*;
+>
+ > public class BankBatchJob {
+>
+>     private static final Charset UTF8 = Charset.forName("UTF-8");
+s>     private static final RoundingMode HALF_EVEN = RoundingMode.HALF_EVEN;
+>
+)>     private static final File DATA_DIR = new File("/app/data");
+>     private static final File OUT_DIR = new File("/app/output");
+>
+>     // Must be a single literal string containing MODE=DB2 and /app/output/bankdb
+>     private static final String JDBC_URL = "jdbc:h2:/app/output/bankdb;MODE=DB2";
+>
+.>     public static void main(String[] args) throws Exception {
+ c>         ensureCleanOutputDir();
+>
+F>         String bizDate = readFirstLine(new File(DATA_DIR, "biz_date.txt")).trim();
+>         int bizDay = parseDay(bizDate);
+>
+>         Map<String, FeeRule> feeRules = loadFeeRules(new File(DATA_DIR, "fee_rules.csv"));
+>         List<String> pivots = loadPivots(new File(DATA_DIR, "fx_pivots.csv"));
+sv>         FxBook fxBook = loadFxRates(new File(DATA_DIR, "fx_rates.csv"));
+>
+>         LinkedHashMap<String, Account> accounts = loadAccounts(new File(DATA_DIR, "accounts.csv"));
+>         List<Txn> txns = loadTxns(new File(DATA_DIR, "transactions.csv"));
+>
+ >         // Precompute reversal relationships: if reversal_of points to any tx_id in file -> both rows REVERSED
+>         HashSet<String> allTxIds = new HashSet<String>();
+>         for (Txn t : txns) allTxIds.add(t.txId);
+   >         HashSet<String> reversedTxIds = new HashSet<String>();
+rite>         for (Txn t : txns) {
+ ">             if (t.reversalOf != null && t.reversalOf.length() > 0 && allTxIds.contains(t.reversalOf)) {
+>                 reversedTxIds.add(t.txId);
+n>                 reversedTxIds.add(t.reversalOf);
+>             }
+>         }
+>
+T>         // H2 DB: create and load ACCOUNTS + TXNS (all rows)
+>         createAndLoadDb(accounts, txns);
+>
+>         // Process txns into exceptions + per-account adjustments
+>         LinkedHashMap<String, BigDecimal> acctAdjSum = new LinkedHashMap<String, BigDecimal>();
+>         for (String acctId : accounts.keySet()) {
+>             acctAdjSum.put(acctId, bd("0.00"));
+>         }
+>
+>         List<ExceptionRow> exceptions = new ArrayList<ExceptionRow>();
+>         int validTxs = 0;
+>         int skippedTxs = 0;
+>
+>         HashSet<String> seenTxIds = new HashSet<String>();
+>
+>         for (Txn t : txns) {
+>             boolean isDup = seenTxIds.contains(t.txId);
+>             if (!isDup) seenTxIds.add(t.txId);
+>
+>             String reason = null;
+>
+>             // Reasons in required precedence order
+>             if (reversedTxIds.contains(t.txId)) {
+>                 reason = "REVERSED";
+>             } else if (t.reversalOf != null && t.reversalOf.length() > 0 && !allTxIds.contains(t.reversalOf)) {
+>                 reason = "REVERSAL_MISSING";
+>             } else {
+>                 Account acct = accounts.get(t.accountId);
+>                 if (acct == null) {
+>                     // Not specified in the required list; still record a skip reason
+>                     reason = "ACCOUNT_MISSING";
+>                 } else {
+>                     BigDecimal fx = null;
+>                     if (!t.currency.equals(acct.currency)) {
+>                         fx = fxBook.resolveRate(t.currency, acct.currency, t.effectiveDay, pivots);
+>                         if (fx == null) {
+>                             reason = "FX_MISSING";
+>                         }
+>                     }
+>
+>                     if (reason == null) {
+>                         if (t.effectiveDay > bizDay) {
+>                             reason = "AFTER_BIZ_DATE";
+>                         }
+>                     }
+>
+>                     if (reason == null) {
+>                         if (!"POSTED".equals(t.status)) {
+>                             reason = t.status;
+>                         }
+>                     }
+>
+>                     if (reason == null) {
+>                         if (isDup) {
+>                             reason = "DUPLICATE";
+>                         }
+>                     }
+>
+>                     if (reason == null) {
+>                         // Valid: convert to account ccy, then fee, then add adjusted amount
+>                         BigDecimal amtAcc10;
+>                         if (fx != null) {
+>                             amtAcc10 = t.amount.multiply(fx).setScale(10, HALF_EVEN);
+>                         } else {
+>                             amtAcc10 = t.amount.setScale(10, HALF_EVEN);
+>                         }
+>
+>                         FeeRul
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+>             if (from.equals(to)) return BigDecimal.ONE.setScale(10, HALF_EVEN);
+>
+>             RatePick direct = pickLatest(from, to, effectiveDay);
+>             RatePick reverse = pickLatest(to, from, effectiveDay);
+>
+>             if (direct != null && reverse != null) {
+>                 if (direct.rateDay > reverse.rateDay) {
+>                     return direct.rate.setScale(10, HALF_EVEN);
+>                 } else if (reverse.rateDay > direct.rateDay) {
+>                     return invert(reverse.rate);
+>                 } else {
+>                     return direct.rate.setScale(10, HALF_EVEN);
+>                 }
+>             } else if (direct != null) {
+>                 return direct.rate.setScale(10, HALF_EVEN);
+>             } else if (reverse != null) {
+>                 return invert(reverse.rate);
+>             }
+>             return null;
+>         }
+>
+>         private RatePick pickLatest(String from, String to, int effectiveDay) {
+>             ArrayList<FxRate> lst = rates.get(key(from, to));
+>             if (lst == null) return null;
+>
+>             int bestDay = Integer.MIN_VALUE;
+>             BigDecimal bestRate = null;
+>
+>             for (int i = 0; i < lst.size(); i++) {
+>                 FxRate r = lst.get(i);
+>                 if (r.rateDay <= effectiveDay && r.rateDay > bestDay) {
+>                     bestDay = r.rateDay;
+>                     bestRate = r.rate;
+>                 }
+>             }
+>
+>             if (bestRate == null) return null;
+>             RatePick p = new RatePick();
+>             p.rateDay = bestDay;
+>             p.rate = bestRate;
+>             return p;
+>         }
+>
+>         private BigDecimal invert(BigDecimal rate) {
+>             // reverse 1/rate (HALF_EVEN 10dp)
+>             return BigDecimal.ONE.divide(rate, 10, HALF_EVEN);
+>         }
+>
+>         private String key(String from, String to) {
+>             return from + "|" + to;
+>         }
+>
+>         private static class FxRate {
+>             int rateDay;
+>             BigDecimal rate;
+>         }
+>
+>         private static class RatePick {
+>             int rateDay;
+>             BigDecimal rate;
+>         }
+>     }
+> }
+> JAVA
+root@d16f2fa7194e:/app# wc -l /app/src/BankBatchJob.java && tail -n 3 /app/src/BankBatchJob.java
+792 /app/src/BankBatchJob.java
+        }
+    }
+}
+root@d16f2fa7194e:/app# javac -source 1.7 -target 1.7 -cp /opt/legacy-lib/h2-1.3.176.jar -d /app/build /app/src/BankBatchJob.java
+/app/src/BankBatchJob.java:609: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+            Date d = sdf.parse(yyyyMmDd);
+            ^
+1 error
+root@d16f2fa7194e:/app# cat > /app/build/MANIFEST.MF <<'MF'
+> Manifest-Version: 1.0
+> Main-Class: BankBatchJob
+> Class-Path: /opt/legacy-lib/h2-1.3.176.jar
+> MF
+root@d16f2fa7194e:/app# jar cfm /app/job.jar /app/build/MANIFEST.MF -C /app/build .
+root@d16f2fa7194e:/app# java -jar /app/job.jar
+Error: Could not find or load main class BankBatchJob
+root@d16f2fa7194e:/app# ls -la /app/output
+total 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:14 .
+drwxr-xr-x 6 root root 4096 Jan  1 05:15 ..
+root@d16f2fa7194e:/app# echo '--- interest.csv'; cat /app/output/interest.csv; echo; echo '--- exceptions.csv'; cat /app/output/exceptions.csv; echo; echo '---
+stats.json'; cat /app/output/stats.json; echo
+--- interest.csv
+cat: /app/output/interest.csv: No such file or directory
+
+--- exceptions.csv
+cat: /app/output/exceptions.csv: No such file or directory
+
+--- stats.json
+cat: /app/output/stats.json: No such file or directory
+
+root@d16f2fa7194e:/app# python3 - <<'PY'
+> import hashlib, pathlib, json
+> interest = pathlib.Path('/app/output/interest.csv').read_bytes()
+> exceptions = pathlib.Path('/app/output/exceptions.csv').read_bytes()
+> stats_b = pathlib.Path('/app/output/stats.json').read_bytes()
+> print('interest.csv md5:', hashlib.md5(interest).hexdigest())
+> print('interest.csv endswith newline:', interest.endswith(b"\n"))
+> print('exceptions.csv endswith newline:', exceptions.endswith(b"\n"))
+> print('stats.json contains newline:', b"\n" in stats_b)
+> stats = json.loads(stats_b.decode('utf-8'))
+> print('stats.report_md5 matches:', stats.get('report_md5') == hashlib.md5(interest).hexdigest())
+> PY
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+  File "/usr/local/lib/python3.13/pathlib/_abc.py", line 625, in read_bytes
+    with self.open(mode='rb') as f:
+         ~~~~~~~~~^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/pathlib/_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/app/output/interest.csv'
+root@d16f2fa7194e:/app# java -jar /app/job.jar && md5sum /app/output/interest.csv /app/output/exceptions.csv /app/output/stats.json
+Error: Could not find or load main class BankBatchJob
+root@d16f2fa7194e:/app#

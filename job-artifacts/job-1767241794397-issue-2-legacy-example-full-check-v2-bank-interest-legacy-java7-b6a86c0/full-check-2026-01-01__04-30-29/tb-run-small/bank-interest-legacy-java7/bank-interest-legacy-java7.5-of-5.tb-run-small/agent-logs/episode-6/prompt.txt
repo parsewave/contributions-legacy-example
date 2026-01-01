@@ -1,0 +1,19 @@
+New Terminal Output:
+
+root@757c60dc43dd:/app# curl -L -o /app/h2.jar https://repo1.maven.org/maven2/com/h2database/h2/1.4.200/h2-1.4.200.jar
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 2249k  100 2249k    0     0  12.1M      0 --:--:-- --:--:-- --:--:-- 12.2M
+root@757c60dc43dd:/app#
+
+
+
+
+
+
+
+
+
+
+
+

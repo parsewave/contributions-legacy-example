@@ -1,0 +1,16 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.1, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /tests
+collecting ... collected 1 item
+
+../tests/test_outputs.py::test_outputs_via_java_validator PASSED         [100%]
+
+==================================== PASSES ====================================
+_______________________ test_outputs_via_java_validator ________________________
+----------------------------- Captured stderr call -----------------------------
+Picked up JAVA_TOOL_OPTIONS: -javaagent:/tmp/jdbc_probe_agent/jdbc-probe-agent.jar=/tmp/jdbc_probe_agent/marker_ba2f4c8d5ae03831.txt
+Picked up JAVA_TOOL_OPTIONS: -javaagent:/tmp/jdbc_probe_agent/jdbc-probe-agent.jar=/tmp/jdbc_probe_agent/marker_8ebc6658cd9b1ed6.txt
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_outputs_via_java_validator
+============================== 1 passed in 3.26s ===============================

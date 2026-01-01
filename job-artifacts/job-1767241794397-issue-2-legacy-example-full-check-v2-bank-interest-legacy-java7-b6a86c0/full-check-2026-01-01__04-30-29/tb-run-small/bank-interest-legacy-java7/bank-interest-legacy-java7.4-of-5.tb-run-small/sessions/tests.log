@@ -1,0 +1,49 @@
+[?2004hroot@534c3e9c095c:/app# asciinema rec --stdin /logs/tests.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/tests.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@534c3e9c095c:/app# clear
+[?2004l[H[J[3J[?2004hroot@534c3e9c095c:/app# bash /tests/run-tests.sh; tmux wait -S done
+[?2004l[1m===================================================================== test session starts ======================================================================[0m
+platform linux -- Python 3.13.1, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /tests
+[1mcollecting ... [0m[1mcollected 1 item                                                                                                                                               [0m
+
+../tests/test_outputs.py::test_outputs_via_java_validator [31mFAILED[0m[31m                                                                                         [100%][0m
+
+=========================================================================== FAILURES ===========================================================================
+[31m[1m_______________________________________________________________ test_outputs_via_java_validator ________________________________________________________________[0m
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92mtest_outputs_via_java_validator[39;49;00m():[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Runs the job end-to-end and validates outputs + key runtime constraints."""[39;49;00m[90m[39;49;00m
+        out_dir = Path([33m"[39;49;00m[33m/app/output[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+        [94mif[39;49;00m out_dir.exists():[90m[39;49;00m
+            shutil.rmtree(out_dir)[90m[39;49;00m
+        out_dir.mkdir(parents=[94mTrue[39;49;00m, exist_ok=[94mTrue[39;49;00m)[90m[39;49;00m
+        data_files = {[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/accounts.csv[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33m505829c96c9fa568cf70abf7c52247d5[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/transactions.csv[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33mad100f16f2e9b52929da8eca55b3edad[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/biz_date.txt[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33m4a58c5b49dafc91047e9f999ede44581[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/fx_rates.csv[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33md351af4cc717a6d8d9353f53d8616c05[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/fx_pivots.csv[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33m31e9e031a576af3d943424f47d9f9390[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/fee_rules.csv[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33ma2a8a66a3db722b2f4a051612c8e8bd7[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+        }[90m[39;49;00m
+        [94mfor[39;49;00m path, expected_md5 [95min[39;49;00m data_files.items():[90m[39;49;00m
+            got = hashlib.md5(Path(path).read_bytes()).hexdigest()[90m[39;49;00m
+            [94massert[39;49;00m got == expected_md5, [33mf[39;49;00m[33m"[39;49;00m[33minput modified before run: [39;49;00m[33m{[39;49;00mpath[33m}[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        job_jar = Path([33m"[39;49;00m[33m/app/job.jar[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+>       [94massert[39;49;00m job_jar.exists(), [33m"[39;49;00m[33m/app/job.jar is missing[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+[1m[31mE       AssertionError: /app/job.jar is missing[0m
+[1m[31mE       assert False[0m
+[1m[31mE        +  where False = exists()[0m
+[1m[31mE        +    where exists = PosixPath('/app/job.jar').exists[0m
+
+[1m[31m/tests/test_outputs.py[0m:352: AssertionError
+[36m[1m=================================================================== short test summary info ====================================================================[0m
+[31mFAILED[0m ../tests/test_outputs.py::[1mtest_outputs_via_java_validator[0m - AssertionError: /app/job.jar is missing
+[31m====================================================================== [31m[1m1 failed[0m[31m in 0.10s[0m[31m =======================================================================[0m
+[?2004hroot@534c3e9c095c:/app# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/tests.cast[0m
+[?2004hroot@534c3e9c095c:/app# 

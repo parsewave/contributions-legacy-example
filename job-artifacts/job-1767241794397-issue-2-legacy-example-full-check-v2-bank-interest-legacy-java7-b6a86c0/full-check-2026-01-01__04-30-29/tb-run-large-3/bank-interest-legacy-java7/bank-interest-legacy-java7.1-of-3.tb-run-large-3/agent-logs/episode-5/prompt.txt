@@ -1,0 +1,252 @@
+New Terminal Output:
+
+root@38af6b5d9dd5:/app# ls -la /app/src /app/build /app/output
+/app/build:
+total 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:04 .
+drwxr-xr-x 7 root root 4096 Jan  1 05:04 ..
+
+/app/output:
+total 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:04 .
+drwxr-xr-x 7 root root 4096 Jan  1 05:04 ..
+
+/app/src:
+total 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:04 .
+drwxr-xr-x 7 root root 4096 Jan  1 05:04 ..
+root@38af6b5d9dd5:/app# cat > /app/src/BankBatchJob.java <<'EOF'
+> import java.io.*;
+> import java.math.*;
+> import java.nio.charset.Charset;
+> import java.security.*;
+> import java.sql.*;
+> import java.text.*;
+;
+  }
+
+  private static List<String[]> readCsv(File f) throws Exception {
+    ArrayList<String[]> rows = new ArrayList<String[]>();
+    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), UTF8));
+    try {
+      String line;
+      while((line=br.readLine())!=null) rows.add(split(line));
+    } finally { br.close(); }
+    return rows;
+  }
+
+  private static Map<String,Integer> hdr(String[] h){
+    HashMap<String,Integer> m = new HashMap<String,Integer>();
+    for(int i=0;i<h.length;i++) m.put(h[i], Integer.valueOf(i));
+    return m;
+  }
+
+  private static String col(String[] r, Map<String,Integer> m, String k){
+    Integer i = m.get(k);
+    if(i==null) return "";
+    int n=i.intValue();
+    return (n>=0 && n<r.length) ? r[n] : "";
+  }
+
+  private static BigDecimal bd2(String s){ return new BigDecimal(s).setScale(2, RM); }
+  private static BigDecimal bd(String s){ return new BigDecimal(s); }
+
+  private static int toDay(String yyyyMmDd) throws Exception {
+    Date d = DF.parse(yyyyMmDd);
+    Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    c.setTime(d);
+    c.set(Calendar.HOUR_OF_DAY,0); c.set(Calendar.MINUTE,0); c.set(Calendar.SECOND,> import java.util.*;
+>
+> public class BankBatchJob {
+>   private static final String JDBC_URL = "jdbc:h2:/app/output/bankdb;MODE=DB2";
+>   private static final Charset UTF8 = Charset.forName("UTF-8");
+>   private static final RoundingMode RM = RoundingMode.HALF_EVEN;
+>   private static final BigDecimal BD0 = new BigDecimal("0");
+ >   private static final BigDecimal BD365 = new BigDecimal("365");
+>
+>   private static final File DATA_DIR = new File("/app/data");
+>   private static final File OUT_DIR = new File("/app/output");
+>
+>   private static final File ACCOUNTS_CSV = new File(DATA_DIR, "accounts.csv");
+>   private static final File TXNS_CSV = new File(DATA_DIR, "transactions.csv");
+)>   private static final File BIZ_DATE_TXT = new File(DATA_DIR, "biz_date.txt");
+>   private static final File FX_RATES_CSV = new File(DATA_DIR, "fx_rates.csv");
+>   private static final File FX_PIVOTS_CSV = new File(DATA_DIR, "fx_pivots.csv");
+>   private static final File FEE_RULES_CSV = new File(DATA_DIR, "fee_rules.csv");
+>
+ >   private static final File INTEREST_CSV = new File(OUT_DIR, "interest.csv");
+>   private static final File EXCEPTIONS_CSV = new File(OUT_DIR, "exceptions.csv");
+>   private static final File STATS_JSON = new File(OUT_DIR, "stats.json");
+>
+>   private static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd");
+>   static {
+>     DF.setLenient(false);
+>     DF.setTimeZone(TimeZone.getTimeZone("UTC"));
+>   }
+>
+>   static class Account {
+>     String id, ccy, feePlan;
+>     int openedDay;
+>     BigDecimal start2, baseApr, promoApr, tierThr2, tierApr;
+>     int promoDays;
+>   }
+>   static class Txn {
+>     int rowNum, effDay;
+>     String txId, acctId, effStr, ccy, status, reversalOf;
+>     BigDecimal amt2;
+>   }
+>   static class FeeRule {
+>     String plan, applies;
+>     BigDecimal flat2, pct, min2, max2;
+>   }
+>   static class FxRate {
+>     int day;
+>     String from, to;
+>     BigDecimal rate;
+>   }
+>
+>   private static void del(File f){ if(f.exists()) f.delete(); }
+>
+>   private static void cleanOutput() throws Exception {
+>     if(!OUT_DIR.exists() && !OUT_DIR.mkdirs()) throw new IOException("cannot create " + OUT_DIR);
+>     del(INTEREST_CSV); del(EXCEPTIONS_CSV); del(STATS_JSON);
+>     del(new File(OUT_DIR, "bankdb.h2.db"));
+>     del(new File(OUT_DIR, "bankdb.trace.db"));
+>     del(new File(OUT_DIR, "bankdb.lock.db"));
+>   }
+>
+>   private static String read1(File f) throws Exception {
+>     BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), UTF8));
+>     try { String s = br.readLine(); return s==null?"":s.trim(); } finally { br.close(); }
+>   }
+>
+>   private static String[] split(String line){
+>     ArrayList<String> parts = new ArrayList<String>();
+>     int s=0;
+>     for(int i=0;i<line.length();i++) if(line.charAt(i)==','){ parts.add(line.substring(s,i)); s=i+1; }
+>     parts.add(line.substring(s));
+>     String[] out = new String[parts.size()];
+>     for(int i=0;i<parts.size();i++) out[i]=parts.get(i);
+>     return out;
+>   }
+>
+>   private static List<String[]> readCsv(File f) throws Exception {
+>     ArrayList<String[]> rows = new ArrayList<String[]>();
+>     Buf
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+;
+>         }
+>       }
+>
+>       BigDecimal adj2 = amtAcct10.setScale(2,RM).subtract(fee2).setScale(2,RM);
+>       BigDecimal prev=sumAdj2.get(a.id);
+>       if(prev==null) prev=BD0.setScale(2,RM);
+>       sumAdj2.put(a.id, prev.add(adj2).setScale(2,RM));
+>       valid++;
+>     }
+>
+>     ArrayList<String> acctIds=new ArrayList<String>(accts.keySet());
+>     Collections.sort(acctIds);
+>
+>     StringBuilder interest=new StringBuilder();
+>     interest.append("account_id,biz_date,eod_balance,apr,daily_interest\n");
+>     BigDecimal totalRaw10=BD0.setScale(10,RM);
+>
+>     for(int i=0;i<acctIds.size();i++){
+>       Account a=accts.get(acctIds.get(i));
+>       BigDecimal adj=sumAdj2.get(a.id); if(adj==null) adj=BD0.setScale(2,RM);
+>       BigDecimal eod2=a.start2.add(adj).setScale(2,RM);
+>
+>       int daysSince = bizDay - a.openedDay;
+>       boolean promo = a.promoDays>0 && daysSince < a.promoDays;
+>       boolean tier = eod2.compareTo(a.tierThr2) >= 0;
+>
+>       BigDecimal apr=a.baseApr;
+>       if(tier) apr=apr.add(a.tierApr);
+>       if(promo) apr=apr.add(a.promoApr);
+>       BigDecimal apr6=apr.setScale(6,RM);
+>
+>       BigDecimal principal2 = eod2.compareTo(BD0)>0 ? eod2 : BD0.setScale(2,RM);
+>       BigDecimal dailyRaw10 = principal2.setScale(10,RM).multiply(apr.setScale(10,RM)).setScale(10,RM).divide(BD365,10,RM);
+>       BigDecimal daily2 = dailyRaw10.setScale(2,RM);
+>       totalRaw10 = totalRaw10.add(dailyRaw10).setScale(10,RM);
+>
+>       interest.append(a.id).append(',').append(bizDate).append(',')
+>         .append(eod2.toPlainString()).append(',').append(apr6.toPlainString()).append(',')
+>         .append(daily2.toPlainString()).append("\n");
+>     }
+>
+>     writeUtf8(INTEREST_CSV, interest.toString());
+>
+>     StringBuilder ex=new StringBuilder();
+>     ex.append("row_num,tx_id,reason\n");
+>     for(int i=0;i<exc.size();i++){
+>       String[] e=exc.get(i);
+>       ex.append(e[0]).append(',').append(e[1]).append(',').append(e[2]).append("\n");
+>     }
+>     writeUtf8(EXCEPTIONS_CSV, ex.toString());
+>
+>     String reportMd5 = md5(readAll(INTEREST_CSV));
+>     BigDecimal total2 = totalRaw10.setScale(2,RM);
+>
+>     String json = "{"+
+>       "\"biz_date\":\""+bizDate+"\","+
+>       "\"accounts\":"+accts.size()+","+
+>       "\"valid_txs\":"+valid+","+
+>       "\"skipped_txs\":"+skipped+","+
+>       "\"total_interest\":\""+total2.toPlainString()+"\","+
+>       "\"report_md5\":\""+reportMd5+"\""+
+>       "}";
+>     writeUtf8(STATS_JSON, json);
+>
+>     buildDb(accts, txns, bizDate, accts.size(), valid, skipped, reportMd5);
+>   }
+> }
+> EOF
+root@38af6b5d9dd5:/app# ls -la /app/src/BankBatchJob.java; wc -l /app/src/BankBatchJob.java | cat
+-rw-r--r-- 1 root root 19314 Jan  1 05:06 /app/src/BankBatchJob.java
+503 /app/src/BankBatchJob.java
+root@38af6b5d9dd5:/app# javac -cp /opt/legacy-lib/h2-1.3.176.jar -d /app/build /app/src/BankBatchJob.java
+/app/src/BankBatchJob.java:109: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+    Date d = DF.parse(yyyyMmDd);
+    ^
+/app/src/BankBatchJob.java:303: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+          pa.setString(2, DF.format(new Date(((long)a.openedDay)*86400000L)));
+                                        ^
+2 errors
+root@38af6b5d9dd5:/app# cat > /app/manifest.mf <<'EOF'
+> Main-Class: BankBatchJob
+> EOF
+root@38af6b5d9dd5:/app# jar cfm /app/job.jar /app/manifest.mf -C /app/build .
+root@38af6b5d9dd5:/app# java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob
+Error: Could not find or load main class BankBatchJob
+root@38af6b5d9dd5:/app# ls -la /app/output
+total 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:04 .
+drwxr-xr-x 7 root root 4096 Jan  1 05:04 ..
+root@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/interest.csv
+sed: can't read /app/output/interest.csv: No such file or directory
+root@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/exceptions.csv
+sed: can't read /app/output/exceptions.csv: No such file or directory
+root@38af6b5d9dd5:/app# wc -l /app/output/interest.csv /app/output/exceptions.csv; echo '---'; (python - <<'PY'
+> import pathlib
+> p=pathlib.Path('/app/output/stats.json')
+> b=p.read_bytes()
+> print('stats.json bytes',len(b))
+> print(b.decode('utf-8'))
+> PY
+> )
+wc: /app/output/interest.csv: No such file or directory
+wc: /app/output/exceptions.csv: No such file or directory
+0 total
+---
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+  File "/usr/local/lib/python3.13/pathlib/_abc.py", line 625, in read_bytes
+    with self.open(mode='rb') as f:
+         ~~~~~~~~~^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/pathlib/_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/app/output/stats.json'
+root@38af6b5d9dd5:/app#

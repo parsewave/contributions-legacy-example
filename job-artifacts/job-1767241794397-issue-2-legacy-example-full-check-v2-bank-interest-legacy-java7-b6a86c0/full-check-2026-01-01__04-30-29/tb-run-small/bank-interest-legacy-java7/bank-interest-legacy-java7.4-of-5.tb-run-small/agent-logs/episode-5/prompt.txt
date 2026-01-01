@@ -1,0 +1,28 @@
+New Terminal Output:
+
+root@534c3e9c095c:/app# find / -type f \( -name '*BankBatchJob*.java' -o -name 'job.jar' \) 2>/dev/null
+root@534c3e9c095c:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

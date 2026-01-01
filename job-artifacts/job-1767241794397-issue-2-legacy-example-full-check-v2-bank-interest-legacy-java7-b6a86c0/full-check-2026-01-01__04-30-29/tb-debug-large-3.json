@@ -1,0 +1,4 @@
+{
+    "outcome": "FAIL",
+    "explanation": "Tests enforce specific stats.json schema details that are not explicitly specified in task.yaml. The failures show the test expects the key name 'biz_date' (trial 2) and total_interest to be a JSON string with 2dp (trial 1), but the instructions only say 'stats.json is single-line JSON' with fields including 'Business date' and 'total_interest=2dp'; they do not mandate exact key names or that total_interest must be a string vs number. Multiple trials consistently fail on stats.json format differences, indicating implicit/underdocumented requirements. Therefore the task instructions are insufficient for the tested expectations."
+}

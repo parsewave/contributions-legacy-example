@@ -1,0 +1,51 @@
+{
+  "analysis": "There is no existing source code or jar under /app, and /app/output does not exist yet. Java 7 JDK is available (javac/java 1.7.0_352), which satisfies the Java-7-bytecode requirement. No H2 jar was found under /usr/share, so we need to install or otherwise obtain H2 (version compatible with 1.3 DB format) to create bankdb.h2.db and RUN_AUDIT/ACCOUNTS/TXNS tables.",
+  "plan": "1) Inspect the input CSV/TXT files to understand exact headers, column order, and data types.\n2) Create /app/output.\n3) Attempt to install an H2 JDBC jar via apt (prefer libh2-java; if that fails, we’ll search the system again or consider vendoring a jar).\n4) After confirming H2 availability and input formats, we will write Java sources for BankBatchJob, compile with -source/-target 1.7, build /app/job.jar with a Main-Class manifest, and run it to generate outputs.",
+  "commands": [
+    {
+      "keystrokes": "sed -n '1,200p' /app/data/accounts.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' /app/data/transactions.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/data/biz_date.txt\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' /app/data/fx_rates.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/data/fx_pivots.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' /app/data/fee_rules.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "mkdir -p /app/output\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "apt-get update\n",
+      "duration": 20.0
+    },
+    {
+      "keystrokes": "apt-get install -y libh2-java\n",
+      "duration": 20.0
+    },
+    {
+      "keystrokes": "ls -ლა /usr/share/java | head\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "ls -la /usr/share/java | grep -i h2 || true\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

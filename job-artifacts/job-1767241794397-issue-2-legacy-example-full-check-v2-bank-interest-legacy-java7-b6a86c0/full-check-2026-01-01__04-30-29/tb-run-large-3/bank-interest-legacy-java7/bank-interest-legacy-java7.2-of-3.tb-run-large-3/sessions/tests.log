@@ -1,0 +1,119 @@
+[?2004hroot@d16f2fa7194e:/app# asciinema rec --stdin /logs/tests.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/tests.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@d16f2fa7194e:/app# clear
+[?2004l[H[J[3J[?2004hroot@d16f2fa7194e:/app# bash /tests/run-tests.sh; tmux wait -S done
+[?2004l[1m===================================================================== test session starts ======================================================================[0m
+platform linux -- Python 3.13.1, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /tests
+[1mcollecting ... [0m[1mcollected 1 item                                                                                                                                               [0m
+
+../tests/test_outputs.py::test_outputs_via_java_validator [31mFAILED[0m[31m                                                                                         [100%][0m
+
+=========================================================================== FAILURES ===========================================================================
+[31m[1m_______________________________________________________________ test_outputs_via_java_validator ________________________________________________________________[0m
+
+    [0m[94mdef[39;49;00m[90m [39;49;00m[92mtest_outputs_via_java_validator[39;49;00m():[90m[39;49;00m
+    [90m    [39;49;00m[33m"""Runs the job end-to-end and validates outputs + key runtime constraints."""[39;49;00m[90m[39;49;00m
+        out_dir = Path([33m"[39;49;00m[33m/app/output[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+        [94mif[39;49;00m out_dir.exists():[90m[39;49;00m
+            shutil.rmtree(out_dir)[90m[39;49;00m
+        out_dir.mkdir(parents=[94mTrue[39;49;00m, exist_ok=[94mTrue[39;49;00m)[90m[39;49;00m
+        data_files = {[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/accounts.csv[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33m505829c96c9fa568cf70abf7c52247d5[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/transactions.csv[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33mad100f16f2e9b52929da8eca55b3edad[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/biz_date.txt[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33m4a58c5b49dafc91047e9f999ede44581[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/fx_rates.csv[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33md351af4cc717a6d8d9353f53d8616c05[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/fx_pivots.csv[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33m31e9e031a576af3d943424f47d9f9390[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+            [33m"[39;49;00m[33m/app/data/fee_rules.csv[39;49;00m[33m"[39;49;00m: [33m"[39;49;00m[33ma2a8a66a3db722b2f4a051612c8e8bd7[39;49;00m[33m"[39;49;00m,[90m[39;49;00m
+        }[90m[39;49;00m
+        [94mfor[39;49;00m path, expected_md5 [95min[39;49;00m data_files.items():[90m[39;49;00m
+            got = hashlib.md5(Path(path).read_bytes()).hexdigest()[90m[39;49;00m
+            [94massert[39;49;00m got == expected_md5, [33mf[39;49;00m[33m"[39;49;00m[33minput modified before run: [39;49;00m[33m{[39;49;00mpath[33m}[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        job_jar = Path([33m"[39;49;00m[33m/app/job.jar[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+        [94massert[39;49;00m job_jar.exists(), [33m"[39;49;00m[33m/app/job.jar is missing[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        [94massert[39;49;00m job_jar.stat().st_size > [94m0[39;49;00m, [33m"[39;49;00m[33m/app/job.jar is empty[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        [94mwith[39;49;00m zipfile.ZipFile(job_jar, [33m"[39;49;00m[33mr[39;49;00m[33m"[39;49;00m) [94mas[39;49;00m zf:[90m[39;49;00m
+            class_entries = [n [94mfor[39;49;00m n [95min[39;49;00m zf.namelist() [94mif[39;49;00m n.endswith([33m"[39;49;00m[33m.class[39;49;00m[33m"[39;49;00m)][90m[39;49;00m
+            [94massert[39;49;00m class_entries, [33m"[39;49;00m[33m/app/job.jar has no class files[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            class_bytes = [][90m[39;49;00m
+            [94mfor[39;49;00m entry [95min[39;49;00m class_entries:[90m[39;49;00m
+                raw = zf.read(entry)[90m[39;49;00m
+                [94massert[39;49;00m raw[:[94m4[39;49;00m] == [33mb[39;49;00m[33m"[39;49;00m[33m\xCA[39;49;00m[33m\xFE[39;49;00m[33m\xBA[39;49;00m[33m\xBE[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33minvalid class file in /app/job.jar[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+                major = [96mint[39;49;00m.from_bytes(raw[[94m6[39;49;00m:[94m8[39;49;00m], [33m"[39;49;00m[33mbig[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+                [94massert[39;49;00m major == [94m51[39;49;00m, [33mf[39;49;00m[33m"[39;49;00m[33m/app/job.jar must be Java 7 bytecode (major=51), got [39;49;00m[33m{[39;49;00mmajor[33m}[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+                class_bytes.append(raw)[90m[39;49;00m
+            literals = [][90m[39;49;00m
+            [94mfor[39;49;00m blob [95min[39;49;00m class_bytes:[90m[39;49;00m
+                literals.extend(_classfile_utf8_strings(blob))[90m[39;49;00m
+            jdbc_literals = [[90m[39;49;00m
+                s [94mfor[39;49;00m s [95min[39;49;00m literals[90m[39;49;00m
+                [94mif[39;49;00m s.startswith([33m"[39;49;00m[33mjdbc:h2:[39;49;00m[33m"[39;49;00m) [95mand[39;49;00m [33m"[39;49;00m[33m/app/output/bankdb[39;49;00m[33m"[39;49;00m [95min[39;49;00m s [95mand[39;49;00m [33m"[39;49;00m[33mMODE=DB2[39;49;00m[33m"[39;49;00m [95min[39;49;00m s[90m[39;49;00m
+            ][90m[39;49;00m
+            [94massert[39;49;00m jdbc_literals, [33m"[39;49;00m[33mjar must include a JDBC URL literal with /app/output/bankdb and MODE=DB2[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94massert[39;49;00m [96mlen[39;49;00m([96mset[39;49;00m(jdbc_literals)) == [94m1[39;49;00m, [33m"[39;49;00m[33mjar must include exactly one JDBC URL literal value[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94massert[39;49;00m [96mlen[39;49;00m(jdbc_literals) == [94m1[39;49;00m, [33m"[39;49;00m[33mjar must include the JDBC URL literal only once[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        agent_build = Path([33m"[39;49;00m[33m/tmp/jdbc_probe_agent[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+        [94mif[39;49;00m agent_build.exists():[90m[39;49;00m
+            shutil.rmtree(agent_build)[90m[39;49;00m
+        agent_build.mkdir(parents=[94mTrue[39;49;00m, exist_ok=[94mTrue[39;49;00m)[90m[39;49;00m
+        agent_jar = _build_jdbc_probe_agent(agent_build)[90m[39;49;00m
+        legacy_cp = [33m"[39;49;00m[33m/opt/legacy-lib/*[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        env = os.environ.copy()[90m[39;49;00m
+    [90m[39;49;00m
+        [94mdef[39;49;00m[90m [39;49;00m[92mrun_job[39;49;00m(marker_path: Path) -> [94mNone[39;49;00m:[90m[39;49;00m
+            env[[33m"[39;49;00m[33mJAVA_TOOL_OPTIONS[39;49;00m[33m"[39;49;00m] = [33mf[39;49;00m[33m"[39;49;00m[33m-javaagent:[39;49;00m[33m{[39;49;00magent_jar[33m}[39;49;00m[33m=[39;49;00m[33m{[39;49;00mmarker_path[33m}[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            subprocess.check_call([[33m"[39;49;00m[33mjava[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33m-cp[39;49;00m[33m"[39;49;00m, [33mf[39;49;00m[33m"[39;49;00m[33m{[39;49;00mjob_jar[33m}[39;49;00m[33m:[39;49;00m[33m{[39;49;00mlegacy_cp[33m}[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mBankBatchJob[39;49;00m[33m"[39;49;00m], cwd=[33m"[39;49;00m[33m/app[39;49;00m[33m"[39;49;00m, env=env)[90m[39;49;00m
+            marker_text = marker_path.read_text(encoding=[33m"[39;49;00m[33mutf-8[39;49;00m[33m"[39;49;00m) [94mif[39;49;00m marker_path.exists() [94melse[39;49;00m [33m"[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            marker_lines = marker_text.splitlines()[90m[39;49;00m
+            url = marker_lines[[94m0[39;49;00m] [94mif[39;49;00m [96mlen[39;49;00m(marker_lines) > [94m0[39;49;00m [94melse[39;49;00m [33m"[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            user = marker_lines[[94m1[39;49;00m] [94mif[39;49;00m [96mlen[39;49;00m(marker_lines) > [94m1[39;49;00m [94melse[39;49;00m [33m"[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            password = marker_lines[[94m2[39;49;00m] [94mif[39;49;00m [96mlen[39;49;00m(marker_lines) > [94m2[39;49;00m [94melse[39;49;00m [33m"[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94massert[39;49;00m url.startswith([33m"[39;49;00m[33mjdbc:h2:[39;49;00m[33m"[39;49;00m), [33m"[39;49;00m[33mjob must open an H2 JDBC connection at runtime[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94massert[39;49;00m [33m"[39;49;00m[33mMODE=DB2[39;49;00m[33m"[39;49;00m [95min[39;49;00m url, [33m"[39;49;00m[33mopened JDBC URL must include MODE=DB2[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94massert[39;49;00m [33m"[39;49;00m[33m/app/output/bankdb[39;49;00m[33m"[39;49;00m [95min[39;49;00m url, [33m"[39;49;00m[33mopened JDBC URL must use the /app/output/bankdb database file[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94massert[39;49;00m url [95min[39;49;00m jdbc_literals, [33m"[39;49;00m[33mopened JDBC URL must match a single literal in the jar[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94massert[39;49;00m user == [33m"[39;49;00m[33msa[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mH2 connection user must be [39;49;00m[33m'[39;49;00m[33msa[39;49;00m[33m'[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+            [94massert[39;49;00m password == [33m"[39;49;00m[33m"[39;49;00m, [33m"[39;49;00m[33mH2 connection password must be empty[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        run_job(agent_build / [33mf[39;49;00m[33m"[39;49;00m[33mmarker_[39;49;00m[33m{[39;49;00msecrets.token_hex([94m8[39;49;00m)[33m}[39;49;00m[33m.txt[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+        first_interest = Path([33m"[39;49;00m[33m/app/output/interest.csv[39;49;00m[33m"[39;49;00m).read_bytes()[90m[39;49;00m
+        first_ex = Path([33m"[39;49;00m[33m/app/output/exceptions.csv[39;49;00m[33m"[39;49;00m).read_bytes()[90m[39;49;00m
+        first_stats = Path([33m"[39;49;00m[33m/app/output/stats.json[39;49;00m[33m"[39;49;00m).read_bytes()[90m[39;49;00m
+        run_job(agent_build / [33mf[39;49;00m[33m"[39;49;00m[33mmarker_[39;49;00m[33m{[39;49;00msecrets.token_hex([94m8[39;49;00m)[33m}[39;49;00m[33m.txt[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+        [94massert[39;49;00m Path([33m"[39;49;00m[33m/app/output/interest.csv[39;49;00m[33m"[39;49;00m).read_bytes() == first_interest, [33m"[39;49;00m[33minterest.csv must be identical across re-runs[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        [94massert[39;49;00m Path([33m"[39;49;00m[33m/app/output/exceptions.csv[39;49;00m[33m"[39;49;00m).read_bytes() == first_ex, [33m"[39;49;00m[33mexceptions.csv must be identical across re-runs[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        [94massert[39;49;00m Path([33m"[39;49;00m[33m/app/output/stats.json[39;49;00m[33m"[39;49;00m).read_bytes() == first_stats, [33m"[39;49;00m[33mstats.json must be identical across re-runs[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        ([90m[39;49;00m
+            expected_interest,[90m[39;49;00m
+            expected_exceptions,[90m[39;49;00m
+            expected_stats,[90m[39;49;00m
+            expected_valid,[90m[39;49;00m
+            expected_skipped,[90m[39;49;00m
+            expected_biz,[90m[39;49;00m
+            expected_accounts,[90m[39;49;00m
+            expected_report_md5,[90m[39;49;00m
+        ) = _compute_expected()[90m[39;49;00m
+        [94massert[39;49;00m Path([33m"[39;49;00m[33m/app/output/interest.csv[39;49;00m[33m"[39;49;00m).read_text(encoding=[33m"[39;49;00m[33mutf-8[39;49;00m[33m"[39;49;00m) == expected_interest, [33m"[39;49;00m[33minterest.csv mismatch[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+        [94massert[39;49;00m Path([33m"[39;49;00m[33m/app/output/exceptions.csv[39;49;00m[33m"[39;49;00m).read_text(encoding=[33m"[39;49;00m[33mutf-8[39;49;00m[33m"[39;49;00m) == expected_exceptions, [33m"[39;49;00m[33mexceptions.csv mismatch[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+>       [94massert[39;49;00m Path([33m"[39;49;00m[33m/app/output/stats.json[39;49;00m[33m"[39;49;00m).read_text(encoding=[33m"[39;49;00m[33mutf-8[39;49;00m[33m"[39;49;00m) == expected_stats, [33m"[39;49;00m[33mstats.json mismatch[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+[1m[31mE       AssertionError: stats.json mismatch[0m
+[1m[31mE       assert '{"business_d...62843f8a087"}' == '{"biz_date":...62843f8a087"}'[0m
+[1m[31mE         [0m
+[1m[31mE         [0m[91m- {"biz_date":"2024-03-01","accounts":4,"valid_txs":7,"skipped_txs":13,"total_interest":"1.39","report_md5":"d6e6bfa87102a7be797a462843f8a087"}[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         ?     ^[90m[39;49;00m[0m
+[1m[31mE         [92m+ {"business_date":"2024-03-01","accounts":4,"valid_txs":7,"skipped_txs":13,"total_interest":"1.39","report_md5":"d6e6bfa87102a7be797a462843f8a087"}[39;49;00m[90m[39;49;00m[0m
+[1m[31mE         ?    ++ ^^^^[90m[39;49;00m[0m
+
+[1m[31m/tests/test_outputs.py[0m:416: AssertionError
+--------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -javaagent:/tmp/jdbc_probe_agent/jdbc-probe-agent.jar=/tmp/jdbc_probe_agent/marker_87960904b1d243f5.txt
+Picked up JAVA_TOOL_OPTIONS: -javaagent:/tmp/jdbc_probe_agent/jdbc-probe-agent.jar=/tmp/jdbc_probe_agent/marker_37b6141d0b5964de.txt
+[36m[1m=================================================================== short test summary info ====================================================================[0m
+[31mFAILED[0m ../tests/test_outputs.py::[1mtest_outputs_via_java_validator[0m - AssertionError: stats.json mismatch
+[31m====================================================================== [31m[1m1 failed[0m[31m in 1.54s[0m[31m =======================================================================[0m
+[?2004hroot@d16f2fa7194e:/app# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/tests.cast[0m
+[?2004hroot@d16f2fa7194e:/app# 

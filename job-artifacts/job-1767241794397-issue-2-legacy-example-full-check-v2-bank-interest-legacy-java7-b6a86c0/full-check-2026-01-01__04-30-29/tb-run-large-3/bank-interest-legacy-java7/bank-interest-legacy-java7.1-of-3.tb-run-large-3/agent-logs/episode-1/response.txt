@@ -1,0 +1,27 @@
+{
+  "analysis": "We have only /app/data with the required input files. Java 7 JDK is installed (javac 1.7.0_352), and an H2 1.3.176 jar is available at /opt/legacy-lib/h2-1.3.176.jar. /app/output does not exist yet. Next we need to inspect the full transactions.csv (and any other input beyond first 5 lines), then implement BankBatchJob (Java 7), compile to Java 7 bytecode, package /app/job.jar, run with H2 on the classpath, and verify outputs and determinism.",
+  "plan": "1) Inspect the remainder of transactions.csv (and re-check other inputs fully) to ensure we implement parsing and rules correctly.\n2) Create a small Java 7 project layout under /app/src, implement com.bank.batch.BankBatchJob with all required logic, including CSV parsing, FX resolution, fee calculation, interest computation, exceptions/stats output, and H2 DB creation.\n3) Compile with javac (Java 7), jar it into /app/job.jar with a Main-Class manifest.\n4) Run the job with H2 jar on the classpath and inspect generated outputs.",
+  "commands": [
+    {
+      "keystrokes": "sed -n '1,200p' /app/data/transactions.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' /app/data/accounts.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' /app/data/fx_rates.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' /app/data/fx_pivots.csv\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' /app/data/fee_rules.csv\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

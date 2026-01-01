@@ -1,0 +1,41 @@
+New Terminal Output:
+root@16bf0d0350a5:/app# ls -R
+.:
+data
+
+./data:
+accounts.csv  biz_date.txt  fee_rules.csv  fx_pivots.csv  fx_rates.csv  transactions.csv
+root@16bf0d0350a5:/app# find . -name BankBatchJob.java
+root@16bf0d0350a5:/app# find . -name "h2*.jar"
+root@16bf0d0350a5:/app# wget -q -O h2.jar https://repo1.maven.org/maven2/com/h2database/h2/1.4.200/h2-1.4.200.jar
+bash: wget: command not found
+root@16bf0d0350a5:/app# SRC=$(find . -name BankBatchJob.java | head -n1); javac -source 7 -target 7 -classpath h2.jar "${SRC}"
+javac: invalid flag:
+Usage: javac <options> <source files>
+use -help for a list of possible options
+root@16bf0d0350a5:/app# jar cf /app/job.jar *.class
+*.class : no such file or directory
+root@16bf0d0350a5:/app# java -cp /app/job.jar:h2.jar BankBatchJob
+Error: Could not find or load main class BankBatchJob
+root@16bf0d0350a5:/app# ls -l /app/output
+ls: cannot access '/app/output': No such file or directory
+root@16bf0d0350a5:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

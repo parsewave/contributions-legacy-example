@@ -1,0 +1,72 @@
+New Terminal Output:
+root@38af6b5d9dd5:/app# ls -la /app
+total 12
+drwxr-xr-x  3 root root 4096 Jan  1 04:33 .
+drwxr-xr-x 20 root root 4096 Jan  1 04:59 ..
+drwxr-xr-x  2 root root 4096 Jan  1 04:30 data
+root@38af6b5d9dd5:/app# find /app -maxdepth 3 -type f -print
+/app/data/fee_rules.csv
+/app/data/fx_pivots.csv
+/app/data/transactions.csv
+/app/data/fx_rates.csv
+/app/data/biz_date.txt
+/app/data/accounts.csv
+root@38af6b5d9dd5:/app# java -version
+openjdk version "1.7.0_352"
+OpenJDK Runtime Environment (Zulu 7.56.0.11-CA-linux64) (build 1.7.0_352-b01)
+OpenJDK 64-Bit Server VM (Zulu 7.56.0.11-CA-linux64) (build 24.352-b01, mixed mode)
+root@38af6b5d9dd5:/app# javac -version
+ls -la /app/data
+javac 1.7.0_352
+root@38af6b5d9dd5:/app# ls -la /app/data
+total 32
+drwxr-xr-x 2 root root 4096 Jan  1 04:30 .
+drwxr-xr-x 3 root root 4096 Jan  1 04:33 ..
+-rw-r--r-- 1 root root  392 Jan  1 04:30 accounts.csv
+-rw-r--r-- 1 root root   11 Jan  1 04:30 biz_date.txt
+-rw-r--r-- 1 root root  154 Jan  1 04:30 fee_rules.csv
+-rw-r--r-- 1 root root   14 Jan  1 04:30 fx_pivots.csv
+-rw-r--r-- 1 root root  499 Jan  1 04:30 fx_rates.csv
+-rw-r--r-- 1 root root  901 Jan  1 04:30 transactions.csv
+root@38af6b5d9dd5:/app# for f in /app/data/accounts.csv /app/data/transactions.csv /app/data/biz_date.txt /app/data/fx_rates.csv /app/data/fx_pivots.csv /app/da
+ta/fee_rules.csv; do echo "=== $f ==="; sed -n '1,5p' "$f"; echo; done
+=== /app/data/accounts.csv ===
+account_id,opened_at,start_balance,base_apr,promo_apr,promo_days,tier_threshold,tier_apr,currency,fee_plan
+A1001,2024-02-01,10000.00,0.01000,0.00500,29,5000.00,0.00200,USD,PLAN_A
+A1002,2020-01-01,5000.00,0.00800,0.00000,0,5000.00,0.00100,USD,PLAN_B
+A1003,2023-12-01,-10.00,0.02000,0.00000,0,10000.00,0.00500,EUR,PLAN_A
+A1004,2023-01-01,36500.00,0.01005,0.00000,0,999999.00,0.00000,USD,PLAN_C
+
+=== /app/data/transactions.csv ===
+tx_id,account_id,effective_date,amount,currency,status,reversal_of
+T001,A1001,2024-03-01,-2000.00,USD,POSTED,
+T002,A1001,2024-03-02,-500.00,EUR,POSTED,
+T003,A1001,2024-02-28,100.00,USD,PENDING,
+T004,A1002,2024-02-15,50.00,USD,POSTED,
+
+=== /app/data/biz_date.txt ===
+2024-03-01
+
+=== /app/data/fx_rates.csv ===
+rate_date,from_ccy,to_ccy,rate
+2024-01-01,USD,EUR,0.9000
+2024-01-01,EUR,USD,1.1111
+2024-02-01,USD,EUR,0.9100
+2024-02-01,EUR,USD,1.0989
+
+=== /app/data/fx_pivots.csv ===
+pivot
+GBP
+EUR
+
+=== /app/data/fee_rules.csv ===
+fee_plan,applies_to,flat_fee,pct_fee,min_fee,max_fee
+PLAN_A,DEBIT,0.50,0.005,0.25,5.00
+PLAN_B,ALL,0.10,0.002,0.10,2.00
+PLAN_C,CREDIT,0.25,0.001,0.25,1.00
+
+root@38af6b5d9dd5:/app# ls -la /app/output || true
+ls: cannot access '/app/output': No such file or directory
+root@38af6b5d9dd5:/app# find / -name 'h2*.jar' 2>/dev/null | head
+/opt/legacy-lib/h2-1.3.176.jar
+root@38af6b5d9dd5:/app#

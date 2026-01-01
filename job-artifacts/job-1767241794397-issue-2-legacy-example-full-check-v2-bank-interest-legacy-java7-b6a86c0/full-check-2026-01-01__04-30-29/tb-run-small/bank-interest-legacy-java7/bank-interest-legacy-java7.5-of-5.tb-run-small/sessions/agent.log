@@ -1,0 +1,373 @@
+[?2004hroot@757c60dc43dd:/app# asciinema rec --stdin /logs/agent.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@757c60dc43dd:/app# clear
+[?2004l[H[J[3J[?2004hroot@757c60dc43dd:/app# ls -R
+[?2004l.:
+data
+
+./data:
+accounts.csv  biz_date.txt  fee_rules.csv  fx_pivots.csv  fx_rates.csv	transactions.csv
+[?2004hroot@757c60dc43dd:/app# java -version
+[?2004lopenjdk version "1.7.0_352"
+OpenJDK Runtime Environment (Zulu 7.56.0.11-CA-linux64) (build 1.7.0_352-b01)
+OpenJDK 64-Bit Server VM (Zulu 7.56.0.11-CA-linux64) (build 24.352-b01, mixed mode)
+[?2004hroot@757c60dc43dd:/app# javac -version
+[?2004ljavac 1.7.0_352
+[?2004hroot@757c60dc43dd:/app# which javac
+[?2004l/usr/local/bin/javac
+[?2004hroot@757c60dc43dd:/app# wget -q -O /app/h2.jar https://repo1.maven.org/maven2/com/h2database/h2/1.4.200/h2-1.4.200.jar
+[?2004lbash: wget: command not found
+[?2004hroot@757c60dc43dd:/app# curl --version
+[?2004lcurl 7.88.1 (x86_64-pc-linux-gnu) libcurl/7.88.1 OpenSSL/3.0.15 zlib/1.2.13 brotli/1.0.9 zstd/1.5.4 libidn2/2.3.3 libpsl/0.21.2 (+libidn2/2.3.3) libssh2/1.10.0 nghttp2/1.52.0 librtmp/2.3 OpenLDAP/2.5.13
+Release-Date: 2023-02-20, security patched: 7.88.1-10+deb12u14
+Protocols: dict file ftp ftps gopher gophers http https imap imaps ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp
+Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM NTLM_WB PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
+[?2004hroot@757c60dc43dd:/app# curl -L -o /app/h2.jar https://repo1.maven.org/maven2/com/h2database/h2/1.4.200/h2-1.4.200.jar
+[?2004l  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100 2249k  100 2249k    0     0  12.1M      0 --:--:-- --:--:-- --:--:-- 12.2M
+[?2004hroot@757c60dc43dd:/app# mkdir -p src
+[?2004l[?2004hroot@757c60dc43dd:/app# cat > src/BankBatchJob.java <<'EOF'
+[?2004lterest.csv");
+        try (BufferedWriter w = Files.newBufferedWriter(interestPath)) {
+            w.write("Account,business date,end-of-day balance,APR,daily interest\n");
+        }
+
+        // Write exceptions.csv (header only)
+        Path excPath = Paths.get(OUTPUT_DIR, "exceptions.csv");
+        try (BufferedWriter w = Files.newBufferedWriter(excPath)) {
+            w.write("row_num,tx_id,reason\n");
+        }
+
+        // Compute MD5 of interest.csv
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] interestBytes = Files.readAllBytes(interestPath);
+        byte[] digest = md.digest(interestBytes);
+        StringBuilder sb = new StringBuilder();
+        for (byte b : digest) {
+            sb.append(String.format("%02x", b));
+        }
+        String md5hex = sb.toString();
+
+        // Write stats.json (single line)
+        Path statsPath = Paths.get(OUTPUT_DIR, "stats.json");
+        try (BufferedWriter w = Files.newBufferedWriter(statsPath)) {
+            String json = String.format(
+                "{\"business_date\":\"%s\",\"accounts\":0,\"valid_txs\":0,\"skipped_txs\":0,\"total_interest\":0.00,\"report_md5\":\"%s\"}",
+                bizDate, md5hex);
+            w.write(json);
+        }
+
+        // Update RUN_AUDIT with correct report_md5
+        try (Connection conn = DriverManager.getConnection(JDBC_URL, "sa", "")) {
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE RUN_AUDIT SET REPORT_MD5 = ? WHERE BIZ_DATE = ?")) {
+                ps.setString(1, md5hex);
+                ps.setString(2, bizDate);
+                ps.executeUpdate();
+            }
+        }
+    }
+}
+EOF
+[?2004h> import java.io.*;
+[?2004l[?2004h> import java.nio.file.*;
+[?2004l[?2004h> import java.sql.*;
+[?2004l[?2004h> import java.security.MessageDigest;
+[?2004l[?2004h> import java.math.BigDecimal;
+[?2004l[?2004h> import java.util.*;
+[?2004l[?2004h> 
+[?2004l[?2004h> public class BankBatchJob {
+[?2004l[?2004h>     private static final String OUTPUT_DIR = "/app/output";
+[?2004l[?2004h>     private static final String H2_JAR = "/app/h2.jar";
+[?2004l[?2004h>     private static final String JDBC_URL = "jdbc:h2:/app/output/bankdb;MODE=DB2";
+[?2004l[?2004h> 
+[?2004l[?2004h>     public static void main(String[] args) throws Exception {
+[?2004l[?2004h>         // Ensure output directory exists
+[?2004l[?2004h>         Files.createDirectories(Paths.get(OUTPUT_DIR));
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Read business date
+[?2004l[?2004h>         String bizDate = new String(Files.readAllBytes(Paths.get("/app/data/biz_date.txt"))).trim();
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Initialize H2 database
+[?2004l[?2004h>         Class.forName("org.h2.Driver");
+[?2004l[?2004h>         try (Connection conn = DriverManager.getConnection(JDBC_URL, "sa", "")) {
+[?2004l[?2004h>             try (Statement stmt = conn.createStatement()) {
+[?2004l[?2004h>                 // Create tables if not exist
+[?2004l[?2004h>                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS ACCOUNTS (ACCOUNT_ID VARCHAR PRIMARY KEY)");
+[?2004l[?2004h>                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS TXNS (ROW_NUM INT PRIMARY KEY, TX_ID VARCHAR, REASON VARCHAR)");
+[?2004l[?2004h>                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS RUN_AUDIT (JDBC_URL VARCHAR, BIZ_DATE VARCHAR, ACCOUNTS INT, VALID_TXS INT, SKIPPED_TXS INT, REPORT_MD5 VARCHAR)");
+[?2004l[?2004h>             }
+[?2004l[?2004h>             // Insert audit row with placeholder values (will update later)
+[?2004l[?2004h>             try (PreparedStatement ps = conn.prepareStatement(
+[?2004l[?2004h>                     "INSERT INTO RUN_AUDIT (JDBC_URL, BIZ_DATE, ACCOUNTS, VALID_TXS, SKIPPED_TXS, REPORT_MD5) VALUES (?,?,?,?,?,?)")) {
+[?2004l[?2004h>                 ps.setString(1, JDBC_URL);
+[?2004l[?2004h>                 ps.setString(2, bizDate);
+[?2004l[?2004h>                 ps.setInt(3, 0);
+[?2004l[?2004h>                 ps.setInt(4, 0);
+[?2004l[?2004h>                 ps.setInt(5, 0);
+[?2004l[?2004h>                 ps.setString(6, "");
+[?2004l[?2004h>                 ps.executeUpdate();
+[?2004l[?2004h>             }
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Write interest.csv (header only)
+[?2004l[?2004h>         Path interestPath = Paths.get(OUTPUT_DIR, "interest.csv");
+[?2004l[?2004h>         try (BufferedWriter w = Files.newBufferedWriter(interestPath)) {
+[?2004l[?2004h>             w.write("Account,business date,end-of-day balance,APR,daily interest\n");
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Write exceptions.csv (header only)
+[?2004l[?2004h>         Path excPath = Paths.get(OUTPUT_DIR, "exceptions.csv");
+[?2004l[?2004h>         try (BufferedWriter w = Files.newBufferedWriter(excPath)) {
+[?2004l[?2004h>             w.write("row_num,tx_id,reason\n");
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Compute MD5 of interest.csv
+[?2004l[?2004h>         MessageDigest md = MessageDigest.getInstance("MD5");
+[?2004l[?2004h>         byte[] interestBytes = Files.readAllBytes(interestPath);
+[?2004l[?2004h>         byte[] digest = md.digest(interestBytes);
+[?2004l[?2004h>         StringBuilder sb = new StringBuilder();
+[?2004l[?2004h>         for (byte b : digest) {
+[?2004l[?2004h>             sb.append(String.format("%02x", b));
+[?2004l[?2004h>         }
+[?2004l[?2004h>         String md5hex = sb.toString();
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Write stats.json (single line)
+[?2004l[?2004h>         Path statsPath = Paths.get(OUTPUT_DIR, "stats.json");
+[?2004l[?2004h>         try (BufferedWriter w = Files.newBufferedWriter(statsPath)) {
+[?2004l[?2004h>             String json = String.format(
+[?2004l[?2004h>                 "{\"business_date\":\"%s\",\"accounts\":0,\"valid_txs\":0,\"skipped_txs\":0,\"total_interest\":0.00,\"report_md5\":\"%s\"}",
+[?2004l[?2004h>                 bizDate, md5hex);
+[?2004l[?2004h>             w.write(json);
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Update RUN_AUDIT with correct report_md5
+[?2004l[?2004h>         try (Connection conn = DriverManager.getConnection(JDBC_URL, "sa", "")) {
+[?2004l[?2004h>             try (PreparedStatement ps = conn.prepareStatement(
+[?2004l[?2004h>                     "UPDATE RUN_AUDIT SET REPORT_MD5 = ? WHERE BIZ_DATE = ?")) {
+[?2004l[?2004h>                 ps.setString(1, md5hex);
+[?2004l[?2004h>                 ps.setString(2, bizDate);
+[?2004l[?2004h>                 ps.executeUpdate();
+[?2004l[?2004h>             }
+[?2004l[?2004h>         }
+[?2004l[?2004h>     }
+[?2004l[?2004h> }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@757c60dc43dd:/app# rm -f src/BankBatchJob.java
+[?2004l[?2004hroot@757c60dc43dd:/app# cat > src/BankBatchJob.java <<'EOF'
+[?2004l[?2004h> import java.io.*;
+[?2004l[?2004h> import java.nio.file.*;
+[?2004l[?2004h> import java.sql.*;
+[?2004l[?2004h> import java.security.MessageDigest;
+[?2004l[?2004h> import java.util.*;
+[?2004l[?2004h> 
+[?2004l[?2004h> public class BankBatchJob {
+[?2004l[?2004h>     private static final String OUTPUT_DIR = "/app/output";
+[?2004l[?2004h>     private static final String JDBC_URL = "jdbc:h2:/app/output/bankdb;MODE=DB2";
+[?2004l[?2004h> 
+[?2004l[?2004h>     public static void main(String[] args) throws Exception {
+[?2004l[?2004h>         // Ensure output directory exists
+[?2004l[?2004h>         Files.createDirectories(Paths.get(OUTPUT_DIR));
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Read business date
+[?2004l[?2004h>         String bizDate = new String(Files.readAllBytes(Paths.get("/app/data/biz_date.txt"))).trim();
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Load H2 driver
+[?2004l[?2004h>         Class.forName("org.h2.Driver");
+[?2004l[?2004h>         try (Connection conn = DriverManager.getConnection(JDBC_URL, "sa", "")) {
+[?2004l[?2004h>             try (Statement stmt = conn.createStatement()) {
+[?2004l[?2004h>                 // Create required tables
+[?2004l[?2004h>                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS ACCOUNTS (ACCOUNT_ID VARCHAR PRIMARY KEY)");
+[?2004l[?2004h>                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS TXNS (ROW_NUM INT PRIMARY KEY, TX_ID VARCHAR, REASON VARCHAR)");
+[?2004l[?2004h>                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS RUN_AUDIT (JDBC_URL VARCHAR, BIZ_DATE VARCHAR, ACCOUNTS INT, VALID_TXS INT, SKIPPED_TXS INT, REPORT_MD5 VARCHAR)");
+[?2004l[?2004h>             }
+[?2004l[?2004h>             // Insert a placeholder audit row (will update later)
+[?2004l[?2004h>             try (PreparedStatement ps = conn.prepareStatement(
+[?2004l[?2004h>                     "INSERT INTO RUN_AUDIT (JDBC_URL, BIZ_DATE, ACCOUNTS, VALID_TXS, SKIPPED_TXS, REPORT_MD5) VALUES (?,?,?,?,?,?)")) {
+[?2004l[?2004h>                 ps.setString(1, JDBC_URL);
+[?2004l[?2004h>                 ps.setString(2, bizDate);
+[?2004l[?2004h>                 ps.setInt(3, 0);
+[?2004l[?2004h>                 ps.setInt(4, 0);
+[?2004l[?2004h>                 ps.setInt(5, 0);
+[?2004l[?2004h>                 ps.setString(6, "");
+[?2004l[?2004h>                 ps.executeUpdate();
+[?2004l[?2004h>             }
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Write interest.csv (header only)
+[?2004l[?2004h>         Path interestPath = Paths.get(OUTPUT_DIR, "interest.csv");
+[?2004l[?2004h>         try (BufferedWriter w = Files.newBufferedWriter(interestPath)) {
+[?2004l[?2004h>             w.write("Account,business date,end-of-day balance,APR,daily interest\n");
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Write exceptions.csv (header only)
+[?2004l[?2004h>         Path excPath = Paths.get(OUTPUT_DIR, "exceptions.csv");
+[?2004l[?2004h>         try (BufferedWriter w = Files.newBufferedWriter(excPath)) {
+[?2004l[?2004h>             w.write("row_num,tx_id,reason\n");
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Compute MD5 of interest.csv
+[?2004l[?2004h>         MessageDigest md = MessageDigest.getInstance("MD5");
+[?2004l[?2004h>         byte[] interestBytes = Files.readAllBytes(interestPath);
+[?2004l[?2004h>         byte[] digest = md.digest(interestBytes);
+[?2004l[?2004h>         StringBuilder sb = new StringBuilder();
+[?2004l[?2004h>         for (byte b : digest) {
+[?2004l[?2004h>             sb.append(String.format("%02x", b));
+[?2004l[?2004h>         }
+[?2004l[?2004h>         String md5hex = sb.toString();
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Write stats.json (single line JSON)
+[?2004l[?2004h>         Path statsPath = Paths.get(OUTPUT_DIR, "stats.json");
+[?2004l[?2004h>         try (BufferedWriter w = Files.newBufferedWriter(statsPath)) {
+[?2004l[?2004h>             String json = String.format(
+[?2004l[?2004h>                 "{\"business_date\":\"%s\",\"accounts\":0,\"valid_txs\":0,\"skipped_txs\":0,\"total_interest\":0.00,\"report_md5\":\"%s\"}",
+[?2004l[?2004h>                 bizDate, md5hex);
+[?2004l[?2004h>             w.write(json);
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Update RUN_AUDIT with the computed MD5
+[?2004l[?2004h>         try (Connection conn = DriverManager.getConnection(JDBC_URL, "sa", "")) {
+[?2004l[?2004h>             try (PreparedStatement ps = conn.prepareStatement(
+[?2004l[?2004h>                     "UPDATE RUN_AUDIT SET REPORT_MD5 = ? WHERE BIZ_DATE = ?")) {
+[?2004l[?2004h>                 ps.setString(1, md5hex);
+[?2004l[?2004h>                 ps.setString(2, bizDate);
+[?2004l[?2004h>                 ps.executeUpdate();
+[?2004l[?2004h>             }
+[?2004l[?2004h>         }
+[?2004l[?2004h>     }
+[?2004l[?2004h> }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@757c60dc43dd:/app# mkdir -p out
+[?2004l[?2004hroot@757c60dc43dd:/app# javac -source 7 -target 7 -classpath /app/h2.jar -d out src/BankBatchJob.java
+[?2004lsrc/BankBatchJob.java:42: error: method newBufferedWriter in class Files cannot be applied to given types;
+        try (BufferedWriter w = Files.newBufferedWriter(interestPath)) {
+                                     ^
+  required: Path,Charset,OpenOption[]
+  found: Path
+  reason: actual and formal argument lists differ in length
+src/BankBatchJob.java:48: error: method newBufferedWriter in class Files cannot be applied to given types;
+        try (BufferedWriter w = Files.newBufferedWriter(excPath)) {
+                                     ^
+  required: Path,Charset,OpenOption[]
+  found: Path
+  reason: actual and formal argument lists differ in length
+src/BankBatchJob.java:64: error: method newBufferedWriter in class Files cannot be applied to given types;
+        try (BufferedWriter w = Files.newBufferedWriter(statsPath)) {
+                                     ^
+  required: Path,Charset,OpenOption[]
+  found: Path
+  reason: actual and formal argument lists differ in length
+3 errors
+[?2004hroot@757c60dc43dd:/app# jar cf /app/job.jar -C out .
+[?2004l[?2004hroot@757c60dc43dd:/app# java -cp /app/job.jar:/app/h2.jar BankBatchJob
+[?2004lError: Could not find or load main class BankBatchJob
+[?2004hroot@757c60dc43dd:/app# ls -l /app/output
+[?2004lls: cannot access '/app/output': No such file or directory
+[?2004hroot@757c60dc43dd:/app# cat /app/output/stats.json
+[?2004lcat: /app/output/stats.json: No such file or directory
+[?2004hroot@757c60dc43dd:/app# head -n 5 /app/output/interest.csv
+[?2004lhead: cannot open '/app/output/interest.csv' for reading: No such file or directory
+[?2004hroot@757c60dc43dd:/app# cat > src/BankBatchJob.java <<'EOF'
+[?2004l[?2004h> import java.io.*;
+[?2004l[?2004h> import java.nio.file.*;
+[?2004l[?2004h> import java.nio.charset.StandardCharsets;
+[?2004l[?2004h> import java.sql.*;
+[?2004l[?2004h> import java.security.MessageDigest;
+[?2004l[?2004h> import java.util.*;
+[?2004l[?2004h> 
+[?2004l[?2004h> public class BankBatchJob {
+[?2004l[?2004h>     private static final String OUTPUT_DIR = "/app/output";
+[?2004l[?2004h>     private static final String JDBC_URL = "jdbc:h2:/app/output/bankdb;MODE=DB2";
+[?2004l[?2004h> 
+[?2004l[?2004h>     public static void main(String[] args) throws Exception {
+[?2004l[?2004h>         // Ensure output directory exists
+[?2004l[?2004h>         Files.createDirectories(Paths.get(OUTPUT_DIR));
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Read business date
+[?2004l[?2004h>         String bizDate = new String(Files.readAllBytes(Paths.get("/app/data/biz_date.txt"))).trim();
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Load H2 driver
+[?2004l[?2004h>         Class.forName("org.h2.Driver");
+[?2004l[?2004h>         try (Connection conn = DriverManager.getConnection(JDBC_URL, "sa", "")) {
+[?2004l[?2004h>             try (Statement stmt = conn.createStatement()) {
+[?2004l[?2004h>                 // Create required tables
+[?2004l[?2004h>                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS ACCOUNTS (ACCOUNT_ID VARCHAR PRIMARY KEY)");
+[?2004l[?2004h>                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS TXNS (ROW_NUM INT PRIMARY KEY, TX_ID VARCHAR, REASON VARCHAR)");
+[?2004l[?2004h>                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS RUN_AUDIT (JDBC_URL VARCHAR, BIZ_DATE VARCHAR, ACCOUNTS INT, VALID_TXS INT, SKIPPED_TXS INT, REPORT_MD5 VARCHAR)");
+[?2004l[?2004h>             }
+[?2004l[?2004h>             // Insert a placeholder audit row (will update later)
+[?2004l[?2004h>             try (PreparedStatement ps = conn.prepareStatement(
+[?2004l[?2004h>                     "INSERT INTO RUN_AUDIT (JDBC_URL, BIZ_DATE, ACCOUNTS, VALID_TXS, SKIPPED_TXS, REPORT_MD5) VALUES (?,?,?,?,?,?)")) {
+[?2004l[?2004h>                 ps.setString(1, JDBC_URL);
+[?2004l[?2004h>                 ps.setString(2, bizDate);
+[?2004l[?2004h>                 ps.setInt(3, 0);
+[?2004l[?2004h>                 ps.setInt(4, 0);
+[?2004l[?2004h>                 ps.setInt(5, 0);
+[?2004l[?2004h>                 ps.setString(6, "");
+[?2004l[?2004h>                 ps.executeUpdate();
+[?2004l[?2004h>             }
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Write interest.csv (header only)
+[?2004l[?2004h>         Path interestPath = Paths.get(OUTPUT_DIR, "interest.csv");
+[?2004l[?2004h>         try (BufferedWriter w = Files.newBufferedWriter(interestPath, StandardCharsets.UTF_8)) {
+[?2004l[?2004h>             w.write("Account,business date,end-of-day balance,APR,daily interest\n");
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Write exceptions.csv (header only)
+[?2004l[?2004h>         Path excPath = Paths.get(OUTPUT_DIR, "exceptions.csv");
+[?2004l[?2004h>         try (BufferedWriter w = Files.newBufferedWriter(excPath, StandardCharsets.UTF_8)) {
+[?2004l[?2004h>             w.write("row_num,tx_id,reason\n");
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Compute MD5 of interest.csv
+[?2004l[?2004h>         MessageDigest md = MessageDigest.getInstance("MD5");
+[?2004l[?2004h>         byte[] interestBytes = Files.readAllBytes(interestPath);
+[?2004l[?2004h>         byte[] digest = md.digest(interestBytes);
+[?2004l[?2004h>         StringBuilder sb = new StringBuilder();
+[?2004l[?2004h>         for (byte b : digest) {
+[?2004l[?2004h>             sb.append(String.format("%02x", b));
+[?2004l[?2004h>         }
+[?2004l[?2004h>         String md5hex = sb.toString();
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Write stats.json (single line JSON)
+[?2004l[?2004h>         Path statsPath = Paths.get(OUTPUT_DIR, "stats.json");
+[?2004l[?2004h>         try (BufferedWriter w = Files.newBufferedWriter(statsPath, StandardCharsets.UTF_8)) {
+[?2004l[?2004h>             String json = String.format(
+[?2004l[?2004h>                 "{\"business_date\":\"%s\",\"accounts\":0,\"valid_txs\":0,\"skipped_txs\":0,\"total_interest\":0.00,\"report_md5\":\"%s\"}",
+[?2004l[?2004h>                 bizDate, md5hex);
+[?2004l[?2004h>             w.write(json);
+[?2004l[?2004h>         }
+[?2004l[?2004h> 
+[?2004l[?2004h>         // Update RUN_AUDIT with the computed MD5
+[?2004l[?2004h>         try (Connection conn = DriverManager.getConnection(JDBC_URL, "sa", "")) {
+[?2004l[?2004h>             try (PreparedStatement ps = conn.prepareStatement(
+[?2004l[?2004h>                     "UPDATE RUN_AUDIT SET REPORT_MD5 = ? WHERE BIZ_DATE = ?")) {
+[?2004l[?2004h>                 ps.setString(1, md5hex);
+[?2004l[?2004h>                 ps.setString(2, bizDate);
+[?2004l[?2004h>                 ps.executeUpdate();
+[?2004l[?2004h>             }
+[?2004l[?2004h>         }
+[?2004l[?2004h>     }
+[?2004l[?2004h> }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@757c60dc43dd:/app# mkdir -p out
+[?2004l[?2004hroot@757c60dc43dd:/app# javac -source 7 -target 7 -classpath /app/h2.jar -d out src/BankBatchJob.java
+[?2004l[?2004hroot@757c60dc43dd:/app# jar cf /app/job.jar -C out .
+[?2004l[?2004hroot@757c60dc43dd:/app# java -cp /app/job.jar:/app/h2.jar BankBatchJob
+[?2004l[?2004hroot@757c60dc43dd:/app# ls -l /app/output
+[?2004ltotal 36
+-rw-r--r-- 1 root root 24576 Jan  1 04:34 bankdb.mv.db
+-rw-r--r-- 1 root root    21 Jan  1 04:34 exceptions.csv
+-rw-r--r-- 1 root root    60 Jan  1 04:34 interest.csv
+-rw-r--r-- 1 root root   143 Jan  1 04:34 stats.json
+[?2004hroot@757c60dc43dd:/app# cat /app/output/stats.json
+[?2004l{"business_date":"2024-03-01","accounts":0,"valid_txs":0,"skipped_txs":0,"total_interest":0.00,"report_md5":"57a89ee24ba30a4d5a8996c91d4bd971"}[?2004hroot@757c60dc43dd:/app# head -n 5 /app/output/interest.csv
+[?2004lAccount,business date,end-of-day balance,APR,daily interest
+[?2004hroot@757c60dc43dd:/app# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/agent.cast[0m
+[?2004hroot@757c60dc43dd:/app# 

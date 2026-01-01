@@ -1,0 +1,23 @@
+{
+  "analysis": "There is no existing Java project or jar under /app. Inputs are present under /app/data and biz_date is 2024-03-01. /app/output does not exist yet. Java runtime is OpenJDK 7. We found an H2 jar at /opt/legacy-lib/h2-1.3.176.jar. The javac version command produced no output, so we need to verify whether javac is installed/working. Next we need to inspect the remaining input CSV formats (fee_rules, fx_rates, fx_pivots, full transactions) and then implement BankBatchJob in Java 7, compile to Java 7 bytecode, package /app/job.jar, run it, and verify deterministic outputs plus H2 DB contents.",
+  "plan": "1) Verify javac availability and version (capture stderr), and locate JAVA_HOME if needed.\n2) Inspect fee_rules.csv, fx_rates.csv, fx_pivots.csv and more of transactions.csv to confirm exact headers/columns.\n3) Create /app/src with BankBatchJob.java and helper classes (CSV parsing, date math, FX lookup, fee calc, H2 writer, report writer).\n4) Compile with javac -source 1.7 -target 1.7, build /app/job.jar with a Main-Class manifest.\n5) Run the job (with H2 jar on classpath if needed) to generate /app/output/*, then sanity-check formatting (newlines, sorting, md5) and rerun to confirm identical results.",
+  "commands": [
+    {
+      "keystrokes": "which javac || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "javac -version 2>&1 || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "echo \"JAVA_HOME=$JAVA_HOME\"; readlink -f \"$(which java)\" || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "echo '--- fee_rules.csv'; cat /app/data/fee_rules.csv; echo; echo '--- fx_pivots.csv'; cat /app/data/fx_pivots.csv; echo; echo '--- fx_rates.csv (head)'; head -n 20 /app/data/fx_rates.csv; echo; echo '--- transactions.csv (full)'; cat /app/data/transactions.csv\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

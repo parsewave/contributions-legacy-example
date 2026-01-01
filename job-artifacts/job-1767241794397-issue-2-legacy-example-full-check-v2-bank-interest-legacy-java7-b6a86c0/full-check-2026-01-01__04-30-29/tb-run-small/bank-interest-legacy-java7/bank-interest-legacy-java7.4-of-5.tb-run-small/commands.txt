@@ -1,0 +1,11 @@
+['asciinema rec --stdin /logs/agent.cast', 'Enter']
+['clear', 'Enter']
+'ls -R\n'
+'ls -l\n'
+'ls -la\n'
+"find / -type f \\( -name '*BankBatchJob*.java' -o -name 'job.jar' \\) 2>/dev/null\n"
+['asciinema rec --stdin /logs/tests.cast', 'Enter']
+['clear', 'Enter']
+['bash ', '/tests/run-tests.sh', 'Enter']
+['C-d']
+['C-d']

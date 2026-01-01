@@ -1,0 +1,142 @@
+New Terminal Output:
+
+root@28a1d3931d7a:/app# set -euo pipefail
+root@28a1d3931d7a:/app# wc -l /app/src/BankBatchJob.java || true
+328 /app/src/BankBatchJob.java
+root@28a1d3931d7a:/app# nl -ba /app/src/BankBatchJob.java | head -n 60
+     1  import java.io.*;
+     2  import java.math.*;
+     3  import java.security.*;
+     4  import java.sql.*;
+     5  import java.text.*;
+     6  import java.util.*;
+     7
+     8  public class BankBatchJob {
+     9    private static final String JDBC_URL = "jdbc:h2:/app/output/bankdb;MODE=DB2";
+    10    private static final File DATA_DIR = new File("/app/data");
+    11    private static final File OUT_DIR = new File("/app/output");
+    12    private static final RoundingMode RM = RoundingMode.HALF_EVEN;
+    13    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+    14    private static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd");
+    15    static { DF.setLenient(false); DF.setTimeZone(UTC); }
+    16
+    17    static class Acct {
+    18      String id; Date opened; BigDecimal start;
+    19      BigDecimal baseApr, promoApr; int promoDays;
+    20      BigDecimal tierTh, tierApr; String ccy, feePlan;
+    21      BigDecimal eod, apr, diRaw;
+    22    }
+    23    static class Fee { String plan, applies; BigDecimal flat,pct,min,max; }
+    24    static class Txn {
+    25      int row; String txId, acctId; Date eff; BigDecimal amt; String ccy,status,revOf;
+    26      boolean valid; String reason;
+    27      BigDecimal convRaw, fee, adj;
+    28    }
+    29    static class Fx { Date d; String f,t; BigDecimal r; }
+    30
+    31    public static void main(String[] args) throws Exception {
+    32      OUT_DIR.mkdirs();
+    33      del("interest.csv"); del("exceptions.csv"); del("stats.json");
+    34      del("bankdb.h2.db"); del("bankdb.trace.db"); del("bankdb.lock.db");
+    35
+    36      Date biz = parse(readAll(new File(DATA_DIR,"biz_date.txt")).trim());
+    37      Map<String,Acct> accts = readAccounts(new File(DATA_DIR,"accounts.csv"));
+    38      Map<String,Fee> fees = readFees(new File(DATA_DIR,"fee_rules.csv"));
+    39      List<String> pivots = readPivots(new File(DATA_DIR,"fx_pivots.csv"));
+    40      List<Fx> fx = readFx(new File(DATA_DIR,"fx_rates.csv"));
+    41      List<Txn> txns = readTxns(new File(DATA_DIR,"transactions.csv"));
+    42
+    43      Set<String> txIds = new HashSet<String>();
+    44      for (Txn t: txns) txIds.add(t.txId);
+    45
+    46      Set<String> reversed = new HashSet<String>();
+    47      for (Txn t: txns) {
+    48        if (t.revOf.length()>0 && txIds.contains(t.revOf)) { reversed.add(t.txId); reversed.add(t.revOf); }
+    49      }
+    50
+    51      Set<String> seen = new HashSet<String>();
+    52      int valid=0, skipped=0;
+    53
+    54      for (Txn t: txns) {
+    55        boolean dup = seen.contains(t.txId); seen.add(t.txId);
+    56        String reason=null;
+    57
+    58        if (reversed.contains(t.txId)) reason="REVERSED";
+    59        else if (t.revOf.length()>0 && !txIds.contains(t.revOf)) reason="REVERSAL_MISSING";
+    60        else {
+root@28a1d3931d7a:/app# grep -n '^import ' /app/src/BankBatchJob.java | head -n 5 || true
+1:import java.io.*;
+2:import java.math.*;
+3:import java.security.*;
+4:import java.sql.*;
+5:import java.text.*;
+root@28a1d3931d7a:/app# first=$(grep -n '^import ' /app/src/BankBatchJob.java | head -n 1 | cut -d: -f1 || true)
+root@28a1d3931d7a:/app# if [ -z "${first}" ]; then echo "ERROR: no import line found"; exit 1; fi
+root@28a1d3931d7a:/app# if [ "${first}" != "1" ]; then tail -n +"${first}" /app/src/BankBatchJob.java > /app/src/BankBatchJob.java.clean && mv /app/src/BankBatc
+hJob.java.clean /app/src/BankBatchJob.java; fi
+root@28a1d3931d7a:/app# perl -0777 -i -pe 's/import java\.sql\.\*;/import java.sql.Connection;\nimport java.sql.DriverManager;\nimport java.sql.Statement;\nimpo
+rt java.sql.PreparedStatement;\nimport java.sql.SQLException;/g' /app/src/BankBatchJob.java
+root@28a1d3931d7a:/app# grep -n '^import ' /app/src/BankBatchJob.java
+1:import java.io.*;
+2:import java.math.*;
+3:import java.security.*;
+4:import java.sql.Connection;
+5:import java.sql.DriverManager;
+6:import java.sql.Statement;
+7:import java.sql.PreparedStatement;
+8:import java.sql.SQLException;
+9:import java.text.*;
+10:import java.util.*;
+root@28a1d3931d7a:/app# rm -rf /app/build/classes && mkdir -p /app/build/classes
+root@28a1d3931d7a:/app# javac -source 1.7 -target 1.7 -cp /app/lib/h2.jar -d /app/build/classes /app/src/BankBatchJob.java
+root@28a1d3931d7a:/app# jar cfm /app/job.jar /app/build/manifest.mf -C /app/build/classes .
+root@28a1d3931d7a:/app# java -jar /app/job.jar
+root@28a1d3931d7a:/app# ls -la /app/output
+total 64
+drwxr-xr-x 2 root root  4096 Jan  1 05:27 .
+drwxr-xr-x 7 root root  4096 Jan  1 05:25 ..
+-rw-r--r-- 1 root root     0 Jan  1 05:26 .md5_first
+-rw-r--r-- 1 root root     0 Jan  1 05:26 .md5_second
+-rw-r--r-- 1 root root 36864 Jan  1 05:27 bankdb.h2.db
+-rw-r--r-- 1 root root   411 Jan  1 05:27 bankdb.trace.db
+-rw-r--r-- 1 root root   264 Jan  1 05:27 exceptions.csv
+-rw-r--r-- 1 root root   206 Jan  1 05:27 interest.csv
+-rw-r--r-- 1 root root   144 Jan  1 05:27 stats.json
+root@28a1d3931d7a:/app# md5sum /app/output/interest.csv | tee /app/output/.md5_first
+d6e6bfa87102a7be797a462843f8a087  /app/output/interest.csv
+root@28a1d3931d7a:/app# java -jar /app/job.jar
+root@28a1d3931d7a:/app# md5sum /app/output/interest.csv | tee /app/output/.md5_second && diff -u /app/output/.md5_first /app/output/.md5_second
+d6e6bfa87102a7be797a462843f8a087  /app/output/interest.csv
+root@28a1d3931d7a:/app# sed -n '1,120p' /app/output/interest.csv
+account_id,biz_date,eod_balance,apr,daily_interest
+A1001,2024-03-01,7965.47,0.012000,0.26
+A1002,2024-03-01,5127.11,0.009000,0.13
+A1003,2024-03-01,-0.80,0.020000,0.00
+A1004,2024-03-01,36500.00,0.010050,1.00
+root@28a1d3931d7a:/app# sed -n '1,200p' /app/output/exceptions.csv
+row_num,tx_id,reason
+2,T002,AFTER_BIZ_DATE
+3,T003,PENDING
+5,T004,DUPLICATE
+6,T005,REVERSED
+7,T006,REVERSED
+9,T008,REVERSAL_MISSING
+10,T009,REVERSED
+11,T010,REVERSED
+13,T012,AFTER_BIZ_DATE
+17,T016,ACCOUNT_MISSING
+18,T016,DUPLICATE
+19,T017,REVERSED
+20,T018,REVERSED
+root@28a1d3931d7a:/app# python3 - <<'PY'
+> from pathlib import Path
+> p=Path('/app/output/stats.json')
+> b=p.read_bytes()
+> print('stats.json len=',len(b))
+> print('stats.json endswith newline?', b.endswith(b"\n"))
+> print(b.decode('utf-8'))
+> PY
+stats.json len= 144
+stats.json endswith newline? False
+{"business_date":"2024-03-01","accounts":4,"valid_txs":7,"skipped_txs":13,"total_interest":1.39,"report_md5":"d6e6bfa87102a7be797a462843f8a087"}
+root@28a1d3931d7a:/app#

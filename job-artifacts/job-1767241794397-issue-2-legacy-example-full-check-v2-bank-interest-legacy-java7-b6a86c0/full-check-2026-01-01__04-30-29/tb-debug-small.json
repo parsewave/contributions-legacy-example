@@ -1,0 +1,4 @@
+{
+    "outcome": "FAIL",
+    "explanation": "Trials that built and ran the job mostly passed runtime constraints (Java 7 bytecode, JDBC literal/usage, idempotence). The consistent failure was interest.csv mismatch: tests expect exact header names 'account_id,biz_date,eod_balance,apr,daily_interest', while the task instructions only describe columns in human-friendly terms ('Account, business date, end-of-day balance, annual percentage rate (APR), and daily interest') without specifying exact header strings, casing, or snake_case. This is a hardcoded test expectation not precisely specified in the task. Therefore, the failures are due to insufficient instructions rather than normal agent limitations."
+}

@@ -1,0 +1,39 @@
+{
+  "analysis": "We are at the root of /app with no file listing yet. To complete the task we need to locate the Java source (BankBatchJob.java), ensure the H2 JDBC driver is available, compile the source targeting Java 7 bytecode, package the compiled class(es) into /app/job.jar, run the job, and finally verify that the required output files appear in /app/output.",
+  "plan": "1. List all files to see the project layout.\n2. Find the path to BankBatchJob.java.\n3. Find any existing H2 JAR; if none, download it.\n4. Compile the Java source with javac using -source 7 -target 7 and the H2 JAR on the classpath.\n5. Create /app/job.jar containing the compiled class files.\n6. Execute the job with java, providing the H2 JAR on the classpath.\n7. List /app/output to confirm the generated reports.",
+  "commands": [
+    {
+      "keystrokes": "ls -R\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "find . -name BankBatchJob.java\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "find . -name \"h2*.jar\"\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "wget -q -O h2.jar https://repo1.maven.org/maven2/com/h2database/h2/1.4.200/h2-1.4.200.jar\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "SRC=$(find . -name BankBatchJob.java | head -n1); javac -source 7 -target 7 -classpath h2.jar \"${SRC}\"\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "jar cf /app/job.jar *.class\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "java -cp /app/job.jar:h2.jar BankBatchJob\n",
+      "duration": 5.0
+    },
+    {
+      "keystrokes": "ls -l /app/output\n",
+      "duration": 0.2
+    }
+  ],
+  "task_complete": false
+}

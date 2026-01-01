@@ -1,0 +1,41 @@
+New Terminal Output:
+root@534c3e9c095c:/app# ls -R
+.:
+data
+
+./data:
+accounts.csv  biz_date.txt  fee_rules.csv  fx_pivots.csv  fx_rates.csv  transactions.csv
+root@534c3e9c095c:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

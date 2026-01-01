@@ -1,0 +1,4 @@
+New Terminal Output:
+
+root@e50802b66863:/app# find / -type f -iname "*bankbatchjob*" 2>/dev/null
+root@e50802b66863:/app#

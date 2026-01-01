@@ -1,0 +1,97 @@
+New Terminal Output:
+
+root@28a1d3931d7a:/app# sed -n '1,200p' /app/data/accounts.csv
+account_id,opened_at,start_balance,base_apr,promo_apr,promo_days,tier_threshold,tier_apr,currency,fee_plan
+A1001,2024-02-01,10000.00,0.01000,0.00500,29,5000.00,0.00200,USD,PLAN_A
+A1002,2020-01-01,5000.00,0.00800,0.00000,0,5000.00,0.00100,USD,PLAN_B
+A1003,2023-12-01,-10.00,0.02000,0.00000,0,10000.00,0.00500,EUR,PLAN_A
+A1004,2023-01-01,36500.00,0.01005,0.00000,0,999999.00,0.00000,USD,PLAN_C
+root@28a1d3931d7a:/app# sed -n '1,200p' /app/data/transactions.csv
+tx_id,account_id,effective_date,amount,currency,status,reversal_of
+T001,A1001,2024-03-01,-2000.00,USD,POSTED,
+T002,A1001,2024-03-02,-500.00,EUR,POSTED,
+T003,A1001,2024-02-28,100.00,USD,PENDING,
+T004,A1002,2024-02-15,50.00,USD,POSTED,
+T004,A1002,2024-02-15,50.00,USD,POSTED,
+T005,A1002,2024-02-16,-20.00,USD,POSTED,
+T006,A1002,2024-02-20,20.00,USD,POSTED,T005
+T007,A1003,2024-03-01,10.00,USD,POSTED,
+T008,A1003,2024-03-01,-10.00,EUR,POSTED,NOPE
+T009,A1004,2024-01-15,1000.00,EUR,POSTED,
+T010,A1004,2024-03-01,-1000.00,USD,POSTED,T009
+T011,A1002,2024-03-01,5.00,USD,POSTED,
+T012,A1002,2024-03-05,5.00,USD,POSTED,
+T013,A1001,2024-02-10,30.00,GBP,POSTED,
+T014,A1001,2024-03-01,-10000.00,JPY,POSTED,
+T015,A1002,2024-03-01,100.00,CAD,POSTED,
+T016,A9999,2024-03-01,25.00,USD,POSTED,
+T016,A1001,2024-03-01,25.00,USD,POSTED,
+T017,A1003,2024-03-01,-15.00,USD,POSTED,T018
+T018,A1003,2024-03-01,15.00,USD,POSTED,
+root@28a1d3931d7a:/app# cat /app/data/biz_date.txt
+2024-03-01
+root@28a1d3931d7a:/app# sed -n '1,200p' /app/data/fx_rates.csv
+rate_date,from_ccy,to_ccy,rate
+2024-01-01,USD,EUR,0.9000
+2024-01-01,EUR,USD,1.1111
+2024-02-01,USD,EUR,0.9100
+2024-02-01,EUR,USD,1.0989
+2024-03-01,USD,EUR,0.9200
+2024-03-01,EUR,USD,1.0870
+2024-02-01,JPY,EUR,0.0065
+2024-03-01,JPY,EUR,0.0066
+2024-02-01,USD,GBP,0.7900
+2024-03-01,USD,GBP,0.8000
+2024-02-01,GBP,JPY,190.00
+2024-03-01,GBP,JPY,188.00
+2024-02-01,JPY,USD,0.0067
+2024-03-01,USD,JPY,150.00
+2024-02-01,CAD,GBP,0.5800
+2024-03-01,GBP,CAD,1.7200
+2024-02-01,CAD,EUR,0.6700
+2024-03-01,EUR,CAD,1.4900
+root@28a1d3931d7a:/app# cat /app/data/fx_pivots.csv
+pivot
+GBP
+EUR
+root@28a1d3931d7a:/app# sed -n '1,200p' /app/data/fee_rules.csv
+fee_plan,applies_to,flat_fee,pct_fee,min_fee,max_fee
+PLAN_A,DEBIT,0.50,0.005,0.25,5.00
+PLAN_B,ALL,0.10,0.002,0.10,2.00
+PLAN_C,CREDIT,0.25,0.001,0.25,1.00
+root@28a1d3931d7a:/app# mkdir -p /app/output
+root@28a1d3931d7a:/app# apt-get update
+Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8791 kB]
+Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [290 kB]
+Fetched 9342 kB in 1s (9716 kB/s)
+Reading package lists... Done
+root@28a1d3931d7a:/app# apt-get install -y libh2-java
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+Suggested packages:
+  libjts-java liblucene8-java libslf4j-java
+The following NEW packages will be installed:
+  libh2-java
+0 upgraded, 1 newly installed, 0 to remove and 39 not upgraded.
+Need to get 2464 kB of archives.
+After this operation, 2628 kB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bookworm/main amd64 libh2-java all 2.1.214-1 [2464 kB]
+Fetched 2464 kB in 1s (4456 kB/s)
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package libh2-java.
+(Reading database ... 7673 files and directories currently installed.)
+Preparing to unpack .../libh2-java_2.1.214-1_all.deb ...
+Unpacking libh2-java (2.1.214-1) ...
+Setting up libh2-java (2.1.214-1) ...
+root@28a1d3931d7a:/app# ls -ლა /usr/share/java | head
+ls: invalid option -- ''
+Try 'ls --help' for more information.
+root@28a1d3931d7a:/app# ls -la /usr/share/java | grep -i h2 || true
+-rw-r--r--  1 root root 2567931 Aug 29  2022 h2-2.1.214.jar
+lrwxrwxrwx  1 root root      14 Aug 29  2022 h2.jar -> h2-2.1.214.jar
+root@28a1d3931d7a:/app#

@@ -1,0 +1,43 @@
+{
+  "analysis": "We are at /app with no prior commands run. We need to inspect the filesystem for existing source/build scaffolding, confirm input files in /app/data, and check for an H2 JDBC jar (or any existing Java project). Then we can implement/compile BankBatchJob to Java 7 bytecode and package it into /app/job.jar, run it, and verify outputs and determinism.",
+  "plan": "1) Inspect /app and /app/data to see what exists and confirm required inputs.\n2) Search for any existing Java sources or build artifacts and locate an H2 jar (needed for H2 1.3 DB2 mode).\n3) Based on what we find, create a small Java 7 project structure (src/...), implement BankBatchJob with the required business logic, compile with javac -source/-target 1.7, and package into /app/job.jar with the correct Main-Class.\n4) Run the jar to generate /app/output files and the H2 DB. Validate formatting requirements (LF + trailing newline for CSVs, stats.json single-line), and ensure reruns produce identical results for same biz_date.",
+  "commands": [
+    {
+      "keystrokes": "cd /app\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "ls -la\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "find /app -maxdepth 3 -type f -name \"*.java\" -o -name \"*.jar\" -o -name \"pom.xml\" -o -name \"build.gradle\" | sed 's#^#/app#' || true\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "ls -la /app/data\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "head -n 5 /app/data/accounts.csv; echo '---'; head -n 5 /app/data/transactions.csv; echo '---'; cat /app/data/biz_date.txt\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "ls -la /app/output || true\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "find / -maxdepth 4 -type f \\( -iname \"h2*.jar\" -o -iname \"h2-*.jar\" \\) 2>/dev/null | head\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "java -version\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "javac -version\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

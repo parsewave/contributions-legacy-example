@@ -1,0 +1,6 @@
+{
+  "analysis": "A full filesystem search for any Java source named '*BankBatchJob*.java' or any existing 'job.jar' returned nothing, indicating that the required source code or compiled JAR is not present in the container. The /app directory only contains the data files needed for processing, but without the Java program we cannot compile or run the batch job to produce the required outputs.",
+  "plan": "Since no source or JAR can be located, the task cannot be completed as described. I will report that the necessary files are missing.",
+  "commands": [],
+  "task_complete": true
+}

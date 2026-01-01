@@ -1,0 +1,6 @@
+{
+  "analysis": "All searches for Java source files, compiled JARs, class files, or any archives that could contain the required `BankBatchJob` implementation have returned nothing. The only Java‑related files on the system are the JDK sample sources and the H2 library, none of which implement the banking batch logic described in the task. Without the source code or a pre‑built JAR, we cannot compile or run the batch job, nor can we generate the required output files (interest.csv, exceptions.csv, stats.json, H2 database, etc.).",
+  "plan": "Since the necessary implementation is not present in the filesystem, the task cannot be completed as specified. The appropriate response is to report that the required `BankBatchJob` source or JAR is missing and therefore the batch job cannot be executed.",
+  "commands": [],
+  "task_complete": false
+}

@@ -1,0 +1,24 @@
+[?2004hroot@534c3e9c095c:/app# asciinema rec --stdin /logs/agent.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@534c3e9c095c:/app# clear
+[?2004l[H[J[3J[?2004hroot@534c3e9c095c:/app# ls -R
+[?2004l.:
+data
+
+./data:
+accounts.csv  biz_date.txt  fee_rules.csv  fx_pivots.csv  fx_rates.csv	transactions.csv
+[?2004hroot@534c3e9c095c:/app# ls -l
+[?2004ltotal 4
+drwxr-xr-x 2 root root 4096 Jan  1 04:30 data
+[?2004hroot@534c3e9c095c:/app# ls -la
+[?2004ltotal 12
+drwxr-xr-x  3 root root 4096 Jan  1 04:33 .
+drwxr-xr-x 20 root root 4096 Jan  1 04:33 ..
+drwxr-xr-x  2 root root 4096 Jan  1 04:30 data
+[?2004hroot@534c3e9c095c:/app# find / -type f \( -name '*BankBatchJob*.java' -o -name 'job.jar' \) 2>/dev/null
+[?2004l[?2004hroot@534c3e9c095c:/app# [?2004l
+exit
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/agent.cast[0m
+[?2004hroot@534c3e9c095c:/app# 

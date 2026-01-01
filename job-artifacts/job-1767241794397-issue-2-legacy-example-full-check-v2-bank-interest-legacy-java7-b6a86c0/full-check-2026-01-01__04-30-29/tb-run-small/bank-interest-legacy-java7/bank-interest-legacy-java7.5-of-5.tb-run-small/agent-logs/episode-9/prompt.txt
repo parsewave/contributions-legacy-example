@@ -1,0 +1,33 @@
+New Terminal Output:
+
+root@757c60dc43dd:/app# mkdir -p out
+root@757c60dc43dd:/app# javac -source 7 -target 7 -classpath /app/h2.jar -d out src/BankBatchJob.java
+src/BankBatchJob.java:42: error: method newBufferedWriter in class Files cannot be applied to given types;
+        try (BufferedWriter w = Files.newBufferedWriter(interestPath)) {
+                                     ^
+  required: Path,Charset,OpenOption[]
+  found: Path
+  reason: actual and formal argument lists differ in length
+src/BankBatchJob.java:48: error: method newBufferedWriter in class Files cannot be applied to given types;
+        try (BufferedWriter w = Files.newBufferedWriter(excPath)) {
+                                     ^
+  required: Path,Charset,OpenOption[]
+  found: Path
+  reason: actual and formal argument lists differ in length
+src/BankBatchJob.java:64: error: method newBufferedWriter in class Files cannot be applied to given types;
+        try (BufferedWriter w = Files.newBufferedWriter(statsPath)) {
+                                     ^
+  required: Path,Charset,OpenOption[]
+  found: Path
+  reason: actual and formal argument lists differ in length
+3 errors
+root@757c60dc43dd:/app# jar cf /app/job.jar -C out .
+root@757c60dc43dd:/app# java -cp /app/job.jar:/app/h2.jar BankBatchJob
+Error: Could not find or load main class BankBatchJob
+root@757c60dc43dd:/app# ls -l /app/output
+ls: cannot access '/app/output': No such file or directory
+root@757c60dc43dd:/app# cat /app/output/stats.json
+cat: /app/output/stats.json: No such file or directory
+root@757c60dc43dd:/app# head -n 5 /app/output/interest.csv
+head: cannot open '/app/output/interest.csv' for reading: No such file or directory
+root@757c60dc43dd:/app#

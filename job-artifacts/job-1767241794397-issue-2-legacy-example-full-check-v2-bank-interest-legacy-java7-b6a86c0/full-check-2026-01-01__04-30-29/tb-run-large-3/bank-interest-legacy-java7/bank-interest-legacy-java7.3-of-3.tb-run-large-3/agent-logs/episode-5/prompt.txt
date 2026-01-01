@@ -1,0 +1,199 @@
+New Terminal Output:
+
+root@28a1d3931d7a:/app# rm -f /app/src/BankBatchJob.java /app/job.jar; mkdir -p /app/src /app/build/classes /app/output
+root@28a1d3931d7a:/app# cat > /app/src/BankBatchJob.java <<'EOF'
+Of)) { reversed.add(t.txId); reversed.add(t.revOf); }
+    }
+
+    Set<String> seen = new HashSet<String>();
+    int valid=0, skipped=0;
+
+    for (Txn t: txns) {
+      boolean dup = seen.contains(t.txId); seen.add(t.txId);
+      String reason=null;
+
+      if (reversed.contains(t.txId)) reason="REVERSED";
+      else if (t.revOf.length()>0 && !txIds.contains(t.revOf)) reason="REVERSAL_MISSING";
+      else {
+        Acct a = accts.get(t.acctId);
+        if (a==null) reason="ACCOUNT_MISSING";
+        else {
+          BigDecimal rate;
+          if (t.ccy.equals(a.ccy)) rate = BigDecimal.ONE.setScale(10,RM);
+          else {
+            rate = fxRate(fx,pivots,t.ccy,a.ccy,t.eff);
+            if (rate==null) reason="FX_MISSING";
+          }
+          if (reason==null) {
+            if (t.eff.after(biz)) reason="AFTER_BIZ_DATE";
+            else if (!"POSTED".equals(t.status)) reason=t.status;
+            else if (dup) reason="DUPLICATE";
+            else {
+              // convert first, keep 10dp, then fee uses converted amount
+              t.convRaw = t.amt.multiply(rate).setScale(10,RM);
+              Fee fr = fees.get(a.feePlan);
+              t.fee = fee(fr, t.convRaw);
+              t.adj = t.convRaw.setScale(2,RM).subtract(t.fee).setScale(2,RM);
+              t.valid=true; valid++;
+            }
+          }
+        }
+      }
+
+      if (reason!=null) { t.valid=false; t.reason=reason; skipped++; }
+    }
+
+    for (Acct a: accts.values()) {
+      BigDecimal sum = bd("0").setScale(2,RM);
+      for (Txn t: txns) if (t.valid && a.id.equals(t.acctId)) sum = sum.add(t.adj).setScale(2,RM);
+      a.eod = a.start.add(sum).setScale(2,RM);
+
+      boolean promo=false;
+      if (a.promoDays>0) promo = daysBetween(a.opened,biz) < a.promoDays;
+
+      BigDecimal apr=a.baseApr;
+      if (a.eod.compareTo(a.tierTh)>=0) apr=apr.add(a.tierApr);
+      if (promo) apr=apr.add(a.promoApr);
+      a.apr=apr;
+
+      BigDecimal principal = a.eod.max(bd("0").setScale(2,RM));
+      BigDecimal dailyRate = a.apr.divide(bd("365"),10,RM);
+      a.diRaw = principal.multiply(dailyRate).setSca> import java.io.*;
+> import java.math.*;
+> import java.security.*;
+> import java.sql.*;
+ite> import java.text.*;
+,bi> import java.util.*;
+>
+> public class BankBatchJob {
+>   private static final String JDBC_URL = "jdbc:h2:/app/output/bankdb;MODE=DB2";
+>   private static final File DATA_DIR = new File("/app/data");
+>   private static final File OUT_DIR = new File("/app/output");
+>   private static final RoundingMode RM = RoundingMode.HALF_EVEN;
+>   private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+>   private static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd");
+d >   static { DF.setLenient(false); DF.setTimeZone(UTC); }
+>
+>   static class Acct {
+>     String id; Date opened; BigDecimal start;
+>     BigDecimal baseApr, promoApr; int promoDays;
+>     BigDecimal tierTh, tierApr; String ccy, feePlan;
+etu>     BigDecimal eod, apr, diRaw;
+ sta>   }
+>   static class Fee { String plan, applies; BigDecimal flat,pct,min,max; }
+t>   static class Txn {
+>     int row; String txId, acctId; Date eff; BigDecimal amt; String ccy,status,revOf;
+>     boolean valid; String reason;
+>     BigDecimal convRaw, fee, adj;
+>   }
+>   static class Fx { Date d; String f,t; BigDecimal r; }
+(>
+>   public static void main(String[] args) throws Exception {
+>     OUT_DIR.mkdirs();
+>     del("interest.csv"); del("exceptions.csv"); del("stats.json");
+
+ >     del("bankdb.h2.db"); del("bankdb.trace.db"); del("bankdb.lock.db");
+>
+f>     Date biz = parse(readAll(new File(DATA_DIR,"biz_date.txt")).trim());
+>     Map<String,Acct> accts = readAccounts(new File(DATA_DIR,"accounts.csv"));
+w>     Map<String,Fee> fees = readFees(new File(DATA_DIR,"fee_rules.csv"));
+>     List<String> pivots = readPivots(new File(DATA_DIR,"fx_pivots.csv"));
+>     List<Fx> fx = readFx(new File(DATA_DIR,"fx_rates.csv"));
+>     List<Txn> txns = readTxns(new File(DATA_DIR,"transactions.csv"));
+>
+p>     Set<String> txIds = new HashSet<String>();
+>     for (Txn t: txns) txIds.add(t.txId);
+>
+t>     Set<String> reversed = new HashSet<String>();
+i>     for (Txn t: txns) {
+>       if (t.revOf.length()>0 && txIds.contains(t.revOf)) { reversed.add(t.txId); reversed.add(t.revOf); }
+>     }
+).setS>
+c>     Set<String> seen = new HashSet<String>();
+>     int valid=0, skipped=0;
+te>
+>     for (Txn t: txns) {
+>       boolean dup = seen.contains(t.txId); seen.add(t.txId);
+>       String reason=null;
+>
+>       if (reversed.contains(t.txId)) reason="REVERSED";
+>       else if (t.revOf.length()>0 && !txIds.contains(t.revOf)) reason="REVERSAL_MISSING";
+tr>       else {
+e>         Acct a = accts.get(t.acctId);
+>         if (a==null) reason="ACCOUNT_MISSING";
+>         else {
+>           BigDecimal rate;
+>        
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+l.Date in java.util and class java.sql.Date in java.sql match
+  private static int daysBetween(Date s, Date e){ return (int)((e.getTime()-s.getTime())/86400000L); }
+                                         ^
+/app/src/BankBatchJob.java:209: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+  private static Fx latest(List<Fx> all, String from, String to, Date eff) {
+                                                                 ^
+/app/src/BankBatchJob.java:219: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+  private static BigDecimal leg(List<Fx> all, String from, String to, Date eff) {
+                                                                      ^
+/app/src/BankBatchJob.java:231: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+  private static BigDecimal fxRate(List<Fx> all, List<String> pivots, String from, String to, Date eff) {
+                                                                                              ^
+/app/src/BankBatchJob.java:243: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+  private static void writeInterest(File f, Date biz, Map<String,Acct> accts) throws Exception {
+                                            ^
+/app/src/BankBatchJob.java:274: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+  private static void writeStats(File f, Date biz, int accounts, int valid, int skipped, BigDecimal total, String md5) throws Exception {
+                                         ^
+/app/src/BankBatchJob.java:282: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+  private static void writeDb(Date biz, Map<String,Acct> accts, List<Txn> txns, int valid, int skipped, String md5) throws Exception {
+                              ^
+/app/src/BankBatchJob.java:18: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+    String id; Date opened; BigDecimal start;
+               ^
+/app/src/BankBatchJob.java:29: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+  static class Fx { Date d; String f,t; BigDecimal r; }
+                    ^
+/app/src/BankBatchJob.java:25: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+    int row; String txId, acctId; Date eff; BigDecimal amt; String ccy,status,revOf;
+                                  ^
+/app/src/BankBatchJob.java:36: error: reference to Date is ambiguous, both class java.util.Date in java.util and class java.sql.Date in java.sql match
+    Date biz = parse(readAll(new File(DATA_DIR,"biz_date.txt")).trim());
+    ^
+14 errors
+root@28a1d3931d7a:/app# cat > /app/build/manifest.mf <<'EOF'
+> Manifest-Version: 1.0
+> Main-Class: BankBatchJob
+> Class-Path: lib/h2.jar
+> EOF
+root@28a1d3931d7a:/app# jar cfm /app/job.jar /app/build/manifest.mf -C /app/build/classes .
+root@28a1d3931d7a:/app# java -jar /app/job.jar
+Error: Could not find or load main class BankBatchJob
+root@28a1d3931d7a:/app# ls -la /app/output
+total 8
+drwxr-xr-x 2 root root 4096 Jan  1 05:18 .
+drwxr-xr-x 7 root root 4096 Jan  1 05:25 ..
+root@28a1d3931d7a:/app# md5sum /app/output/interest.csv | tee /app/output/.md5_first
+md5sum: /app/output/interest.csv: No such file or directory
+root@28a1d3931d7a:/app# java -jar /app/job.jar
+Error: Could not find or load main class BankBatchJob
+root@28a1d3931d7a:/app# md5sum /app/output/interest.csv | tee /app/output/.md5_second && diff -u /app/output/.md5_first /app/output/.md5_second || true
+md5sum: /app/output/interest.csv: No such file or directory
+root@28a1d3931d7a:/app# sed -n '1,120p' /app/output/interest.csv
+sed: can't read /app/output/interest.csv: No such file or directory
+root@28a1d3931d7a:/app# sed -n '1,200p' /app/output/exceptions.csv
+sed: can't read /app/output/exceptions.csv: No such file or directory
+root@28a1d3931d7a:/app# python3 - <<'PY'
+> from pathlib import Path
+> b=Path('/app/output/stats.json').read_bytes()
+> print('stats.json has newline?', b.endswith(b"\n"))
+> print(b.decode('utf-8'))
+> PY
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+  File "/usr/local/lib/python3.13/pathlib/_abc.py", line 625, in read_bytes
+    with self.open(mode='rb') as f:
+         ~~~~~~~~~^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/pathlib/_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/app/output/stats.json'
+root@28a1d3931d7a:/app#

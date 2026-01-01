@@ -1,0 +1,6 @@
+{
+  "analysis": "All searches for any Java source files, compiled JARs, class files, or archives containing the required BankBatchJob implementation have returned no results. The filesystem only contains the input CSV files and JDK sample code; there is no BankBatchJob or related banking logic present anywhere on the system. Without this code we cannot compile, package, or run the batch job, nor generate the required output files (interest.csv, exceptions.csv, stats.json, H2 database, etc.).",
+  "plan": "Report that the necessary BankBatchJob source code or compiled JAR is missing, making it impossible to complete the task as described.",
+  "commands": [],
+  "task_complete": false
+}

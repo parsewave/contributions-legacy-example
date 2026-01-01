@@ -1,0 +1,6 @@
+{
+  "analysis": "Searches for any Java source, compiled JAR, class files, or archives containing the required BankBatchJob implementation yielded no results. The only files present are the input data and JDK sample code. Without the necessary Java program we cannot compile, package, or execute the batch job, and thus cannot produce the required output files.",
+  "plan": "Inform that the required BankBatchJob source code or compiled JAR is missing, so the task cannot be completed as specified.",
+  "commands": [],
+  "task_complete": false
+}

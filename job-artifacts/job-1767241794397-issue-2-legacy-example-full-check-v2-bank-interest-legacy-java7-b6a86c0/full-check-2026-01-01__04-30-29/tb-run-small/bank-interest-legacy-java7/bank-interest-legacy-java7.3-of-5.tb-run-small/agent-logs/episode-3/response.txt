@@ -1,0 +1,31 @@
+{
+  "analysis": "A pre-built /app/job.jar is present, but we still need the H2 JDBC driver to run it. The main class is unknown, so we should inspect the JAR's manifest to find the Main-Class entry. We have curl installed, so we can download the H2 driver (e.g., version 1.4.200) to /app/h2.jar. Once we have both JARs, we can run the job using java -cp /app/job.jar:/app/h2.jar <MainClass>. After execution, we will list /app/output to verify that the required files have been generated.",
+  "plan": "1. List the contents of /app/job.jar to see the package structure.\n2. Show the MANIFEST.MF to identify the Main-Class.\n3. Download the H2 driver JAR to /app/h2.jar using curl.\n4. Run the job with java -cp /app/job.jar:/app/h2.jar <MainClass>.\n5. List /app/output to confirm the output files.\nWe will execute these steps in order.",
+  "commands": [
+    {
+      "keystrokes": "jar tf /app/job.jar | head -n 20\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "jar xf /app/job.jar META-INF/MANIFEST.MF\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "cat META-INF/MANIFEST.MF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "curl -L -o /app/h2.jar https://repo1.maven.org/maven2/com/h2database/h2/1.4.200/h2-1.4.200.jar\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "java -cp /app/job.jar:/app/h2.jar $(grep -i \"Main-Class\" META-INF/MANIFEST.MF | cut -d: -f2 | tr -d ' \\r')\n",
+      "duration": 5.0
+    },
+    {
+      "keystrokes": "ls -l /app/output\n",
+      "duration": 0.2
+    }
+  ],
+  "task_complete": false
+}

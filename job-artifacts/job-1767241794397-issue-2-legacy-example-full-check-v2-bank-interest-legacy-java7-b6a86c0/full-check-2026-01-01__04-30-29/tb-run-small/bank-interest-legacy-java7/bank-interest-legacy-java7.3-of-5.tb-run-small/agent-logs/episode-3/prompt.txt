@@ -1,0 +1,22 @@
+New Terminal Output:
+
+root@16bf0d0350a5:/app# find /app -type f -name "*.java" 2>/dev/null
+root@16bf0d0350a5:/app# find /app -type f -name "*.jar" 2>/dev/null
+/app/job.jar
+root@16bf0d0350a5:/app# which curl || echo "curl not found"
+/usr/bin/curl
+root@16bf0d0350a5:/app# which apt-get || which yum || which apk || echo "no package manager found"
+/usr/bin/apt-get
+root@16bf0d0350a5:/app#
+
+
+
+
+
+
+
+
+
+
+
+

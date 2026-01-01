@@ -1,0 +1,45 @@
+New Terminal Output:
+
+root@16bf0d0350a5:/app# find / -type f \( -name "*.zip" -o -name "*.tar" -o -name "*.tgz" -o -name "*.tar.gz" \) 2>/dev/null | head -n 20
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/nio/zipfs/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/management/MemoryMonitor/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/management/JTop/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/management/VerboseGC/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/management/FullThreadDump/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/scripting/jconsole-plugin/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/SampleTree/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/Notepad/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/TransparentRuler/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/Font2DTest/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/Metalworks/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/TableExample/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/SwingApplet/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/FileChooserDemo/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jfc/CodePointIM/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jvmti/waiters/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jvmti/hprof/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jvmti/compiledMethodLoad/src.zip
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/demo/jvmti/mtrace/src.zip
+root@16bf0d0350a5:/app# find / -type f -name "*.java" 2>/dev/null | head -n 20
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/forkjoin/mergesort/MergeDemo.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/forkjoin/mergesort/MergeSort.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/multicast/MulticastAddress.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/multicast/Reader.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/multicast/Sender.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/ChannelIO.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/MalformedRequestException.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/DispatcherN.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Dispatcher1.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/RequestServicer.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Request.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/URLDumper.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/ChannelIOSecure.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/N1.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/B1.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/StringContent.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Server.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/AcceptHandler.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/Dispatcher.java
+/opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/sample/nio/server/FileContent.java
+root@16bf0d0350a5:/app#

@@ -1,0 +1,15 @@
+{
+  "analysis": "The /app directory only contains a 'data' subdirectory with the required input CSV and txt files. There is no source code, build scripts, or pre‑compiled JAR present. To fulfill the task we need a Java program (BankBatchJob) that reads the input files, performs the detailed financial calculations, writes the three output files and the H2 database, and then package it as /app/job.jar. Since no source is provided, we must create the Java source ourselves, compile it targeting Java 7 bytecode, and run it. The steps are:\n1. Create a src directory and write a Java class BankBatchJob implementing the required logic (reading CSVs, applying reversal, FX conversion, fees, interest, writing outputs, and interacting with H2). This is a substantial amount of code.\n2. Compile the source with javac -source 7 -target 7.\n3. Package the compiled classes into /app/job.jar.\n4. Ensure the H2 JDBC driver JAR is available (download if needed) and include it on the classpath when running the job.\n5. Execute the job, passing the JDBC URL (jdbc:h2:/app/output/bankdb;MODE=DB2) so it creates the required database.\n6. Verify that /app/output now contains interest.csv, exceptions.csv, stats.json, and bankdb.h2.db.\n\nBefore writing the Java code, we need to confirm that a Java compiler (javac) and the H2 driver are available. We'll also create a minimal build script (e.g., a simple shell script) to compile and run the job.\n\nThe immediate next step is to check if Java is installed and locate the H2 driver (or download it).",
+  "plan": "1. Check Java version and presence of javac.\n2. Download the H2 database JAR (if not present) to /app/h2.jar.\n3. Create a src directory and a placeholder BankBatchJob.java file (we will later fill in the detailed implementation). For now, just create the file to confirm the environment.\n4. Compile the Java source with javac targeting Java 7.\n5. Package the class into /app/job.jar.\n6. Run the job with the appropriate classpath (including h2.jar) and the required JDBC URL.\n\nWe will start by checking the Java installation.",
+  "commands": [
+    {
+      "keystrokes": "java -version\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "javac -version\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

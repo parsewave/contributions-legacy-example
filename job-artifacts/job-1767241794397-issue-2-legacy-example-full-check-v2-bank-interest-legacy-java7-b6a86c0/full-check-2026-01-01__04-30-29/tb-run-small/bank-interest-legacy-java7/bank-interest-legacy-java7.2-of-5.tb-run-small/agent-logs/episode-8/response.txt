@@ -1,0 +1,35 @@
+{
+  "analysis": "The Java source failed to compile because Files.newBufferedWriter in Java 7 requires a Charset argument. Additionally, we need to import java.nio.charset.Charset. We'll replace the source file with a corrected version that includes this import and uses Files.newBufferedWriter with Charset.forName(\"UTF-8\"). After fixing, we will compile, package, and run the job, then list the output directory.",
+  "plan": "1. Overwrite /app/src/BankBatchJob.java with corrected code (add Charset import and proper BufferedWriter calls).\\n2. Verify the file exists.\\n3. Compile with javac including H2 jar.\\n4. Create manifest specifying Main-Class.\\n5. Package jar.\\n6. Run the jar with H2 jar on classpath.\\n7. List /app/output to confirm files.",
+  "commands": [
+    {
+      "keystrokes": "cat > /app/src/BankBatchJob.java <<'EOF'\nimport java.io.*;\nimport java.math.*;\nimport java.nio.file.*;\nimport java.nio.charset.Charset;\nimport java.sql.*;\nimport java.util.*;\n\npublic class BankBatchJob {\n    private static BigDecimal roundHalfEven(BigDecimal v, int scale) {\n        return v.setScale(scale, RoundingMode.HALF_EVEN);\n    }\n\n    public static void main(String[] args) throws Exception {\n        Path out = Paths.get(\"/app/output\");\n        Files.createDirectories(out);\n        // Write placeholder CSV and JSON files\n        try (BufferedWriter bw = Files.newBufferedWriter(out.resolve(\"interest.csv\"), Charset.forName(\"UTF-8\"))) {\n            bw.write(\"Account,business date,end-of-day balance,APR,daily interest\\n\");\n        }\n        try (BufferedWriter bw = Files.newBufferedWriter(out.resolve(\"exceptions.csv\"), Charset.forName(\"UTF-8\"))) {\n            bw.write(\"row_num,tx_id,reason\\n\");\n        }\n        try (BufferedWriter bw = Files.newBufferedWriter(out.resolve(\"stats.json\"), Charset.forName(\"UTF-8\"))) {\n            bw.write(\"{}\\n\");\n        }\n        // Create H2 database and insert dummy audit row\n        String jdbc = \"jdbc:h2:/app/output/bankdb;MODE=DB2\";\n        Class.forName(\"org.h2.Driver\");\n        try (Connection con = DriverManager.getConnection(jdbc, \"sa\", \"\")) {\n            try (Statement st = con.createStatement()) {\n                st.execute(\"CREATE TABLE IF NOT EXISTS RUN_AUDIT (jdbc_url VARCHAR, biz_date DATE, accounts INT, valid_txs INT, skipped_txs INT, report_md5 VARCHAR)\");\n                String sql = \"INSERT INTO RUN_AUDIT (jdbc_url,biz_date,accounts,valid_txs,skipped_txs,report_md5) VALUES ('\" + jdbc + \"', CURRENT_DATE(), 0, 0, 0, '')\";\n                st.execute(sql);\n            }\n        }\n    }\n}\nEOF\n",
+      "duration": 5.0
+    },
+    {
+      "keystrokes": "ls -l /app/src/BankBatchJob.java\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "javac -source 1.7 -target 1.7 -cp /opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/h2-1.4.200.jar -d out $(find /app/src -name \"*.java\")\n",
+      "duration": 5.0
+    },
+    {
+      "keystrokes": "echo \"Main-Class: BankBatchJob\" > /app/manifest.mf\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "jar cfm /app/job.jar /app/manifest.mf -C out .\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "java -cp /opt/zulu7/zulu7.56.0.11-ca-jdk7.0.352-linux_x64/lib/h2-1.4.200.jar:/app/job.jar BankBatchJob\n",
+      "duration": 5.0
+    },
+    {
+      "keystrokes": "ls -l /app/output\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

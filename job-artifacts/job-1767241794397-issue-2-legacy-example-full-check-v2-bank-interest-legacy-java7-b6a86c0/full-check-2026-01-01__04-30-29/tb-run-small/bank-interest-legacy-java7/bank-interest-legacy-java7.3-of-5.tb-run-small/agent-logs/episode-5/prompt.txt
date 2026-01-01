@@ -1,0 +1,6 @@
+New Terminal Output:
+
+root@16bf0d0350a5:/app# find / -type f -iname "*BankBatchJob*" 2>/dev/null | head -n 20
+root@16bf0d0350a5:/app# find / -type f -name "*.class" 2>/dev/null | grep -i bank | head -n 20
+root@16bf0d0350a5:/app# find / -type f -name "*.jar" 2>/dev/null | grep -i bank | head -n 20
+root@16bf0d0350a5:/app#

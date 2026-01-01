@@ -1,0 +1,171 @@
+New Terminal Output:
+
+root@38af6b5d9dd5:/app# grep -n 'Date d =\|new Date(\|BigDecimal adj2 =\|total_interest' /app/src/BankBatchJob.java | head -50
+109:    Date d = DF.parse(yyyyMmDd);
+303:          pa.setString(2, DF.format(new Date(((long)a.openedDay)*86400000L)));
+440:      BigDecimal adj2 = amtAcct10.setScale(2,RM).subtract(fee2).setScale(2,RM);
+496:      "\"total_interest\":\""+total2.toPlainString()+"\","+
+root@38af6b5d9dd5:/app# perl -pi -e 's/\bDate d =/java.util.Date d =/g; s/new Date\(/new java.util.Date(/g' /app/src/BankBatchJob.java
+root@38af6b5d9dd5:/app# python - <<'PY'
+> from pathlib import Path
+> p=Path('/app/src/BankBatchJob.java')
+> s=p.read_text('utf-8')
+> s=s.replace('BigDecimal adj2 = amtAcct10.setScale(2,RM).subtract(fee2).setScale(2,RM);',
+d now convert that to numeric (remove the wrapping quotes in the JSON itself)
+s=s.replace('"\\"total_interest\\":"+total2.toPlainString()+","+',
+            '"\\"total_interest\\":"+total2.toPlainString()+","+')
+# (Most reliable) do the plain-text replace of the original line we saw in the earlier full version:
+s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+            '"\\"total_interest\\":"+total2.toPlainString()+","+')
+# If present in the file (as shown in terminal output):
+s=s.replace('\"total_interest\":\""+total2.toPlainString()+"\",',
+            '\"total_interest\":"+total2.toPlainString()+",')
+# Now the numeric form we actually want:
+s=s.replace('\"total_interest\":"+total2.toPlainString()+",',
+            '\"total_interest\":"+total2.toPlainString()+",')
+# If still string-form in unescaped form:
+s=s.replace('"total_interest":"'+"+total2.toPlainString()+"+'",',
+            '"total_interest":'+"+total2.toPlainString()+"+'",')
+
+p.write_text(s,'utf-8')
+print('patched')
+PY
+>             'BigDecimal adj2 = amtAcct10.subtract(fee2).setScale(2,RM);')
+> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+> # Now remove the extra quotes around total_interest (make it a number)
+> s=s.replace('"\\"total_interest\\":"+total2.toPlainString()+","+',
+>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+> # The line above keeps the quotes; fix precisely for numeric:
+> s=s.replace('"\\"total_interest\\":"+total2.toPlainString()+","+',
+>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+> # If the code is exactly as expected, do an exact replace:
+> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+> # Fallback: replace the actual source snippet seen earlier:
+> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+> # Final targeted replace based on the plain Java snippet:
+> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+> # If it was written without the extra escaping (common):
+> s=s.replace('"total_interest":"'+"+total2.toPlainString()+"+'",'+"+",
+>             '"total_interest":'+"+total2.toPlainString()+"+'",'+"+",
+>            )
+> # Safer: just do a direct replace of the exact line fragment
+> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+> # If still not replaced, do a regex replace
+> import re
+> s=re.sub(r'"\\"total_interest\\":\\""\+total2\.toPlainString\(\)\+"\\","\+','"\\"total_interest\\":"+total2.toPlainString()+","+',s)
+> # Now remove the quotes around the numeric value in JSON construction
+> s=re.sub(r'"\\"total_interest\\":\\""\+total2\.toPlainString\(\)\+"\\","\+','"\\"total_interest\\":"+total2.toPlainString()+","+',s)
+> # We actually want: "total_interest": + total2.toPlainString() + ,
+> s=re.sub(r'"\\"total_interest\\":\\""\+total2\.toPlainString\(\)\+"\\""', '"\\"total_interest\\":"+total2.toPlainString()', s)
+> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\""',
+>             '"\\"total_interest\\":"+total2.toPlainString()')
+> # Finally, correct to numeric (no quotes) if present as the straightforward line from our intended code:
+> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+> # If the source is exactly:
+> #   "\"total_interest\":\""+total2.toPlainString()+"\","+
+> # convert to:
+> #   "\"total_interest\":"+total2.toPlainString()+","+
+> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+> # And now convert that to numeric (remove the wrapping quotes in the JSON itself)
+> s=s.replace('"\\"total_interest\\":"+total2.toPlainString()+","+',
+>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+> # (Most reliable) do the plain-text replace of the original line we saw in the earlier full version:
+> s=s.replace('"\\"total_interest\\":\\""+total2.toPlainString()+"\\","+',
+>             '"\\"total_interest\\":"+total2.toPlainString()+","+')
+> # If present in the file (as shown in terminal output):
+> s=s.replace('\"total_interest\":\""+total2.toPlainString()+"\",',
+>             '\"total_interest\":"+total2.toPlainString()+",')
+> # Now the numeric form we actually want:
+> s=s.replace('\"total_interest\":"+total2.toPlainString()+",',
+>             '\"total_interest\":"+total2.toPlainString()+",')
+> # If still string-form in unescaped form:
+> s=s.replace('"total_interest":"'+"+total2.toPlainString()+"+'",',
+>             '"total_interest":'+"+total2.toPlainString()+"+'",')
+>
+> p.write_text(s,'utf-8')
+> print('patched')
+> PY
+patched
+root@38af6b5d9dd5:/app# python - <<'PY'
+> import re
+> from pathlib import Path
+> s=Path('/app/src/BankBatchJob.java').read_text('utf-8')
+> # Show the JSON construction area and adjusted line to confirm
+> for pat in [r'BigDecimal adj2 =.*', r'total_interest.*']:
+>     m=re.search(pat,s)
+>     print(pat, '=>', (m.group(0) if m else 'NOT FOUND'))
+> PY
+BigDecimal adj2 =.* => BigDecimal adj2 = amtAcct10.subtract(fee2).setScale(2,RM);
+total_interest.* => total_interest\":"+total2.toPlainString()+","+
+root@38af6b5d9dd5:/app# rm -rf /app/build/* /app/job.jar
+root@38af6b5d9dd5:/app# javac -cp /opt/legacy-lib/h2-1.3.176.jar -d /app/build /app/src/BankBatchJob.java
+root@38af6b5d9dd5:/app# cat > /app/manifest.mf <<'EOF'
+> Main-Class: BankBatchJob
+> EOF
+root@38af6b5d9dd5:/app# jar cfm /app/job.jar /app/manifest.mf -C /app/build .
+root@38af6b5d9dd5:/app# java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob
+root@38af6b5d9dd5:/app# ls -la /app/output
+total 64
+drwxr-xr-x 2 root root  4096 Jan  1 05:07 .
+drwxr-xr-x 7 root root  4096 Jan  1 05:07 ..
+-rw-r--r-- 1 root root 36864 Jan  1 05:07 bankdb.h2.db
+-rw-r--r-- 1 root root   411 Jan  1 05:07 bankdb.trace.db
+-rw-r--r-- 1 root root   259 Jan  1 05:07 exceptions.csv
+-rw-r--r-- 1 root root   206 Jan  1 05:07 interest.csv
+-rw-r--r-- 1 root root   139 Jan  1 05:07 stats.json
+root@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/interest.csv
+account_id,biz_date,eod_balance,apr,daily_interest
+A1001,2024-03-01,7965.47,0.012000,0.26
+A1002,2024-03-01,5127.11,0.009000,0.13
+A1003,2024-03-01,-0.80,0.020000,0.00
+A1004,2024-03-01,36500.00,0.010050,1.00
+root@38af6b5d9dd5:/app# sed -n '1,200p' /app/output/exceptions.csv
+row_num,tx_id,reason
+2,T002,AFTER_BIZ_DATE
+3,T003,PENDING
+5,T004,DUPLICATE
+6,T005,REVERSED
+7,T006,REVERSED
+9,T008,REVERSAL_MISSING
+10,T009,REVERSED
+11,T010,REVERSED
+13,T012,AFTER_BIZ_DATE
+17,T016,FX_MISSING
+18,T016,DUPLICATE
+19,T017,REVERSED
+20,T018,REVERSED
+root@38af6b5d9dd5:/app# python - <<'PY'
+> from pathlib import Path
+> p=Path('/app/output/stats.json')
+> b=p.read_bytes()
+> print('stats.json endswith newline?', b[-1:]==b"\n")
+> print('stats.json newline_count', b.count(b"\n"))
+> print(b.decode('utf-8'))
+> PY
+stats.json endswith newline? False
+stats.json newline_count 0
+{"biz_date":"2024-03-01","accounts":4,"valid_txs":7,"skipped_txs":13,"total_interest":1.39,"report_md5":"d6e6bfa87102a7be797a462843f8a087"}
+root@38af6b5d9dd5:/app# python - <<'PY'
+> from pathlib import Path
+> for f in ['/app/output/interest.csv','/app/output/exceptions.csv']:
+>     b=Path(f).read_bytes()
+>     print(f, 'last_byte', b[-1], 'newline_count', b.count(b"\n"))
+> PY
+/app/output/interest.csv last_byte 10 newline_count 5
+/app/output/exceptions.csv last_byte 10 newline_count 14
+root@38af6b5d9dd5:/app# cp -a /app/output /app/output_run1
+root@38af6b5d9dd5:/app# java -cp /app/job.jar:/opt/legacy-lib/h2-1.3.176.jar BankBatchJob
+root@38af6b5d9dd5:/app# diff -u /app/output_run1/interest.csv /app/output/interest.csv || true
+diff: /app/output_run1/interest.csv: No such file or directory
+root@38af6b5d9dd5:/app# diff -u /app/output_run1/exceptions.csv /app/output/exceptions.csv || true
+diff: /app/output_run1/exceptions.csv: No such file or directory
+root@38af6b5d9dd5:/app# diff -u /app/output_run1/stats.json /app/output/stats.json || true
+diff: /app/output_run1/stats.json: No such file or directory
+root@38af6b5d9dd5:/app#
